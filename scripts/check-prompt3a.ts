@@ -1,21 +1,28 @@
 import { db } from "../src/lib/db";
 import { CmsDraftKind, CmsDraftOperation, CmsDraftStatus } from "../src/generated/prisma/client";
 import { createCmsDraft, updateCmsDraft, submitCmsDraft, returnCmsDraft, withdrawCmsDraft, archiveCmsDraft, publishCmsDraft } from "../src/lib/cms-workflow";
-import { clearStaffLoginFailures, recordStaffLoginFailure, staffLoginAllowed } from "../src/lib/login-throttle";
+import { clearStaffLoginFailures, recordStaffLoginFailure, staffLoginAllowed, staffLoginAttemptKey } from "../src/lib/login-throttle";
 import { POST as adminLogin } from "../src/app/api/admin/login/route";
 import { POST as authLogin } from "../src/app/api/auth/[...all]/route";
 import { NextRequest } from "next/server";
 import { createStaffAccount, changeStaffRole, setStaffAccountActive, initiateStaffPasswordReset, completeStaffPasswordReset, disableEditorWithReassignment } from "../src/lib/staff-accounts";
 import { resolveCmsDraftTarget } from "../src/lib/cms-workflow";
+import { assertQaExecutionSafe } from "../src/lib/execution-safety";
 
 const suffix = Date.now().toString(36);
 let assertions = 0;
+let qaTenantId: string | undefined;
+const qaUserIds: string[] = [];
+const loginAttemptKeys = new Set<string>();
 const check: (value: unknown, message: string) => asserts value = (value, message) => { if (!value) throw new Error(message); assertions += 1; };
 
 async function main() {
+  assertQaExecutionSafe();
   const tenant = await db.tenant.create({ data: { slug: `prompt3a-${suffix}`, displayName: "Prompt 3A QA" } });
+  qaTenantId = tenant.id;
   const editor = await db.user.create({ data: { id: crypto.randomUUID(), name: "QA Editor", email: `p3a-editor-${suffix}@example.invalid` } });
   const admin = await db.user.create({ data: { id: crypto.randomUUID(), name: "QA Admin", email: `p3a-admin-${suffix}@example.invalid` } });
+  qaUserIds.push(editor.id, admin.id);
   await db.staffMembership.createMany({ data: [{ tenantId: tenant.id, userId: editor.id, role: "EDITOR" }, { tenantId: tenant.id, userId: admin.id, role: "ADMINISTRATOR" }] });
   const resolved = { id: tenant.id, slug: tenant.slug, displayName: tenant.displayName };
   const news = await db.newsNotice.create({ data: { tenantId: tenant.id, title: "Live", summary: "Live", isPublished: true, publishedAt: new Date() } });
@@ -76,19 +83,23 @@ async function main() {
   try { await publishCmsDraft({ tenant: resolved, actorUserId: admin.id, draftId: mediaDraft.id }); } catch (error) { mediaMessage = error instanceof Error ? error.message : ""; }
   check(mediaMessage === "This item has since been retired. This draft cannot be published.", "Retired MEDIA target was not blocked.");
   await clearStaffLoginFailures("qa@example.invalid", "127.0.0.1");
+  loginAttemptKeys.add(staffLoginAttemptKey("qa@example.invalid", "127.0.0.1"));
   for (let i = 0; i < 5; i += 1) await recordStaffLoginFailure("qa@example.invalid", "127.0.0.1");
   check(!(await staffLoginAllowed("qa@example.invalid", "127.0.0.1")), "Login throttle did not block repeated failures.");
+  loginAttemptKeys.add(staffLoginAttemptKey(`missing-${suffix}@example.invalid`, "127.0.0.2"));
   const loginResponse = await adminLogin(new Request("http://localhost/api/admin/login", {
     method: "POST", headers: { "content-type": "application/json", "x-forwarded-for": "127.0.0.2" },
     body: JSON.stringify({ email: `missing-${suffix}@example.invalid`, password: "not-a-password" }),
   }) as never);
   check(loginResponse.status === 401 && (await loginResponse.json()).error === "The email or password was not recognised.", "Login route did not return a generic failure.");
+  loginAttemptKeys.add(staffLoginAttemptKey(`direct-missing-${suffix}@example.invalid`, "127.0.0.3"));
   const directLoginResponse = await authLogin(new NextRequest("http://localhost/api/auth/sign-in/email", {
     method: "POST", headers: { "content-type": "application/json", "x-forwarded-for": "127.0.0.3" },
     body: JSON.stringify({ email: `direct-missing-${suffix}@example.invalid`, password: "not-a-password" }),
   }) as never);
   check(directLoginResponse.status === 401 && (await directLoginResponse.json()).error === "The email or password was not recognised.", "Direct Better Auth email endpoint bypassed the login guard.");
   const blockedEmail = `blocked-${suffix}@example.invalid`;
+  loginAttemptKeys.add(staffLoginAttemptKey(blockedEmail, "127.0.0.4"));
   for (let attempt = 0; attempt < 5; attempt += 1) {
     const failed = await adminLogin(new NextRequest("http://localhost/api/admin/login", {
       method: "POST", headers: { "content-type": "application/json", "x-forwarded-for": "127.0.0.4" },
@@ -104,6 +115,7 @@ async function main() {
   await clearStaffLoginFailures(blockedEmail, "127.0.0.4");
   check(await staffLoginAllowed(blockedEmail, "127.0.0.4"), "Successful-login clearing equivalent did not clear the durable throttle key.");
   const directEmail = `direct-blocked-${suffix}@example.invalid`;
+  loginAttemptKeys.add(staffLoginAttemptKey(directEmail, "127.0.0.5"));
   for (let attempt = 0; attempt < 5; attempt += 1) {
     const response = await authLogin(new NextRequest("http://localhost/api/auth/sign-in/email", { method: "POST", headers: { "content-type": "application/json", "x-forwarded-for": "127.0.0.5" }, body: JSON.stringify({ email: directEmail, password: "wrong" }) }));
     check(response.status === 401, "Direct auth threshold attempt did not fail generically.");
@@ -114,9 +126,11 @@ async function main() {
   const afterDirectBlocked = await db.staffLoginAttempt.findUniqueOrThrow({ where: { key: `${directEmail}|127.0.0.5` } });
   check(blockedDirectResponse.status === 401 && afterDirectBlocked.failures === beforeDirectBlocked.failures, "Direct auth guard dispatched after threshold instead of stopping at the durable guard.");
   const provisioned = await createStaffAccount({ tenant: resolved, actorUserId: admin.id, name: "Provisioned Editor", email: `provisioned-${suffix}@example.invalid`, password: "Strong-Password-123", role: "EDITOR" });
+  qaUserIds.push(provisioned.userId);
   check(provisioned.role === "EDITOR" && Boolean(await db.user.findUnique({ where: { id: provisioned.userId } })), "Staff provisioning did not create a linked user.");
   const adminTwo = await createStaffAccount({ tenant: resolved, actorUserId: admin.id, name: "Second Admin", email: `admin-two-${suffix}@example.invalid`, password: "Strong-Password-123", role: "ADMINISTRATOR" });
   const adminThree = await createStaffAccount({ tenant: resolved, actorUserId: admin.id, name: "Third Admin", email: `admin-three-${suffix}@example.invalid`, password: "Strong-Password-123", role: "ADMINISTRATOR" });
+  qaUserIds.push(adminTwo.userId, adminThree.userId);
   await changeStaffRole({ tenant: resolved, actorUserId: admin.id, membershipId: adminTwo.id, role: "EDITOR" });
   await changeStaffRole({ tenant: resolved, actorUserId: admin.id, membershipId: adminTwo.id, role: "ADMINISTRATOR" });
   await Promise.allSettled([
@@ -140,10 +154,31 @@ async function main() {
   let reusedReset = false;
   try { await completeStaffPasswordReset({ membershipId: provisioned.id, token: resetToken, password: "Another-Strong-Password-123" }); } catch { reusedReset = true; }
   check(reusedReset, "Reset token was reusable.");
+  const atomicReset = await initiateStaffPasswordReset({ tenant: resolved, actorUserId: admin.id, membershipId: provisioned.id, baseUrl: "http://127.0.0.1:5000" });
+  const atomicResetToken = decodeURIComponent(atomicReset.resetLink!.split("#token=")[1]);
+  await setStaffAccountActive({ tenant: resolved, actorUserId: admin.id, membershipId: provisioned.id, isActive: false });
+  let inactiveResetRejected = false;
+  try { await completeStaffPasswordReset({ membershipId: provisioned.id, token: atomicResetToken, password: "Atomic-Strong-Password-123" }); } catch { inactiveResetRejected = true; }
+  check(inactiveResetRejected, "Password reset succeeded for a disabled staff membership.");
+  await setStaffAccountActive({ tenant: resolved, actorUserId: admin.id, membershipId: provisioned.id, isActive: true });
+  let atomicResetPreserved = true;
+  try { await completeStaffPasswordReset({ membershipId: provisioned.id, token: atomicResetToken, password: "Atomic-Strong-Password-123" }); } catch { atomicResetPreserved = false; }
+  check(atomicResetPreserved, "A valid reset token was consumed after a failed completion.");
+  const concurrentReset = await initiateStaffPasswordReset({ tenant: resolved, actorUserId: admin.id, membershipId: provisioned.id, baseUrl: "http://127.0.0.1:5000" });
+  const concurrentResetToken = decodeURIComponent(concurrentReset.resetLink!.split("#token=")[1]);
+  const concurrentResults = await Promise.all([
+    completeStaffPasswordReset({ membershipId: provisioned.id, token: concurrentResetToken, password: "Concurrent-Strong-Password-123" }).then(() => true).catch(() => false),
+    completeStaffPasswordReset({ membershipId: provisioned.id, token: concurrentResetToken, password: "Concurrent-Strong-Password-456" }).then(() => true).catch(() => false),
+  ]);
+  check(concurrentResults.filter(Boolean).length === 1, "Concurrent reset completion did not allow exactly one success.");
   const assignedDraft = await createCmsDraft({ tenant: resolved, actorUserId: editor.id, kind: CmsDraftKind.NEWS, operation: CmsDraftOperation.CREATE, payload: { title: "Assigned", summary: "Assigned" } });
+  const assignedByOtherDraft = await createCmsDraft({ tenant: resolved, actorUserId: provisioned.userId, kind: CmsDraftKind.NEWS, operation: CmsDraftOperation.CREATE, payload: { title: "Assigned by another editor", summary: "Assigned by another editor" } });
+  await db.cmsDraft.update({ where: { id: assignedByOtherDraft.id }, data: { assignedTo: editor.id } });
   await disableEditorWithReassignment({ tenant: resolved, actorUserId: admin.id, membershipId: (await db.staffMembership.findUniqueOrThrow({ where: { tenantId_userId: { tenantId: tenant.id, userId: editor.id } } })).id, assigneeUserId: provisioned.userId });
   const reassigned = await db.cmsDraft.findUniqueOrThrow({ where: { id: assignedDraft.id } });
   check(reassigned.assignedTo === provisioned.userId, "Disable/reassignment did not preserve assigned ownership.");
+  const reassignedByOther = await db.cmsDraft.findUniqueOrThrow({ where: { id: assignedByOtherDraft.id } });
+  check(reassignedByOther.assignedTo === provisioned.userId, "Disable/reassignment missed a draft assigned to the disabled editor.");
   await updateCmsDraft({ tenant: resolved, actorUserId: provisioned.userId, draftId: assignedDraft.id, revision: reassigned.revision, payload: { title: "Assigned revised", summary: "Assigned revised" } });
   await submitCmsDraft({ tenant: resolved, actorUserId: provisioned.userId, draftId: assignedDraft.id });
   const retiredResolved = await resolveCmsDraftTarget(resolved, CmsDraftKind.MEDIA, retiredMedia.id);
@@ -160,14 +195,35 @@ async function main() {
   check(auditActions.filter((entry) => entry.action.startsWith("STAFF_")).every((entry) => !JSON.stringify(entry.changeMetadata).match(/password|resetLink|token/i)), "Staff audit metadata exposed secret material.");
   check((await db.cmsDraft.findMany({ where: { tenantId: tenant.id, status: { in: [CmsDraftStatus.DRAFT, CmsDraftStatus.WAITING_FOR_APPROVAL, CmsDraftStatus.RETURNED_FOR_CHANGES] } } })).every((draft) => draft.tenantId === tenant.id), "Pending count escaped tenant scope.");
   console.info(JSON.stringify({ assertions, script: "check-prompt3a" }));
-  await db.auditLog.deleteMany({ where: { tenantId: tenant.id } });
-  await db.cmsDraft.deleteMany({ where: { tenantId: tenant.id } });
-  await db.newsNotice.deleteMany({ where: { tenantId: tenant.id } });
-  await db.siteNotice.deleteMany({ where: { tenantId: tenant.id } });
-  await db.mediaAsset.deleteMany({ where: { tenantId: tenant.id } });
-  await db.staffMembership.deleteMany({ where: { tenantId: tenant.id } });
-  await db.tenant.delete({ where: { id: tenant.id } });
-  await db.user.deleteMany({ where: { id: { in: [editor.id, admin.id, provisioned.userId] } } });
+  await cleanupAfterFailure();
+  qaTenantId = undefined;
 }
 
-main().catch((error) => { console.error(error); process.exitCode = 1; }).finally(() => db.$disconnect());
+async function cleanupAfterFailure() {
+  if (!qaTenantId) return;
+  const [audits, drafts, news, notices, media, memberships] = await Promise.all([
+    db.auditLog.findMany({ where: { tenantId: qaTenantId }, select: { id: true } }),
+    db.cmsDraft.findMany({ where: { tenantId: qaTenantId }, select: { id: true } }),
+    db.newsNotice.findMany({ where: { tenantId: qaTenantId }, select: { id: true } }),
+    db.siteNotice.findMany({ where: { tenantId: qaTenantId }, select: { id: true } }),
+    db.mediaAsset.findMany({ where: { tenantId: qaTenantId }, select: { id: true } }),
+    db.staffMembership.findMany({ where: { tenantId: qaTenantId }, select: { id: true } }),
+  ]);
+  const ids = (rows: Array<{ id: string }>) => rows.map((row) => row.id);
+  const loginAttempts = await db.staffLoginAttempt.findMany({ where: { key: { in: [...loginAttemptKeys] } }, select: { id: true } });
+  await db.auditLog.deleteMany({ where: { id: { in: ids(audits) } } });
+  await db.staffLoginAttempt.deleteMany({ where: { id: { in: ids(loginAttempts) } } });
+  await db.cmsDraft.deleteMany({ where: { id: { in: ids(drafts) } } });
+  await db.newsNotice.deleteMany({ where: { id: { in: ids(news) } } });
+  await db.siteNotice.deleteMany({ where: { id: { in: ids(notices) } } });
+  await db.mediaAsset.deleteMany({ where: { id: { in: ids(media) } } });
+  await db.staffMembership.deleteMany({ where: { id: { in: ids(memberships) } } });
+  await db.tenant.delete({ where: { id: qaTenantId } });
+  await db.user.deleteMany({ where: { id: { in: qaUserIds } } });
+}
+
+main().catch(async (error) => {
+  try { await cleanupAfterFailure(); } catch (cleanupError) { console.error(cleanupError); }
+  console.error(error);
+  process.exitCode = 1;
+}).finally(() => db.$disconnect());

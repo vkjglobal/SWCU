@@ -9,6 +9,7 @@ import {
 } from "../src/lib/media-service";
 import { getR2Client, readMediaObject } from "../src/lib/r2";
 import { getServerEnvironment } from "../src/lib/env";
+import { assertQaExecutionSafe } from "../src/lib/execution-safety";
 
 const testEmail = `prompt2-media-qa-${Date.now()}@example.invalid`;
 const mediaIds: string[] = [];
@@ -18,6 +19,7 @@ const formDocumentIds: string[] = [];
 let userId: string | undefined;
 
 async function main() {
+  assertQaExecutionSafe();
   const tenant = await db.tenant.findUniqueOrThrow({
     where: { slug: "swcu" },
     select: { id: true, slug: true, displayName: true },
@@ -185,35 +187,24 @@ async function main() {
 
 async function cleanup() {
   const environment = getServerEnvironment();
-  if (heroSlideIds.length) {
-    await db.homeHeroSlide.deleteMany({ where: { id: { in: heroSlideIds } } });
-  }
-  if (formDocumentIds.length) {
-    await db.formDocument.deleteMany({
-      where: { id: { in: formDocumentIds } },
-    });
-  }
-  if (mediaIds.length) {
-    await db.auditLog.deleteMany({
-      where: { targetType: "MediaAsset", targetId: { in: mediaIds } },
-    });
-    await db.mediaAsset.deleteMany({ where: { id: { in: mediaIds } } });
-  }
-  if (userId) {
-    await db.user.deleteMany({ where: { id: userId } });
-  }
-  await Promise.all(
-    objectKeys.map((Key) =>
-      getR2Client().send(
-        new DeleteObjectCommand({
-          Bucket: environment.R2_BUCKET_NAME,
-          Key,
-        }),
-      ),
-    ),
-  );
-  getR2Client().destroy();
+  const errors: string[] = [];
+  const attempt = async (label: string, action: () => Promise<unknown>) => {
+    try { await action(); } catch (error) { errors.push(`${label}: ${error instanceof Error ? error.message : String(error)}`); }
+  };
+  const client = getR2Client();
+  await attempt("R2 objects", async () => {
+    for (const Key of objectKeys) {
+      await client.send(new DeleteObjectCommand({ Bucket: environment.R2_BUCKET_NAME, Key }));
+    }
+  });
+  await attempt("Hero slides", async () => { if (heroSlideIds.length) await db.homeHeroSlide.deleteMany({ where: { id: { in: heroSlideIds } } }); });
+  await attempt("Form documents", async () => { if (formDocumentIds.length) await db.formDocument.deleteMany({ where: { id: { in: formDocumentIds } } }); });
+  await attempt("Media audits", async () => { if (mediaIds.length) await db.auditLog.deleteMany({ where: { targetType: "MediaAsset", targetId: { in: mediaIds } } }); });
+  await attempt("Media rows", async () => { if (mediaIds.length) await db.mediaAsset.deleteMany({ where: { id: { in: mediaIds } } }); });
+  await attempt("QA user", async () => { if (userId) await db.user.delete({ where: { id: userId } }); });
+  client.destroy();
   await db.$disconnect();
+  if (errors.length) throw new Error(`Media QA cleanup failures: ${errors.join("; ")}`);
 }
 
 main()

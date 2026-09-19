@@ -64,12 +64,6 @@ a {
   text-decoration: none;
 }
 
-.mobile-member-login {
-  color: #fff;
-  background: #163b5c;
-  border-color: #176db3;
-}
-
 button,
 a {
   -webkit-tap-highlight-color: transparent;
@@ -114,10 +108,8 @@ a {
   color: #176db3;
 }
 
-.header-join,
-.header-member-login {
-  display: none;
-}
+.header-join { display: none; }
+.header-member-login { display: inline-flex; }
 
 @media (min-width: 640px) {
   .header-member-login {

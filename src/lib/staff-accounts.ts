@@ -61,7 +61,26 @@ export async function setStaffAccountActive(input: { tenant: ResolvedTenant; act
     }
     const updated = await tx.staffMembership.update({ where: { id: membership.id }, data: { isActive: input.isActive } });
     if (!input.isActive) {
-      await tx.cmsDraft.updateMany({ where: { tenantId: input.tenant.id, createdBy: membership.userId, assignedTo: null, status: { in: ["DRAFT", "WAITING_FOR_APPROVAL", "RETURNED_FOR_CHANGES"] } }, data: { assignedTo: null } });
+      const drafts = await tx.cmsDraft.updateMany({
+        where: {
+          tenantId: input.tenant.id,
+          OR: [{ createdBy: membership.userId }, { assignedTo: membership.userId }],
+          status: { in: ["DRAFT", "WAITING_FOR_APPROVAL", "RETURNED_FOR_CHANGES"] },
+        },
+        data: { assignedTo: null },
+      });
+      if (drafts.count > 0) {
+        await tx.auditLog.create({
+          data: {
+            tenantId: input.tenant.id,
+            actorUserId: input.actorUserId,
+            action: "STAFF_DRAFTS_UNASSIGNED",
+            targetType: "StaffMembership",
+            targetId: membership.id,
+            changeMetadata: { count: drafts.count },
+          },
+        });
+      }
     }
     return { membership, updated };
   });
@@ -82,7 +101,11 @@ export async function disableEditorWithReassignment(input: {
     const replacement = await tx.staffMembership.findUnique({ where: { tenantId_userId: { tenantId: input.tenant.id, userId: input.assigneeUserId } } });
     if (!member || !replacement?.isActive || replacement.role !== StaffRole.EDITOR) throw new Error("Choose an active replacement Editor.");
     const drafts = await tx.cmsDraft.updateMany({
-      where: { tenantId: input.tenant.id, createdBy: member.userId, status: { in: [CmsDraftStatus.DRAFT, CmsDraftStatus.WAITING_FOR_APPROVAL, CmsDraftStatus.RETURNED_FOR_CHANGES] } },
+      where: {
+        tenantId: input.tenant.id,
+        OR: [{ createdBy: member.userId }, { assignedTo: member.userId }],
+        status: { in: [CmsDraftStatus.DRAFT, CmsDraftStatus.WAITING_FOR_APPROVAL, CmsDraftStatus.RETURNED_FOR_CHANGES] },
+      },
       data: { assignedTo: replacement.userId, revision: { increment: 1 } },
     });
     const updated = await tx.staffMembership.update({ where: { id: member.id }, data: { isActive: false } });
@@ -119,17 +142,29 @@ export async function completeStaffPasswordReset(input: { membershipId: string; 
   const context = await auth.$context;
   const identifier = `staff-password-reset:${input.membershipId}`;
   const value = createHash("sha256").update(input.token).digest("hex");
-  const stored = await context.internalAdapter.findVerificationValue(identifier);
-  const supplied = Buffer.from(value);
-  const expected = Buffer.from(stored?.value ?? "");
-  if (!stored || supplied.length !== expected.length || !timingSafeEqual(supplied, expected) || stored.expiresAt <= new Date()) throw new Error("This password reset link is invalid or expired.");
-  const consumed = await context.internalAdapter.consumeVerificationValue(identifier);
-  if (!consumed || consumed.value !== stored.value) throw new Error("This password reset link is invalid or expired.");
-  const membership = await db.staffMembership.findUnique({ where: { id: input.membershipId } });
-  if (!membership?.isActive) throw new Error("This password reset link is invalid or expired.");
-  const account = await context.internalAdapter.findCredentialAccount(membership.userId);
-  if (!account) throw new Error("Staff credential account is unavailable.");
-  await context.internalAdapter.updateAccount(account.id, { password: await context.password.hash(input.password) });
-  await context.internalAdapter.deleteUserSessions(membership.userId);
+  const password = await context.password.hash(input.password);
+  await db.$transaction(async (tx) => {
+    const rows = await tx.$queryRaw<Array<{ value: string; expiresAt: Date }>>`
+      SELECT "value", "expiresAt"
+      FROM "verifications"
+      WHERE "identifier" = ${identifier}
+      FOR UPDATE
+    `;
+    const stored = rows[0];
+    const supplied = Buffer.from(value);
+    const expected = Buffer.from(stored?.value ?? "");
+    if (!stored || supplied.length !== expected.length || !timingSafeEqual(supplied, expected) || stored.expiresAt <= new Date()) {
+      throw new Error("This password reset link is invalid or expired.");
+    }
+    const membership = await tx.staffMembership.findUnique({ where: { id: input.membershipId } });
+    if (!membership?.isActive) throw new Error("This password reset link is invalid or expired.");
+    const account = await tx.account.findFirst({ where: { userId: membership.userId, providerId: "credential" } });
+    if (!account) throw new Error("Staff credential account is unavailable.");
+    await tx.account.update({ where: { id: account.id }, data: { password } });
+    const consumed = await tx.verification.deleteMany({ where: { identifier, value, expiresAt: { gt: new Date() } } });
+    if (consumed.count !== 1) throw new Error("This password reset link is invalid or expired.");
+  });
+  const membership = await db.staffMembership.findUnique({ where: { id: input.membershipId }, select: { userId: true } });
+  if (membership) await context.internalAdapter.deleteUserSessions(membership.userId);
   return { completed: true };
 }

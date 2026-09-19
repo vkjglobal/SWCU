@@ -12,6 +12,7 @@ import { uploadDocument, uploadMedia } from "../src/lib/media-service";
 import { getR2Client } from "../src/lib/r2";
 import { mediaCacheControl } from "../src/lib/media-cache";
 import { canServeMedia } from "../src/lib/media-access";
+import { assertQaExecutionSafe } from "../src/lib/execution-safety";
 
 const suffix = Date.now().toString(36);
 const mediaKeys: string[] = [];
@@ -26,6 +27,7 @@ function check(condition: unknown, message: string): asserts condition {
 }
 
 async function main() {
+  assertQaExecutionSafe();
   const tenant = await db.tenant.create({
     data: { slug: `prompt2-workflow-${suffix}`, displayName: "Prompt 2 workflow QA" },
   });
@@ -51,11 +53,14 @@ async function main() {
   const resolved = { id: tenant.id, slug: tenant.slug, displayName: tenant.displayName };
 
   const heroMedia = await uploadMedia({ tenant: resolved, actorUserId: admin.id, purpose: "hero", altText: "Published hero", file: new NodeFile([image], "hero.jpg", { type: "image/jpeg" }) as unknown as File });
+  mediaKeys.push(heroMedia.objectKey);
   const heroReplacement = await uploadMedia({ tenant: resolved, actorUserId: editor.id, purpose: "hero", altText: "Draft hero", file: new NodeFile([replacementImage], "hero-replacement.jpg", { type: "image/jpeg" }) as unknown as File });
+  mediaKeys.push(heroReplacement.objectKey);
   const formMedia = await uploadDocument({ tenant: resolved, actorUserId: admin.id, altText: "Published form", file: new NodeFile([pdf], "published.pdf", { type: "application/pdf" }) as unknown as File });
+  mediaKeys.push(formMedia.objectKey);
   const formReplacement = await uploadDocument({ tenant: resolved, actorUserId: editor.id, altText: "Draft form", file: new NodeFile([pdf], "replacement.pdf", { type: "application/pdf" }) as unknown as File });
+  mediaKeys.push(formReplacement.objectKey);
   mediaIds.push(heroMedia.id, heroReplacement.id, formMedia.id, formReplacement.id);
-  mediaKeys.push(heroMedia.objectKey, heroReplacement.objectKey, formMedia.objectKey, formReplacement.objectKey);
 
   const hero = await db.homeHeroSlide.create({ data: { tenantId: tenant.id, mediaAssetId: heroMedia.id, altText: "Published hero", isEnabled: true } });
   const form = await db.formDocument.create({ data: { tenantId: tenant.id, mediaAssetId: formMedia.id, title: "Published form", isEnabled: true } });
@@ -112,15 +117,15 @@ async function main() {
   check((await db.mediaAsset.findUniqueOrThrow({ where: { id: heroReplacement.id } })).retiredAt === null, "Shared Hero REMOVE retired an asset still referenced.");
   const sharedHeroReplace = await db.homeHeroSlide.create({ data: { tenantId: tenant.id, mediaAssetId: heroReplacement.id, altText: "Shared replace", isEnabled: true } });
   const heroReplaceMedia = await uploadMedia({ tenant: resolved, actorUserId: editor.id, purpose: "hero", altText: "Shared replacement", file: new NodeFile([image], "shared-hero-replacement.jpg", { type: "image/jpeg" }) as unknown as File });
-  mediaIds.push(heroReplaceMedia.id);
   mediaKeys.push(heroReplaceMedia.objectKey);
+  mediaIds.push(heroReplaceMedia.id);
   const sharedHeroReplaceDraft = await createCmsDraft({ tenant: resolved, actorUserId: editor.id, kind: CmsDraftKind.HERO, operation: CmsDraftOperation.REPLACE, targetId: sharedHeroReplace.id, mediaAssetId: heroReplaceMedia.id, payload: { mediaAssetId: heroReplaceMedia.id, altText: "Shared replacement" } });
   await publishCmsDraft({ tenant: resolved, actorUserId: admin.id, draftId: sharedHeroReplaceDraft.id });
   check((await db.mediaAsset.findUniqueOrThrow({ where: { id: heroReplacement.id } })).retiredAt === null, "Shared Hero REPLACE retired an asset still referenced.");
   const sharedForm = await db.formDocument.create({ data: { tenantId: tenant.id, mediaAssetId: formReplacement.id, title: "Shared form", isEnabled: true } });
   const sharedFormReplacement = await uploadDocument({ tenant: resolved, actorUserId: editor.id, altText: "Shared form replacement", file: new NodeFile([pdf], "shared-replacement.pdf", { type: "application/pdf" }) as unknown as File });
-  mediaIds.push(sharedFormReplacement.id);
   mediaKeys.push(sharedFormReplacement.objectKey);
+  mediaIds.push(sharedFormReplacement.id);
   const sharedFormDraft = await createCmsDraft({ tenant: resolved, actorUserId: editor.id, kind: CmsDraftKind.FORM_DOCUMENT, operation: CmsDraftOperation.REPLACE, targetId: form.id, mediaAssetId: sharedFormReplacement.id, payload: { title: form.title, mediaAssetId: sharedFormReplacement.id, isEnabled: true } });
   await publishCmsDraft({ tenant: resolved, actorUserId: admin.id, draftId: sharedFormDraft.id });
   check((await db.mediaAsset.findUniqueOrThrow({ where: { id: formReplacement.id } })).retiredAt === null, "Shared Form replacement retired an asset still referenced.");
@@ -166,24 +171,42 @@ async function main() {
 }
 
 async function cleanup() {
+  const errors: string[] = [];
+  const attempt = async (label: string, action: () => Promise<unknown>) => {
+    try { await action(); } catch (error) { errors.push(`${label}: ${error instanceof Error ? error.message : String(error)}`); }
+  };
   if (tenantId) {
-    await db.auditLog.deleteMany({ where: { tenantId } });
-    await db.cmsDraft.deleteMany({ where: { tenantId } });
-    await db.formDocument.deleteMany({ where: { tenantId } });
-    await db.homeHeroSlide.deleteMany({ where: { tenantId } });
-    await db.newsNotice.deleteMany({ where: { tenantId } });
-    await db.fAQ.deleteMany({ where: { tenantId } });
-    await db.siteNotice.deleteMany({ where: { tenantId } });
-    await db.staffMembership.deleteMany({ where: { tenantId } });
-    await db.mediaAsset.deleteMany({ where: { tenantId } });
-    await db.tenant.delete({ where: { id: tenantId } });
+    const ids = await Promise.all([
+      db.auditLog.findMany({ where: { tenantId }, select: { id: true } }),
+      db.cmsDraft.findMany({ where: { tenantId }, select: { id: true } }),
+      db.formDocument.findMany({ where: { tenantId }, select: { id: true } }),
+      db.homeHeroSlide.findMany({ where: { tenantId }, select: { id: true } }),
+      db.newsNotice.findMany({ where: { tenantId }, select: { id: true } }),
+      db.fAQ.findMany({ where: { tenantId }, select: { id: true } }),
+      db.siteNotice.findMany({ where: { tenantId }, select: { id: true } }),
+      db.staffMembership.findMany({ where: { tenantId }, select: { id: true } }),
+      db.mediaAsset.findMany({ where: { tenantId }, select: { id: true, objectKey: true } }),
+    ]);
+    await attempt("R2 objects", async () => {
+      const client = getR2Client();
+      for (const media of ids[8]) await client.send(new DeleteObjectCommand({ Bucket: process.env.R2_BUCKET_NAME, Key: media.objectKey }));
+      client.destroy();
+    });
+    await attempt("audit rows", async () => { if (ids[0].length) await db.auditLog.deleteMany({ where: { id: { in: ids[0].map((row) => row.id) } } }); });
+    await attempt("draft rows", async () => { if (ids[1].length) await db.cmsDraft.deleteMany({ where: { id: { in: ids[1].map((row) => row.id) } } }); });
+    await attempt("form rows", async () => { if (ids[2].length) await db.formDocument.deleteMany({ where: { id: { in: ids[2].map((row) => row.id) } } }); });
+    await attempt("hero rows", async () => { if (ids[3].length) await db.homeHeroSlide.deleteMany({ where: { id: { in: ids[3].map((row) => row.id) } } }); });
+    await attempt("news rows", async () => { if (ids[4].length) await db.newsNotice.deleteMany({ where: { id: { in: ids[4].map((row) => row.id) } } }); });
+    await attempt("FAQ rows", async () => { if (ids[5].length) await db.fAQ.deleteMany({ where: { id: { in: ids[5].map((row) => row.id) } } }); });
+    await attempt("notice rows", async () => { if (ids[6].length) await db.siteNotice.deleteMany({ where: { id: { in: ids[6].map((row) => row.id) } } }); });
+    await attempt("membership rows", async () => { if (ids[7].length) await db.staffMembership.deleteMany({ where: { id: { in: ids[7].map((row) => row.id) } } }); });
+    await attempt("media rows", async () => { if (ids[8].length) await db.mediaAsset.deleteMany({ where: { id: { in: ids[8].map((row) => row.id) } } }); });
+    await attempt("tenant fixture", () => db.tenant.delete({ where: { id: tenantId } }));
   }
-  if (adminId) await db.user.deleteMany({ where: { id: adminId } });
-  if (editorId) await db.user.deleteMany({ where: { id: editorId } });
-  const client = getR2Client();
-  await Promise.all(mediaKeys.map((Key) => client.send(new DeleteObjectCommand({ Bucket: process.env.R2_BUCKET_NAME, Key }))));
-  client.destroy();
+  if (adminId) await attempt("administrator fixture", () => db.user.delete({ where: { id: adminId } }));
+  if (editorId) await attempt("editor fixture", () => db.user.delete({ where: { id: editorId } }));
   await db.$disconnect();
+  if (errors.length) throw new Error(`CMS workflow cleanup failures: ${errors.join("; ")}`);
 }
 
 main().finally(cleanup).catch((error) => { console.error(error); process.exitCode = 1; });

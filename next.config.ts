@@ -6,7 +6,7 @@ const allowedDevOrigins = ["127.0.0.1", process.env.REPLIT_DEV_DOMAIN].filter(
 
 const nextConfig: NextConfig = {
   agentRules: false,
-  allowedDevOrigins,
+  ...(process.env.NODE_ENV === "development" ? { allowedDevOrigins } : {}),
   poweredByHeader: false,
   reactStrictMode: true,
 };

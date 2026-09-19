@@ -9,6 +9,8 @@
   "scripts": {
     "dev": "next dev -H 0.0.0.0 -p ${PORT:-3000}",
     "build": "next build",
+    "prebuild": "prisma generate",
+    "postinstall": "prisma generate",
     "start": "next start -H 0.0.0.0 -p ${PORT:-3000}",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
@@ -22,6 +24,9 @@
     "check:prompt3a": "NODE_OPTIONS=--conditions=react-server tsx scripts/check-prompt3a.ts",
     "check:prompt3b": "NODE_OPTIONS=--conditions=react-server tsx scripts/check-prompt3b.ts",
     "check:prompt3b:http": "NODE_OPTIONS=--conditions=react-server tsx scripts/check-prompt3b-http.ts",
+    "check:seed-safety": "NODE_OPTIONS=--conditions=react-server tsx scripts/check-seed-safety.ts",
+    "check:qa-residue": "NODE_OPTIONS=--conditions=react-server tsx scripts/check-qa-residue.ts",
+    "check:migrations": "tsx scripts/check-migrations.ts",
     "check:tenant": "tsx scripts/check-tenant.ts",
     "bootstrap:admin": "tsx scripts/bootstrap-admin.ts"
   },

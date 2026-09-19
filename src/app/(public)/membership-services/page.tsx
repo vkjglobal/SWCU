@@ -3,7 +3,7 @@ import Link from "next/link";
 import { headers } from "next/headers";
 import { requireTenant } from "@/lib/tenant";
 import { getCalculatorSettings, getPublishedPageContent, getPublishedRates, getPublishedResources } from "@/lib/public-data";
-import { AnchorNav, AvailabilityState, Content, InnerHero, ResourceCard } from "../_components";
+import { AnchorNav, Content, InnerHero, ResourceCard } from "../_components";
 import { buildPublicMetadata } from "../metadata";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -23,8 +23,8 @@ export default async function MembershipServicesPage() {
   const membershipForms = resources.forms.filter((form) => /membership/i.test(form.title) && form.mediaAssetId);
 
   return <><InnerHero eyebrow="Membership & Services" title="Membership & Member Services" summary={by("MEMBERSHIP_INTRO")?.body?.split(/\n/)[0]} /><AnchorNav items={sections.map(([id, label]) => [id, label])} /><div className="site-container section-shell"><div className="grid gap-12 lg:grid-cols-[1fr_.72fr]"><div className="grid gap-12">
-    {sections.map(([id, label, slot]) => <section id={id} key={id} className="scroll-mt-36">
-       {by(slot) ? <Content heading={by(slot)?.heading || label} body={by(slot)?.body} /> : <AvailabilityState heading={label}>Approved information for this service is not currently available.</AvailabilityState>}
+     {sections.map(([id, label, slot]) => <section id={id} key={id} className="scroll-mt-36">
+        {by(slot) && <Content heading={by(slot)?.heading || label} body={by(slot)?.body} />}
       {id === "membership" && <div id="joining" className="mt-8 scroll-mt-36 rounded-2xl bg-soft-blue-grey p-7">
         <p className="eyebrow">Joining SWCU</p><h2 className="display-heading mt-3 text-3xl font-bold text-deep-navy">Become a Member</h2>
         <ol className="mt-6 grid gap-4 text-charcoal/80">

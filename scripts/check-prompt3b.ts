@@ -5,6 +5,7 @@ import { CmsDraftKind, CmsDraftOperation } from "../src/generated/prisma/client"
 import { createCmsDraft, submitCmsDraft, publishCmsDraft } from "../src/lib/cms-workflow";
 import { uploadDocument } from "../src/lib/media-service";
 import { deleteMediaObject } from "../src/lib/r2";
+import { assertQaExecutionSafe } from "../src/lib/execution-safety";
 
 let assertions = 0;
 const qaContactIds = new Set<string>();
@@ -13,57 +14,66 @@ const qaDraftIds = new Set<string>();
 const qaObjectKeys = new Set<string>();
 const qaMediaIds = new Set<string>();
 const qaRateKeys = new Set<string>();
+const suffix = Date.now().toString(36);
+let fixtureTenantId: string | undefined;
+const fixtureActorIds = new Set<string>();
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(`Prompt 3B assertion failed: ${message}`);
   assertions += 1;
 }
 
 async function runAssertions() {
-  const tenant = await db.tenant.findUniqueOrThrow({ where: { slug: "swcu" }, select: { id: true, slug: true, displayName: true } });
-  await db.pageContent.deleteMany({ where: { tenantId: tenant.id, body: { in: ["QA privacy", "HTTP QA privacy"] } } });
-  await db.staffMembership.deleteMany({ where: { tenantId: tenant.id, userId: { in: ["prompt3b-qa-admin", "prompt3b-qa-editor"] } } });
-  await db.cmsDraft.deleteMany({ where: { tenantId: tenant.id, createdBy: { in: ["prompt3b-qa-admin", "prompt3b-qa-editor"] } } });
-  await db.user.deleteMany({ where: { id: { in: ["prompt3b-qa-admin", "prompt3b-qa-editor"] } } }).catch(() => undefined);
-  const other = await db.tenant.findFirst({ where: { id: { not: tenant.id } }, select: { id: true, slug: true, displayName: true } });
-  assert(tenant.displayName === "Service Worker Credit Union", "seeded tenant");
-  assert((await db.calculatorSettings.findUnique({ where: { tenantId: tenant.id } }))?.isEnabled === false, "calculator remains inactive");
-  const story = await db.pageContent.findUnique({ where: { tenantId_slot: { tenantId: tenant.id, slot: "ABOUT_STORY" } } });
-  const loans = await db.pageContent.findUnique({ where: { tenantId_slot: { tenantId: tenant.id, slot: "LOANS_INTRO" } } });
-  assert(story?.heading === "Our Story" && story.body === "Founded around 2000; now serving members from 300 Waimanu Road." && story.isPublished && loans?.heading === "Loans" && loans.body === "SWCU loans are for provident or productive purposes. Applications are considered against repayment ability, income or salary, and the member account position." && loans.isPublished, "exact approved public copy");
+  assertQaExecutionSafe();
+  const publicTenant = await db.tenant.findUniqueOrThrow({ where: { slug: "swcu" }, select: { id: true, slug: true, displayName: true } });
+  const other = await db.tenant.findFirst({ where: { id: { not: publicTenant.id } }, select: { id: true, slug: true, displayName: true } });
+  assert(publicTenant.displayName === "Service Worker Credit Union", "seeded tenant");
+  assert((await db.calculatorSettings.findUnique({ where: { tenantId: publicTenant.id } }))?.isEnabled === false, "calculator remains inactive");
+  const story = await db.pageContent.findUnique({ where: { tenantId_slot: { tenantId: publicTenant.id, slot: "ABOUT_STORY" } } });
+  const loans = await db.pageContent.findUnique({ where: { tenantId_slot: { tenantId: publicTenant.id, slot: "LOANS_INTRO" } } });
+  assert(story?.heading === "Our Story" && story.body === "Service Worker Credit Union began on 23 August 2000, when a group of Fiji Public Service Association members met in Suva to establish a credit union for members. Today, SWCU serves its members from 300 Waimanu Road, Suva." && story.isPublished && loans?.heading === "Loans" && loans.body === "SWCU provides member loans for provident or productive purposes. Applications are considered against repayment ability, income or salary, and the member’s account position." && loans.isPublished, "exact approved public copy");
+  const approvedSlots = ["ABOUT_STORY", "ABOUT_VISION", "ABOUT_MISSION", "ABOUT_PURPOSE", "MEMBERSHIP_INTRO", "SAVINGS_INTRO", "LOANS_INTRO", "RETIREMENT_INTRO", "DEATH_BENEFIT_INTRO"];
+  assert((await db.pageContent.count({ where: { tenantId: publicTenant.id, slot: { in: approvedSlots }, isPublished: true } })) === approvedSlots.length, "all approved public copy slots are published");
   const forbiddenSlots = ["VISION", "MISSION", "PURPOSE", "GOVERNANCE", "SAVINGS", "RETIREMENT", "DEATH_BENEFIT", "TERMS"];
-  assert((await db.pageContent.count({ where: { tenantId: tenant.id, slot: { in: [...forbiddenSlots, "MEMBERSHIP_LOANS"] } } })) === 0, "unapproved page slots absent");
-  assert((await db.pageContent.count({ where: { tenantId: tenant.id, slot: "PRIVACY" } })) === 0, "privacy legal text not invented");
-  assert((await db.rateFee.count({ where: { tenantId: tenant.id } })) === 0, "no invented rates");
-  assert((await db.leadershipRecord.count({ where: { tenantId: tenant.id } })) === 0, "no invented people");
-  const pages = await getPublishedPageContent(tenant);
+  assert((await db.pageContent.count({ where: { tenantId: publicTenant.id, slot: { in: [...forbiddenSlots, "MEMBERSHIP_LOANS"] } } })) === 0, "unapproved page slots absent");
+  assert((await db.pageContent.count({ where: { tenantId: publicTenant.id, slot: "PRIVACY" } })) === 0, "privacy legal text not invented");
+  assert((await db.rateFee.count({ where: { tenantId: publicTenant.id } })) === 0, "no invented rates");
+  assert((await db.leadershipRecord.count({ where: { tenantId: publicTenant.id } })) === 0, "no invented people");
+  const pages = await getPublishedPageContent(publicTenant);
   assert(pages.every((page) => Boolean(page.slot)), "published page projection");
-  assert((await getPublishedLeadership(tenant)).every((person) => Boolean(person.name)), "published leadership projection");
-  assert((await getPublishedRates(tenant)).every((rate) => Boolean(rate.displayValue)), "published rates projection");
-  assert((await getCalculatorSettings(tenant))?.isEnabled === false, "public calculator disabled");
-  assert((await hasPublishedPrivacy(tenant)) === false, "privacy gate closed");
-  assert((await getPublicContactSettings(tenant))?.telephone === "(679) 7730445", "allowed contact phone");
-  assert((await getPublicContactSettings(tenant))?.publicEmail === "swcu2016@gmail.com", "allowed contact email");
-  const resources = await getPublishedResources(tenant);
+  assert((await getPublishedLeadership(publicTenant)).every((person) => Boolean(person.name)), "published leadership projection");
+  assert((await getPublishedRates(publicTenant)).every((rate) => Boolean(rate.displayValue)), "published rates projection");
+  assert((await getCalculatorSettings(publicTenant))?.isEnabled === false, "public calculator disabled");
+  assert((await hasPublishedPrivacy(publicTenant)) === false, "privacy gate closed");
+  assert((await getPublicContactSettings(publicTenant))?.telephone === "(679) 7730445", "allowed contact phone");
+  assert((await getPublicContactSettings(publicTenant))?.publicEmail === "swcu2016@gmail.com", "allowed contact email");
+  const resources = await getPublishedResources(publicTenant);
   assert(resources.news.every((item) => Boolean(item.title)), "published news only");
   assert(resources.faqs.length >= 0, "FAQ projection is tenant-scoped");
   if (other) {
     assert((await getPublishedPageContent(other)).every((item) => item.slot !== "PRIVATE"), "tenant page isolation");
-    assert((await getPublicContactSettings(other))?.organisationName !== "Service Worker Credit Union" || other.id === tenant.id, "tenant contact isolation");
+    assert((await getPublicContactSettings(other))?.organisationName !== "Service Worker Credit Union" || other.id === publicTenant.id, "tenant contact isolation");
   }
-  await assertRejects(() => submitContactEnquiry({ tenant, ipAddress: "prompt3b-test", value: { name: "Test Person", email: "test@example.com", phone: "", subject: "Membership", message: "Please contact me.", privacyAcknowledged: true, website: "" } }), "privacy gate blocks contact");
-  await assertRejects(() => submitContactEnquiry({ tenant, ipAddress: "prompt3b-test", value: { name: "Test Person", email: "not-an-email", phone: "", subject: "Membership", message: "Please contact me.", privacyAcknowledged: true, website: "" } }), "invalid email rejected");
-  await assertRejects(() => submitContactEnquiry({ tenant, ipAddress: "prompt3b-test", value: { name: "Test Person", email: "test@example.com", phone: "", subject: "Request a Call Back", message: "Please call me.", privacyAcknowledged: true, website: "" } }), "callback phone required");
-  await assertRejects(() => submitContactEnquiry({ tenant, ipAddress: "prompt3b-honeypot", value: { name: "Test Person", email: "test@example.com", phone: "", subject: "Membership", message: "Please contact me.", privacyAcknowledged: true, website: "bot" } }), "honeypot rejected");
-  await db.user.upsert({ where: { id: "prompt3b-qa-admin" }, update: { name: "Prompt 3B QA Admin", email: "prompt3b-admin@qa.invalid" }, create: { id: "prompt3b-qa-admin", name: "Prompt 3B QA Admin", email: "prompt3b-admin@qa.invalid" } });
-  await db.user.upsert({ where: { id: "prompt3b-qa-editor" }, update: { name: "Prompt 3B QA Editor", email: "prompt3b-editor@qa.invalid" }, create: { id: "prompt3b-qa-editor", name: "Prompt 3B QA Editor", email: "prompt3b-editor@qa.invalid" } });
-  await db.staffMembership.upsert({ where: { tenantId_userId: { tenantId: tenant.id, userId: "prompt3b-qa-admin" } }, update: { role: "ADMINISTRATOR", isActive: true }, create: { tenantId: tenant.id, userId: "prompt3b-qa-admin", role: "ADMINISTRATOR" } });
-  await db.staffMembership.upsert({ where: { tenantId_userId: { tenantId: tenant.id, userId: "prompt3b-qa-editor" } }, update: { role: "EDITOR", isActive: true }, create: { tenantId: tenant.id, userId: "prompt3b-qa-editor", role: "EDITOR" } });
+  await assertRejects(() => submitContactEnquiry({ tenant: publicTenant, ipAddress: "prompt3b-test", value: { name: "Test Person", email: "test@example.com", phone: "", subject: "Membership", message: "Please contact me.", privacyAcknowledged: true, website: "" } }), "privacy gate blocks contact");
+  await assertRejects(() => submitContactEnquiry({ tenant: publicTenant, ipAddress: "prompt3b-test", value: { name: "Test Person", email: "not-an-email", phone: "", subject: "Membership", message: "Please contact me.", privacyAcknowledged: true, website: "" } }), "invalid email rejected");
+  await assertRejects(() => submitContactEnquiry({ tenant: publicTenant, ipAddress: "prompt3b-test", value: { name: "Test Person", email: "test@example.com", phone: "", subject: "Request a Call Back", message: "Please call me.", privacyAcknowledged: true, website: "" } }), "callback phone required");
+  await assertRejects(() => submitContactEnquiry({ tenant: publicTenant, ipAddress: "prompt3b-honeypot", value: { name: "Test Person", email: "test@example.com", phone: "", subject: "Membership", message: "", privacyAcknowledged: true, website: "bot" } }), "honeypot rejected");
+  const fixtureSlug = `prompt3b-fixture-${suffix}`;
+  const fixtureHostname = `prompt3b-${suffix}.qa.invalid`;
+  if (await db.tenant.findUnique({ where: { slug: fixtureSlug }, select: { id: true } })) throw new Error("Exact Prompt 3B fixture slug already exists; refusing to mutate it.");
+  if (await db.tenantDomain.findUnique({ where: { hostname: fixtureHostname }, select: { id: true } })) throw new Error("Exact Prompt 3B fixture hostname already exists; refusing to mutate it.");
+  const tenant = await db.tenant.create({ data: { slug: fixtureSlug, displayName: "Prompt 3B Fixture QA" } });
+  fixtureTenantId = tenant.id;
+  await db.tenantDomain.create({ data: { tenantId: tenant.id, hostname: fixtureHostname, isPrimary: true } });
+  const adminId = `prompt3b-qa-admin-${suffix}`;
+  const editorId = `prompt3b-qa-editor-${suffix}`;
+  fixtureActorIds.add(adminId); fixtureActorIds.add(editorId);
+  await db.user.create({ data: { id: adminId, name: "Prompt 3B QA Admin", email: `${adminId}@qa.invalid` } });
+  await db.user.create({ data: { id: editorId, name: "Prompt 3B QA Editor", email: `${editorId}@qa.invalid` } });
+  await db.staffMembership.createMany({ data: [{ tenantId: tenant.id, userId: adminId, role: "ADMINISTRATOR" }, { tenantId: tenant.id, userId: editorId, role: "EDITOR" }] });
   const editor = await db.staffMembership.findFirst({ where: { tenantId: tenant.id, role: "EDITOR", isActive: true }, select: { userId: true } });
   const administrator = await db.staffMembership.findFirst({ where: { tenantId: tenant.id, role: "ADMINISTRATOR", isActive: true }, select: { userId: true } });
   assert(Boolean(editor && administrator), "staff roles available for workflow tests");
   if (editor && administrator) {
-    await db.cmsDraft.deleteMany({ where: { tenantId: tenant.id, kind: CmsDraftKind.PAGE_CONTENT, targetId: `${tenant.id}:page:ABOUT_STORY` } });
-    await db.pageContent.deleteMany({ where: { tenantId: tenant.id, slot: "ABOUT_STORY" } });
     const first = await createCmsDraft({ tenant, actorUserId: editor.userId, kind: CmsDraftKind.PAGE_CONTENT, operation: CmsDraftOperation.UPDATE, targetId: `${tenant.id}:page:ABOUT_STORY`, payload: { slot: "ABOUT_STORY", heading: "QA story", body: "Approved QA copy." } }); qaDraftIds.add(first.id);
     const revised = await createCmsDraft({ tenant, actorUserId: editor.userId, kind: CmsDraftKind.PAGE_CONTENT, operation: CmsDraftOperation.UPDATE, targetId: `${tenant.id}:page:ABOUT_STORY`, expectedRevision: first.revision, payload: { slot: "ABOUT_STORY", heading: "QA story revised", body: "Approved QA copy." } }); qaDraftIds.add(revised.id);
     assert(revised.revision > first.revision, "same-slot save revises safely");
@@ -71,7 +81,6 @@ async function runAssertions() {
     await assertRejects(() => publishCmsDraft({ tenant, actorUserId: editor.userId, draftId: revised.id }), "Editor cannot publish page content");
     await publishCmsDraft({ tenant, actorUserId: administrator.userId, draftId: revised.id });
     assert((await db.pageContent.findUnique({ where: { tenantId_slot: { tenantId: tenant.id, slot: "ABOUT_STORY" } } }))?.isPublished === true, "Administrator publishes fixed slot");
-    await db.pageContent.deleteMany({ where: { tenantId: tenant.id, slot: "ABOUT_STORY" } });
   }
   if (administrator) {
     const qaMedia = await uploadDocument({ tenant, actorUserId: administrator.userId, file: new File([Buffer.from("%PDF-1.4 QA\n%%EOF")], "qa.pdf", { type: "application/pdf" }), altText: "QA annual report" }); qaObjectKeys.add(qaMedia.objectKey); qaMediaIds.add(qaMedia.id);
@@ -110,12 +119,12 @@ async function runAssertions() {
   assert(["SKIPPED_NO_RECIPIENT", "SKIPPED_NO_PROVIDER", "SENT", "FAILED"].includes(contactResult.notification.status), "truthful notification readiness");
   const stored = await db.contactSubmission.findFirstOrThrow({ where: { tenantId: tenant.id, reference: contactResult.reference } });
   qaContactIds.add(stored.id);
-  await updateContactStatus({ tenant, actorUserId: administrator?.userId ?? "prompt3b-qa-admin", id: stored.id, status: "BEING_HANDLED", note: "QA note" });
+  await updateContactStatus({ tenant, actorUserId: administrator?.userId ?? adminId, id: stored.id, status: "BEING_HANDLED", note: "QA note" });
   assert((await db.contactSubmission.findUnique({ where: { id: stored.id } }))?.viewedAt === null, "status update does not mark viewed");
   const viewedAuditsBefore = await db.auditLog.count({ where: { tenantId: tenant.id, targetId: stored.reference, action: "CONTACT_ENQUIRY_VIEWED" } });
   await Promise.all([
-    openContactEnquiry({ tenant, actorUserId: administrator?.userId ?? "prompt3b-qa-admin", id: stored.id }),
-    openContactEnquiry({ tenant, actorUserId: administrator?.userId ?? "prompt3b-qa-admin", id: stored.id }),
+    openContactEnquiry({ tenant, actorUserId: administrator?.userId ?? adminId, id: stored.id }),
+    openContactEnquiry({ tenant, actorUserId: administrator?.userId ?? adminId, id: stored.id }),
   ]);
   assert((await db.contactSubmission.findUnique({ where: { id: stored.id } }))?.status === "BEING_HANDLED", "inbox status and note persistence");
   assert((await db.auditLog.count({ where: { tenantId: tenant.id, targetId: stored.reference, action: "CONTACT_ENQUIRY_VIEWED" } })) === viewedAuditsBefore + 1, "detail open audits viewed exactly once");
@@ -137,10 +146,7 @@ async function assertRejects(fn: () => Promise<unknown>, message: string) {
 }
 
 async function main() {
-  const tenant = await db.tenant.findUniqueOrThrow({ where: { slug: "swcu" }, select: { id: true } });
-  await db.pageContent.deleteMany({ where: { tenantId: tenant.id, body: { in: ["QA privacy", "HTTP QA privacy"] } } });
-  const originalPages = await db.pageContent.findMany({ where: { tenantId: tenant.id } });
-  const originalContact = await db.contactSettings.findUnique({ where: { tenantId: tenant.id } });
+  assertQaExecutionSafe();
   const originalFetch = globalThis.fetch;
   const originalResendKey = process.env.RESEND_API_KEY;
   const originalContactFrom = process.env.CONTACT_EMAIL_FROM;
@@ -157,15 +163,35 @@ async function main() {
     if (originalContactFrom === undefined) delete process.env.CONTACT_EMAIL_FROM; else process.env.CONTACT_EMAIL_FROM = originalContactFrom;
     await attempt("contacts", () => db.contactSubmission.deleteMany({ where: { id: { in: [...qaContactIds] } } }));
     await attempt("rate limits", () => db.contactRateLimit.deleteMany({ where: { key: { in: [...qaRateKeys] } } }));
-    await attempt("audits", () => db.auditLog.deleteMany({ where: { tenantId: tenant.id, OR: [{ targetId: { in: [...qaContactReferences] } }, { actorUserId: { in: ["prompt3b-qa-admin", "prompt3b-qa-editor"] } }] } }));
-    await attempt("drafts", () => db.cmsDraft.deleteMany({ where: { id: { in: [...qaDraftIds] } } }));
-    await attempt("forms", () => db.formDocument.deleteMany({ where: { tenantId: tenant.id, category: "ANNUAL_REPORT", title: "QA annual" } }));
-    await attempt("media objects and rows", async () => { for (const key of qaObjectKeys) await deleteMediaObject(key).catch(() => undefined); await db.mediaAsset.deleteMany({ where: { id: { in: [...qaMediaIds] } } }); });
-    await attempt("leadership", async () => undefined);
-    await attempt("memberships", () => db.staffMembership.deleteMany({ where: { tenantId: tenant.id, userId: { in: ["prompt3b-qa-admin", "prompt3b-qa-editor"] } } }));
-    await attempt("users", () => db.user.deleteMany({ where: { id: { in: ["prompt3b-qa-admin", "prompt3b-qa-editor"] } } }));
-    await attempt("page content restore", async () => { await db.pageContent.deleteMany({ where: { tenantId: tenant.id } }); for (const page of originalPages) await db.pageContent.create({ data: { id: page.id, tenantId: page.tenantId, slot: page.slot, heading: page.heading, body: page.body, mediaAssetId: page.mediaAssetId, isPublished: page.isPublished, publishedAt: page.publishedAt } }); });
-    await attempt("contact settings restore", async () => { if (originalContact) { const data = { organisationName: originalContact.organisationName, streetAddress: originalContact.streetAddress, postalAddress: originalContact.postalAddress, telephone: originalContact.telephone, publicEmail: originalContact.publicEmail, officeHours: originalContact.officeHours, directionsUrl: originalContact.directionsUrl, notificationRecipients: Array.isArray(originalContact.notificationRecipients) ? originalContact.notificationRecipients.filter((item): item is string => typeof item === "string") : [] }; await db.contactSettings.upsert({ where: { tenantId: tenant.id }, update: data, create: { ...data, tenantId: tenant.id } }); } else await db.contactSettings.deleteMany({ where: { tenantId: tenant.id } }); });
+    if (fixtureTenantId) {
+      const [auditRows, draftRows, formRows, mediaRows, membershipRows, pageRows, domainRows, contactRows, rateRows] = await Promise.all([
+        db.auditLog.findMany({ where: { tenantId: fixtureTenantId }, select: { id: true } }),
+        db.cmsDraft.findMany({ where: { tenantId: fixtureTenantId }, select: { id: true } }),
+        db.formDocument.findMany({ where: { tenantId: fixtureTenantId }, select: { id: true } }),
+        db.mediaAsset.findMany({ where: { tenantId: fixtureTenantId }, select: { id: true, objectKey: true } }),
+        db.staffMembership.findMany({ where: { tenantId: fixtureTenantId }, select: { id: true } }),
+        db.pageContent.findMany({ where: { tenantId: fixtureTenantId }, select: { id: true } }),
+        db.tenantDomain.findMany({ where: { tenantId: fixtureTenantId }, select: { id: true } }),
+        db.contactSubmission.findMany({ where: { tenantId: fixtureTenantId }, select: { id: true } }),
+        db.contactRateLimit.findMany({ where: { tenantId: fixtureTenantId }, select: { id: true } }),
+      ]);
+      const ids = (rows: Array<{ id: string }>) => rows.map((row) => row.id);
+      await attempt("audits", () => auditRows.length ? db.auditLog.deleteMany({ where: { id: { in: ids(auditRows) } } }) : Promise.resolve());
+      await attempt("drafts", () => draftRows.length ? db.cmsDraft.deleteMany({ where: { id: { in: ids(draftRows) } } }) : Promise.resolve());
+      await attempt("forms", () => formRows.length ? db.formDocument.deleteMany({ where: { id: { in: ids(formRows) } } }) : Promise.resolve());
+      await attempt("page content", () => pageRows.length ? db.pageContent.deleteMany({ where: { id: { in: ids(pageRows) } } }) : Promise.resolve());
+      await attempt("contacts", () => contactRows.length ? db.contactSubmission.deleteMany({ where: { id: { in: ids(contactRows) } } }) : Promise.resolve());
+      await attempt("rate limits", () => rateRows.length ? db.contactRateLimit.deleteMany({ where: { id: { in: ids(rateRows) } } }) : Promise.resolve());
+      await attempt("R2 objects", async () => {
+        const exactObjectKeys = new Set([...qaObjectKeys, ...mediaRows.map((row) => row.objectKey)]);
+        for (const key of exactObjectKeys) await deleteMediaObject(key);
+      });
+      await attempt("media rows", () => mediaRows.length ? db.mediaAsset.deleteMany({ where: { id: { in: ids(mediaRows) } } }) : Promise.resolve());
+      await attempt("memberships", () => membershipRows.length ? db.staffMembership.deleteMany({ where: { id: { in: ids(membershipRows) } } }) : Promise.resolve());
+      await attempt("domain", () => domainRows.length ? db.tenantDomain.deleteMany({ where: { id: { in: ids(domainRows) } } }) : Promise.resolve());
+      await attempt("tenant", () => db.tenant.delete({ where: { id: fixtureTenantId } }));
+    }
+    await attempt("users", () => fixtureActorIds.size ? db.user.deleteMany({ where: { id: { in: [...fixtureActorIds] } } }) : Promise.resolve());
   }
   if (failure) { if (cleanupErrors.length) console.error(JSON.stringify({ cleanupErrors })); throw failure; }
   if (cleanupErrors.length) throw new Error(`Cleanup failures: ${cleanupErrors.join("; ")}`);

@@ -6,19 +6,19 @@ const WINDOW_MS = 15 * 60 * 1000;
 const BLOCK_MS = 15 * 60 * 1000;
 const MAX_FAILURES = 5;
 
-function keyFor(email: string, ipAddress?: string) {
+export function staffLoginAttemptKey(email: string, ipAddress?: string) {
   return `${email.trim().toLowerCase()}|${ipAddress ?? "unknown"}`;
 }
 
 export async function staffLoginAllowed(email: string, ipAddress?: string, now = new Date()) {
-  const attempt = await db.staffLoginAttempt.findUnique({ where: { key: keyFor(email, ipAddress) } });
+  const attempt = await db.staffLoginAttempt.findUnique({ where: { key: staffLoginAttemptKey(email, ipAddress) } });
   if (!attempt) return true;
   if (attempt.blockedUntil && attempt.blockedUntil > now) return false;
   return now.getTime() - attempt.windowStart.getTime() >= WINDOW_MS || attempt.failures < MAX_FAILURES;
 }
 
 export async function recordStaffLoginFailure(email: string, ipAddress?: string, now = new Date()) {
-  const key = keyFor(email, ipAddress);
+  const key = staffLoginAttemptKey(email, ipAddress);
   return db.$transaction(async (tx) => {
     await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${key}, 0))`;
     const previous = await tx.staffLoginAttempt.findUnique({ where: { key } });
@@ -34,7 +34,7 @@ export async function recordStaffLoginFailure(email: string, ipAddress?: string,
 }
 
 export async function clearStaffLoginFailures(email: string, ipAddress?: string) {
-  await db.staffLoginAttempt.deleteMany({ where: { key: keyFor(email, ipAddress) } });
+  await db.staffLoginAttempt.deleteMany({ where: { key: staffLoginAttemptKey(email, ipAddress) } });
 }
 
 export const STAFF_LOGIN_GENERIC_ERROR = "The email or password was not recognised.";
