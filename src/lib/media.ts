@@ -15,7 +15,7 @@ export function createMediaObjectKey(input: {
 
   if (
     !safeSegment.test(tenantSlug) ||
-    !safeSegment.test(category) ||
+    !category.split("/").every((segment) => safeSegment.test(segment)) ||
     !/^[a-z0-9]+$/.test(extension)
   ) {
     throw new Error("Invalid media key segment");

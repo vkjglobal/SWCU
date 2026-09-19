@@ -194,6 +194,16 @@ export type TenantWhereInput = {
   settings?: Prisma.XOR<Prisma.TenantSettingsNullableScalarRelationFilter, Prisma.TenantSettingsWhereInput> | null
   staff?: Prisma.StaffMembershipListRelationFilter
   auditLogs?: Prisma.AuditLogListRelationFilter
+  siteNotices?: Prisma.SiteNoticeListRelationFilter
+  heroSlides?: Prisma.HomeHeroSlideListRelationFilter
+  highlights?: Prisma.HomeHighlightListRelationFilter
+  homeSettings?: Prisma.XOR<Prisma.HomeSettingsNullableScalarRelationFilter, Prisma.HomeSettingsWhereInput> | null
+  services?: Prisma.ServiceListRelationFilter
+  forms?: Prisma.FormDocumentListRelationFilter
+  newsNotices?: Prisma.NewsNoticeListRelationFilter
+  faqs?: Prisma.FAQListRelationFilter
+  contactSettings?: Prisma.XOR<Prisma.ContactSettingsNullableScalarRelationFilter, Prisma.ContactSettingsWhereInput> | null
+  mediaAssets?: Prisma.MediaAssetListRelationFilter
 }
 
 export type TenantOrderByWithRelationInput = {
@@ -207,6 +217,16 @@ export type TenantOrderByWithRelationInput = {
   settings?: Prisma.TenantSettingsOrderByWithRelationInput
   staff?: Prisma.StaffMembershipOrderByRelationAggregateInput
   auditLogs?: Prisma.AuditLogOrderByRelationAggregateInput
+  siteNotices?: Prisma.SiteNoticeOrderByRelationAggregateInput
+  heroSlides?: Prisma.HomeHeroSlideOrderByRelationAggregateInput
+  highlights?: Prisma.HomeHighlightOrderByRelationAggregateInput
+  homeSettings?: Prisma.HomeSettingsOrderByWithRelationInput
+  services?: Prisma.ServiceOrderByRelationAggregateInput
+  forms?: Prisma.FormDocumentOrderByRelationAggregateInput
+  newsNotices?: Prisma.NewsNoticeOrderByRelationAggregateInput
+  faqs?: Prisma.FAQOrderByRelationAggregateInput
+  contactSettings?: Prisma.ContactSettingsOrderByWithRelationInput
+  mediaAssets?: Prisma.MediaAssetOrderByRelationAggregateInput
 }
 
 export type TenantWhereUniqueInput = Prisma.AtLeast<{
@@ -223,6 +243,16 @@ export type TenantWhereUniqueInput = Prisma.AtLeast<{
   settings?: Prisma.XOR<Prisma.TenantSettingsNullableScalarRelationFilter, Prisma.TenantSettingsWhereInput> | null
   staff?: Prisma.StaffMembershipListRelationFilter
   auditLogs?: Prisma.AuditLogListRelationFilter
+  siteNotices?: Prisma.SiteNoticeListRelationFilter
+  heroSlides?: Prisma.HomeHeroSlideListRelationFilter
+  highlights?: Prisma.HomeHighlightListRelationFilter
+  homeSettings?: Prisma.XOR<Prisma.HomeSettingsNullableScalarRelationFilter, Prisma.HomeSettingsWhereInput> | null
+  services?: Prisma.ServiceListRelationFilter
+  forms?: Prisma.FormDocumentListRelationFilter
+  newsNotices?: Prisma.NewsNoticeListRelationFilter
+  faqs?: Prisma.FAQListRelationFilter
+  contactSettings?: Prisma.XOR<Prisma.ContactSettingsNullableScalarRelationFilter, Prisma.ContactSettingsWhereInput> | null
+  mediaAssets?: Prisma.MediaAssetListRelationFilter
 }, "id" | "slug">
 
 export type TenantOrderByWithAggregationInput = {
@@ -260,6 +290,16 @@ export type TenantCreateInput = {
   settings?: Prisma.TenantSettingsCreateNestedOneWithoutTenantInput
   staff?: Prisma.StaffMembershipCreateNestedManyWithoutTenantInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  siteNotices?: Prisma.SiteNoticeCreateNestedManyWithoutTenantInput
+  heroSlides?: Prisma.HomeHeroSlideCreateNestedManyWithoutTenantInput
+  highlights?: Prisma.HomeHighlightCreateNestedManyWithoutTenantInput
+  homeSettings?: Prisma.HomeSettingsCreateNestedOneWithoutTenantInput
+  services?: Prisma.ServiceCreateNestedManyWithoutTenantInput
+  forms?: Prisma.FormDocumentCreateNestedManyWithoutTenantInput
+  newsNotices?: Prisma.NewsNoticeCreateNestedManyWithoutTenantInput
+  faqs?: Prisma.FAQCreateNestedManyWithoutTenantInput
+  contactSettings?: Prisma.ContactSettingsCreateNestedOneWithoutTenantInput
+  mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateInput = {
@@ -273,6 +313,16 @@ export type TenantUncheckedCreateInput = {
   settings?: Prisma.TenantSettingsUncheckedCreateNestedOneWithoutTenantInput
   staff?: Prisma.StaffMembershipUncheckedCreateNestedManyWithoutTenantInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  siteNotices?: Prisma.SiteNoticeUncheckedCreateNestedManyWithoutTenantInput
+  heroSlides?: Prisma.HomeHeroSlideUncheckedCreateNestedManyWithoutTenantInput
+  highlights?: Prisma.HomeHighlightUncheckedCreateNestedManyWithoutTenantInput
+  homeSettings?: Prisma.HomeSettingsUncheckedCreateNestedOneWithoutTenantInput
+  services?: Prisma.ServiceUncheckedCreateNestedManyWithoutTenantInput
+  forms?: Prisma.FormDocumentUncheckedCreateNestedManyWithoutTenantInput
+  newsNotices?: Prisma.NewsNoticeUncheckedCreateNestedManyWithoutTenantInput
+  faqs?: Prisma.FAQUncheckedCreateNestedManyWithoutTenantInput
+  contactSettings?: Prisma.ContactSettingsUncheckedCreateNestedOneWithoutTenantInput
+  mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUpdateInput = {
@@ -286,6 +336,16 @@ export type TenantUpdateInput = {
   settings?: Prisma.TenantSettingsUpdateOneWithoutTenantNestedInput
   staff?: Prisma.StaffMembershipUpdateManyWithoutTenantNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  siteNotices?: Prisma.SiteNoticeUpdateManyWithoutTenantNestedInput
+  heroSlides?: Prisma.HomeHeroSlideUpdateManyWithoutTenantNestedInput
+  highlights?: Prisma.HomeHighlightUpdateManyWithoutTenantNestedInput
+  homeSettings?: Prisma.HomeSettingsUpdateOneWithoutTenantNestedInput
+  services?: Prisma.ServiceUpdateManyWithoutTenantNestedInput
+  forms?: Prisma.FormDocumentUpdateManyWithoutTenantNestedInput
+  newsNotices?: Prisma.NewsNoticeUpdateManyWithoutTenantNestedInput
+  faqs?: Prisma.FAQUpdateManyWithoutTenantNestedInput
+  contactSettings?: Prisma.ContactSettingsUpdateOneWithoutTenantNestedInput
+  mediaAssets?: Prisma.MediaAssetUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateInput = {
@@ -299,6 +359,16 @@ export type TenantUncheckedUpdateInput = {
   settings?: Prisma.TenantSettingsUncheckedUpdateOneWithoutTenantNestedInput
   staff?: Prisma.StaffMembershipUncheckedUpdateManyWithoutTenantNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  siteNotices?: Prisma.SiteNoticeUncheckedUpdateManyWithoutTenantNestedInput
+  heroSlides?: Prisma.HomeHeroSlideUncheckedUpdateManyWithoutTenantNestedInput
+  highlights?: Prisma.HomeHighlightUncheckedUpdateManyWithoutTenantNestedInput
+  homeSettings?: Prisma.HomeSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  services?: Prisma.ServiceUncheckedUpdateManyWithoutTenantNestedInput
+  forms?: Prisma.FormDocumentUncheckedUpdateManyWithoutTenantNestedInput
+  newsNotices?: Prisma.NewsNoticeUncheckedUpdateManyWithoutTenantNestedInput
+  faqs?: Prisma.FAQUncheckedUpdateManyWithoutTenantNestedInput
+  contactSettings?: Prisma.ContactSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateManyInput = {
@@ -428,6 +498,146 @@ export type TenantUpdateOneRequiredWithoutAuditLogsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutAuditLogsInput, Prisma.TenantUpdateWithoutAuditLogsInput>, Prisma.TenantUncheckedUpdateWithoutAuditLogsInput>
 }
 
+export type TenantCreateNestedOneWithoutSiteNoticesInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutSiteNoticesInput, Prisma.TenantUncheckedCreateWithoutSiteNoticesInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutSiteNoticesInput
+  connect?: Prisma.TenantWhereUniqueInput
+}
+
+export type TenantUpdateOneRequiredWithoutSiteNoticesNestedInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutSiteNoticesInput, Prisma.TenantUncheckedCreateWithoutSiteNoticesInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutSiteNoticesInput
+  upsert?: Prisma.TenantUpsertWithoutSiteNoticesInput
+  connect?: Prisma.TenantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutSiteNoticesInput, Prisma.TenantUpdateWithoutSiteNoticesInput>, Prisma.TenantUncheckedUpdateWithoutSiteNoticesInput>
+}
+
+export type TenantCreateNestedOneWithoutHeroSlidesInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutHeroSlidesInput, Prisma.TenantUncheckedCreateWithoutHeroSlidesInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutHeroSlidesInput
+  connect?: Prisma.TenantWhereUniqueInput
+}
+
+export type TenantUpdateOneRequiredWithoutHeroSlidesNestedInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutHeroSlidesInput, Prisma.TenantUncheckedCreateWithoutHeroSlidesInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutHeroSlidesInput
+  upsert?: Prisma.TenantUpsertWithoutHeroSlidesInput
+  connect?: Prisma.TenantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutHeroSlidesInput, Prisma.TenantUpdateWithoutHeroSlidesInput>, Prisma.TenantUncheckedUpdateWithoutHeroSlidesInput>
+}
+
+export type TenantCreateNestedOneWithoutHighlightsInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutHighlightsInput, Prisma.TenantUncheckedCreateWithoutHighlightsInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutHighlightsInput
+  connect?: Prisma.TenantWhereUniqueInput
+}
+
+export type TenantUpdateOneRequiredWithoutHighlightsNestedInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutHighlightsInput, Prisma.TenantUncheckedCreateWithoutHighlightsInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutHighlightsInput
+  upsert?: Prisma.TenantUpsertWithoutHighlightsInput
+  connect?: Prisma.TenantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutHighlightsInput, Prisma.TenantUpdateWithoutHighlightsInput>, Prisma.TenantUncheckedUpdateWithoutHighlightsInput>
+}
+
+export type TenantCreateNestedOneWithoutHomeSettingsInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutHomeSettingsInput, Prisma.TenantUncheckedCreateWithoutHomeSettingsInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutHomeSettingsInput
+  connect?: Prisma.TenantWhereUniqueInput
+}
+
+export type TenantUpdateOneRequiredWithoutHomeSettingsNestedInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutHomeSettingsInput, Prisma.TenantUncheckedCreateWithoutHomeSettingsInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutHomeSettingsInput
+  upsert?: Prisma.TenantUpsertWithoutHomeSettingsInput
+  connect?: Prisma.TenantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutHomeSettingsInput, Prisma.TenantUpdateWithoutHomeSettingsInput>, Prisma.TenantUncheckedUpdateWithoutHomeSettingsInput>
+}
+
+export type TenantCreateNestedOneWithoutServicesInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutServicesInput, Prisma.TenantUncheckedCreateWithoutServicesInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutServicesInput
+  connect?: Prisma.TenantWhereUniqueInput
+}
+
+export type TenantUpdateOneRequiredWithoutServicesNestedInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutServicesInput, Prisma.TenantUncheckedCreateWithoutServicesInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutServicesInput
+  upsert?: Prisma.TenantUpsertWithoutServicesInput
+  connect?: Prisma.TenantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutServicesInput, Prisma.TenantUpdateWithoutServicesInput>, Prisma.TenantUncheckedUpdateWithoutServicesInput>
+}
+
+export type TenantCreateNestedOneWithoutFormsInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutFormsInput, Prisma.TenantUncheckedCreateWithoutFormsInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutFormsInput
+  connect?: Prisma.TenantWhereUniqueInput
+}
+
+export type TenantUpdateOneRequiredWithoutFormsNestedInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutFormsInput, Prisma.TenantUncheckedCreateWithoutFormsInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutFormsInput
+  upsert?: Prisma.TenantUpsertWithoutFormsInput
+  connect?: Prisma.TenantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutFormsInput, Prisma.TenantUpdateWithoutFormsInput>, Prisma.TenantUncheckedUpdateWithoutFormsInput>
+}
+
+export type TenantCreateNestedOneWithoutNewsNoticesInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutNewsNoticesInput, Prisma.TenantUncheckedCreateWithoutNewsNoticesInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutNewsNoticesInput
+  connect?: Prisma.TenantWhereUniqueInput
+}
+
+export type TenantUpdateOneRequiredWithoutNewsNoticesNestedInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutNewsNoticesInput, Prisma.TenantUncheckedCreateWithoutNewsNoticesInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutNewsNoticesInput
+  upsert?: Prisma.TenantUpsertWithoutNewsNoticesInput
+  connect?: Prisma.TenantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutNewsNoticesInput, Prisma.TenantUpdateWithoutNewsNoticesInput>, Prisma.TenantUncheckedUpdateWithoutNewsNoticesInput>
+}
+
+export type TenantCreateNestedOneWithoutFaqsInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutFaqsInput, Prisma.TenantUncheckedCreateWithoutFaqsInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutFaqsInput
+  connect?: Prisma.TenantWhereUniqueInput
+}
+
+export type TenantUpdateOneRequiredWithoutFaqsNestedInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutFaqsInput, Prisma.TenantUncheckedCreateWithoutFaqsInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutFaqsInput
+  upsert?: Prisma.TenantUpsertWithoutFaqsInput
+  connect?: Prisma.TenantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutFaqsInput, Prisma.TenantUpdateWithoutFaqsInput>, Prisma.TenantUncheckedUpdateWithoutFaqsInput>
+}
+
+export type TenantCreateNestedOneWithoutContactSettingsInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutContactSettingsInput, Prisma.TenantUncheckedCreateWithoutContactSettingsInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutContactSettingsInput
+  connect?: Prisma.TenantWhereUniqueInput
+}
+
+export type TenantUpdateOneRequiredWithoutContactSettingsNestedInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutContactSettingsInput, Prisma.TenantUncheckedCreateWithoutContactSettingsInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutContactSettingsInput
+  upsert?: Prisma.TenantUpsertWithoutContactSettingsInput
+  connect?: Prisma.TenantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutContactSettingsInput, Prisma.TenantUpdateWithoutContactSettingsInput>, Prisma.TenantUncheckedUpdateWithoutContactSettingsInput>
+}
+
+export type TenantCreateNestedOneWithoutMediaAssetsInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutMediaAssetsInput, Prisma.TenantUncheckedCreateWithoutMediaAssetsInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutMediaAssetsInput
+  connect?: Prisma.TenantWhereUniqueInput
+}
+
+export type TenantUpdateOneRequiredWithoutMediaAssetsNestedInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutMediaAssetsInput, Prisma.TenantUncheckedCreateWithoutMediaAssetsInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutMediaAssetsInput
+  upsert?: Prisma.TenantUpsertWithoutMediaAssetsInput
+  connect?: Prisma.TenantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutMediaAssetsInput, Prisma.TenantUpdateWithoutMediaAssetsInput>, Prisma.TenantUncheckedUpdateWithoutMediaAssetsInput>
+}
+
 export type TenantCreateWithoutDomainsInput = {
   id?: string
   slug: string
@@ -438,6 +648,16 @@ export type TenantCreateWithoutDomainsInput = {
   settings?: Prisma.TenantSettingsCreateNestedOneWithoutTenantInput
   staff?: Prisma.StaffMembershipCreateNestedManyWithoutTenantInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  siteNotices?: Prisma.SiteNoticeCreateNestedManyWithoutTenantInput
+  heroSlides?: Prisma.HomeHeroSlideCreateNestedManyWithoutTenantInput
+  highlights?: Prisma.HomeHighlightCreateNestedManyWithoutTenantInput
+  homeSettings?: Prisma.HomeSettingsCreateNestedOneWithoutTenantInput
+  services?: Prisma.ServiceCreateNestedManyWithoutTenantInput
+  forms?: Prisma.FormDocumentCreateNestedManyWithoutTenantInput
+  newsNotices?: Prisma.NewsNoticeCreateNestedManyWithoutTenantInput
+  faqs?: Prisma.FAQCreateNestedManyWithoutTenantInput
+  contactSettings?: Prisma.ContactSettingsCreateNestedOneWithoutTenantInput
+  mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutDomainsInput = {
@@ -450,6 +670,16 @@ export type TenantUncheckedCreateWithoutDomainsInput = {
   settings?: Prisma.TenantSettingsUncheckedCreateNestedOneWithoutTenantInput
   staff?: Prisma.StaffMembershipUncheckedCreateNestedManyWithoutTenantInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  siteNotices?: Prisma.SiteNoticeUncheckedCreateNestedManyWithoutTenantInput
+  heroSlides?: Prisma.HomeHeroSlideUncheckedCreateNestedManyWithoutTenantInput
+  highlights?: Prisma.HomeHighlightUncheckedCreateNestedManyWithoutTenantInput
+  homeSettings?: Prisma.HomeSettingsUncheckedCreateNestedOneWithoutTenantInput
+  services?: Prisma.ServiceUncheckedCreateNestedManyWithoutTenantInput
+  forms?: Prisma.FormDocumentUncheckedCreateNestedManyWithoutTenantInput
+  newsNotices?: Prisma.NewsNoticeUncheckedCreateNestedManyWithoutTenantInput
+  faqs?: Prisma.FAQUncheckedCreateNestedManyWithoutTenantInput
+  contactSettings?: Prisma.ContactSettingsUncheckedCreateNestedOneWithoutTenantInput
+  mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutDomainsInput = {
@@ -478,6 +708,16 @@ export type TenantUpdateWithoutDomainsInput = {
   settings?: Prisma.TenantSettingsUpdateOneWithoutTenantNestedInput
   staff?: Prisma.StaffMembershipUpdateManyWithoutTenantNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  siteNotices?: Prisma.SiteNoticeUpdateManyWithoutTenantNestedInput
+  heroSlides?: Prisma.HomeHeroSlideUpdateManyWithoutTenantNestedInput
+  highlights?: Prisma.HomeHighlightUpdateManyWithoutTenantNestedInput
+  homeSettings?: Prisma.HomeSettingsUpdateOneWithoutTenantNestedInput
+  services?: Prisma.ServiceUpdateManyWithoutTenantNestedInput
+  forms?: Prisma.FormDocumentUpdateManyWithoutTenantNestedInput
+  newsNotices?: Prisma.NewsNoticeUpdateManyWithoutTenantNestedInput
+  faqs?: Prisma.FAQUpdateManyWithoutTenantNestedInput
+  contactSettings?: Prisma.ContactSettingsUpdateOneWithoutTenantNestedInput
+  mediaAssets?: Prisma.MediaAssetUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutDomainsInput = {
@@ -490,6 +730,16 @@ export type TenantUncheckedUpdateWithoutDomainsInput = {
   settings?: Prisma.TenantSettingsUncheckedUpdateOneWithoutTenantNestedInput
   staff?: Prisma.StaffMembershipUncheckedUpdateManyWithoutTenantNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  siteNotices?: Prisma.SiteNoticeUncheckedUpdateManyWithoutTenantNestedInput
+  heroSlides?: Prisma.HomeHeroSlideUncheckedUpdateManyWithoutTenantNestedInput
+  highlights?: Prisma.HomeHighlightUncheckedUpdateManyWithoutTenantNestedInput
+  homeSettings?: Prisma.HomeSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  services?: Prisma.ServiceUncheckedUpdateManyWithoutTenantNestedInput
+  forms?: Prisma.FormDocumentUncheckedUpdateManyWithoutTenantNestedInput
+  newsNotices?: Prisma.NewsNoticeUncheckedUpdateManyWithoutTenantNestedInput
+  faqs?: Prisma.FAQUncheckedUpdateManyWithoutTenantNestedInput
+  contactSettings?: Prisma.ContactSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutSettingsInput = {
@@ -502,6 +752,16 @@ export type TenantCreateWithoutSettingsInput = {
   domains?: Prisma.TenantDomainCreateNestedManyWithoutTenantInput
   staff?: Prisma.StaffMembershipCreateNestedManyWithoutTenantInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  siteNotices?: Prisma.SiteNoticeCreateNestedManyWithoutTenantInput
+  heroSlides?: Prisma.HomeHeroSlideCreateNestedManyWithoutTenantInput
+  highlights?: Prisma.HomeHighlightCreateNestedManyWithoutTenantInput
+  homeSettings?: Prisma.HomeSettingsCreateNestedOneWithoutTenantInput
+  services?: Prisma.ServiceCreateNestedManyWithoutTenantInput
+  forms?: Prisma.FormDocumentCreateNestedManyWithoutTenantInput
+  newsNotices?: Prisma.NewsNoticeCreateNestedManyWithoutTenantInput
+  faqs?: Prisma.FAQCreateNestedManyWithoutTenantInput
+  contactSettings?: Prisma.ContactSettingsCreateNestedOneWithoutTenantInput
+  mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutSettingsInput = {
@@ -514,6 +774,16 @@ export type TenantUncheckedCreateWithoutSettingsInput = {
   domains?: Prisma.TenantDomainUncheckedCreateNestedManyWithoutTenantInput
   staff?: Prisma.StaffMembershipUncheckedCreateNestedManyWithoutTenantInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  siteNotices?: Prisma.SiteNoticeUncheckedCreateNestedManyWithoutTenantInput
+  heroSlides?: Prisma.HomeHeroSlideUncheckedCreateNestedManyWithoutTenantInput
+  highlights?: Prisma.HomeHighlightUncheckedCreateNestedManyWithoutTenantInput
+  homeSettings?: Prisma.HomeSettingsUncheckedCreateNestedOneWithoutTenantInput
+  services?: Prisma.ServiceUncheckedCreateNestedManyWithoutTenantInput
+  forms?: Prisma.FormDocumentUncheckedCreateNestedManyWithoutTenantInput
+  newsNotices?: Prisma.NewsNoticeUncheckedCreateNestedManyWithoutTenantInput
+  faqs?: Prisma.FAQUncheckedCreateNestedManyWithoutTenantInput
+  contactSettings?: Prisma.ContactSettingsUncheckedCreateNestedOneWithoutTenantInput
+  mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutSettingsInput = {
@@ -542,6 +812,16 @@ export type TenantUpdateWithoutSettingsInput = {
   domains?: Prisma.TenantDomainUpdateManyWithoutTenantNestedInput
   staff?: Prisma.StaffMembershipUpdateManyWithoutTenantNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  siteNotices?: Prisma.SiteNoticeUpdateManyWithoutTenantNestedInput
+  heroSlides?: Prisma.HomeHeroSlideUpdateManyWithoutTenantNestedInput
+  highlights?: Prisma.HomeHighlightUpdateManyWithoutTenantNestedInput
+  homeSettings?: Prisma.HomeSettingsUpdateOneWithoutTenantNestedInput
+  services?: Prisma.ServiceUpdateManyWithoutTenantNestedInput
+  forms?: Prisma.FormDocumentUpdateManyWithoutTenantNestedInput
+  newsNotices?: Prisma.NewsNoticeUpdateManyWithoutTenantNestedInput
+  faqs?: Prisma.FAQUpdateManyWithoutTenantNestedInput
+  contactSettings?: Prisma.ContactSettingsUpdateOneWithoutTenantNestedInput
+  mediaAssets?: Prisma.MediaAssetUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutSettingsInput = {
@@ -554,6 +834,16 @@ export type TenantUncheckedUpdateWithoutSettingsInput = {
   domains?: Prisma.TenantDomainUncheckedUpdateManyWithoutTenantNestedInput
   staff?: Prisma.StaffMembershipUncheckedUpdateManyWithoutTenantNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  siteNotices?: Prisma.SiteNoticeUncheckedUpdateManyWithoutTenantNestedInput
+  heroSlides?: Prisma.HomeHeroSlideUncheckedUpdateManyWithoutTenantNestedInput
+  highlights?: Prisma.HomeHighlightUncheckedUpdateManyWithoutTenantNestedInput
+  homeSettings?: Prisma.HomeSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  services?: Prisma.ServiceUncheckedUpdateManyWithoutTenantNestedInput
+  forms?: Prisma.FormDocumentUncheckedUpdateManyWithoutTenantNestedInput
+  newsNotices?: Prisma.NewsNoticeUncheckedUpdateManyWithoutTenantNestedInput
+  faqs?: Prisma.FAQUncheckedUpdateManyWithoutTenantNestedInput
+  contactSettings?: Prisma.ContactSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutStaffInput = {
@@ -566,6 +856,16 @@ export type TenantCreateWithoutStaffInput = {
   domains?: Prisma.TenantDomainCreateNestedManyWithoutTenantInput
   settings?: Prisma.TenantSettingsCreateNestedOneWithoutTenantInput
   auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  siteNotices?: Prisma.SiteNoticeCreateNestedManyWithoutTenantInput
+  heroSlides?: Prisma.HomeHeroSlideCreateNestedManyWithoutTenantInput
+  highlights?: Prisma.HomeHighlightCreateNestedManyWithoutTenantInput
+  homeSettings?: Prisma.HomeSettingsCreateNestedOneWithoutTenantInput
+  services?: Prisma.ServiceCreateNestedManyWithoutTenantInput
+  forms?: Prisma.FormDocumentCreateNestedManyWithoutTenantInput
+  newsNotices?: Prisma.NewsNoticeCreateNestedManyWithoutTenantInput
+  faqs?: Prisma.FAQCreateNestedManyWithoutTenantInput
+  contactSettings?: Prisma.ContactSettingsCreateNestedOneWithoutTenantInput
+  mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutStaffInput = {
@@ -578,6 +878,16 @@ export type TenantUncheckedCreateWithoutStaffInput = {
   domains?: Prisma.TenantDomainUncheckedCreateNestedManyWithoutTenantInput
   settings?: Prisma.TenantSettingsUncheckedCreateNestedOneWithoutTenantInput
   auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  siteNotices?: Prisma.SiteNoticeUncheckedCreateNestedManyWithoutTenantInput
+  heroSlides?: Prisma.HomeHeroSlideUncheckedCreateNestedManyWithoutTenantInput
+  highlights?: Prisma.HomeHighlightUncheckedCreateNestedManyWithoutTenantInput
+  homeSettings?: Prisma.HomeSettingsUncheckedCreateNestedOneWithoutTenantInput
+  services?: Prisma.ServiceUncheckedCreateNestedManyWithoutTenantInput
+  forms?: Prisma.FormDocumentUncheckedCreateNestedManyWithoutTenantInput
+  newsNotices?: Prisma.NewsNoticeUncheckedCreateNestedManyWithoutTenantInput
+  faqs?: Prisma.FAQUncheckedCreateNestedManyWithoutTenantInput
+  contactSettings?: Prisma.ContactSettingsUncheckedCreateNestedOneWithoutTenantInput
+  mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutStaffInput = {
@@ -606,6 +916,16 @@ export type TenantUpdateWithoutStaffInput = {
   domains?: Prisma.TenantDomainUpdateManyWithoutTenantNestedInput
   settings?: Prisma.TenantSettingsUpdateOneWithoutTenantNestedInput
   auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  siteNotices?: Prisma.SiteNoticeUpdateManyWithoutTenantNestedInput
+  heroSlides?: Prisma.HomeHeroSlideUpdateManyWithoutTenantNestedInput
+  highlights?: Prisma.HomeHighlightUpdateManyWithoutTenantNestedInput
+  homeSettings?: Prisma.HomeSettingsUpdateOneWithoutTenantNestedInput
+  services?: Prisma.ServiceUpdateManyWithoutTenantNestedInput
+  forms?: Prisma.FormDocumentUpdateManyWithoutTenantNestedInput
+  newsNotices?: Prisma.NewsNoticeUpdateManyWithoutTenantNestedInput
+  faqs?: Prisma.FAQUpdateManyWithoutTenantNestedInput
+  contactSettings?: Prisma.ContactSettingsUpdateOneWithoutTenantNestedInput
+  mediaAssets?: Prisma.MediaAssetUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutStaffInput = {
@@ -618,6 +938,16 @@ export type TenantUncheckedUpdateWithoutStaffInput = {
   domains?: Prisma.TenantDomainUncheckedUpdateManyWithoutTenantNestedInput
   settings?: Prisma.TenantSettingsUncheckedUpdateOneWithoutTenantNestedInput
   auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  siteNotices?: Prisma.SiteNoticeUncheckedUpdateManyWithoutTenantNestedInput
+  heroSlides?: Prisma.HomeHeroSlideUncheckedUpdateManyWithoutTenantNestedInput
+  highlights?: Prisma.HomeHighlightUncheckedUpdateManyWithoutTenantNestedInput
+  homeSettings?: Prisma.HomeSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  services?: Prisma.ServiceUncheckedUpdateManyWithoutTenantNestedInput
+  forms?: Prisma.FormDocumentUncheckedUpdateManyWithoutTenantNestedInput
+  newsNotices?: Prisma.NewsNoticeUncheckedUpdateManyWithoutTenantNestedInput
+  faqs?: Prisma.FAQUncheckedUpdateManyWithoutTenantNestedInput
+  contactSettings?: Prisma.ContactSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutAuditLogsInput = {
@@ -630,6 +960,16 @@ export type TenantCreateWithoutAuditLogsInput = {
   domains?: Prisma.TenantDomainCreateNestedManyWithoutTenantInput
   settings?: Prisma.TenantSettingsCreateNestedOneWithoutTenantInput
   staff?: Prisma.StaffMembershipCreateNestedManyWithoutTenantInput
+  siteNotices?: Prisma.SiteNoticeCreateNestedManyWithoutTenantInput
+  heroSlides?: Prisma.HomeHeroSlideCreateNestedManyWithoutTenantInput
+  highlights?: Prisma.HomeHighlightCreateNestedManyWithoutTenantInput
+  homeSettings?: Prisma.HomeSettingsCreateNestedOneWithoutTenantInput
+  services?: Prisma.ServiceCreateNestedManyWithoutTenantInput
+  forms?: Prisma.FormDocumentCreateNestedManyWithoutTenantInput
+  newsNotices?: Prisma.NewsNoticeCreateNestedManyWithoutTenantInput
+  faqs?: Prisma.FAQCreateNestedManyWithoutTenantInput
+  contactSettings?: Prisma.ContactSettingsCreateNestedOneWithoutTenantInput
+  mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutAuditLogsInput = {
@@ -642,6 +982,16 @@ export type TenantUncheckedCreateWithoutAuditLogsInput = {
   domains?: Prisma.TenantDomainUncheckedCreateNestedManyWithoutTenantInput
   settings?: Prisma.TenantSettingsUncheckedCreateNestedOneWithoutTenantInput
   staff?: Prisma.StaffMembershipUncheckedCreateNestedManyWithoutTenantInput
+  siteNotices?: Prisma.SiteNoticeUncheckedCreateNestedManyWithoutTenantInput
+  heroSlides?: Prisma.HomeHeroSlideUncheckedCreateNestedManyWithoutTenantInput
+  highlights?: Prisma.HomeHighlightUncheckedCreateNestedManyWithoutTenantInput
+  homeSettings?: Prisma.HomeSettingsUncheckedCreateNestedOneWithoutTenantInput
+  services?: Prisma.ServiceUncheckedCreateNestedManyWithoutTenantInput
+  forms?: Prisma.FormDocumentUncheckedCreateNestedManyWithoutTenantInput
+  newsNotices?: Prisma.NewsNoticeUncheckedCreateNestedManyWithoutTenantInput
+  faqs?: Prisma.FAQUncheckedCreateNestedManyWithoutTenantInput
+  contactSettings?: Prisma.ContactSettingsUncheckedCreateNestedOneWithoutTenantInput
+  mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutAuditLogsInput = {
@@ -670,6 +1020,16 @@ export type TenantUpdateWithoutAuditLogsInput = {
   domains?: Prisma.TenantDomainUpdateManyWithoutTenantNestedInput
   settings?: Prisma.TenantSettingsUpdateOneWithoutTenantNestedInput
   staff?: Prisma.StaffMembershipUpdateManyWithoutTenantNestedInput
+  siteNotices?: Prisma.SiteNoticeUpdateManyWithoutTenantNestedInput
+  heroSlides?: Prisma.HomeHeroSlideUpdateManyWithoutTenantNestedInput
+  highlights?: Prisma.HomeHighlightUpdateManyWithoutTenantNestedInput
+  homeSettings?: Prisma.HomeSettingsUpdateOneWithoutTenantNestedInput
+  services?: Prisma.ServiceUpdateManyWithoutTenantNestedInput
+  forms?: Prisma.FormDocumentUpdateManyWithoutTenantNestedInput
+  newsNotices?: Prisma.NewsNoticeUpdateManyWithoutTenantNestedInput
+  faqs?: Prisma.FAQUpdateManyWithoutTenantNestedInput
+  contactSettings?: Prisma.ContactSettingsUpdateOneWithoutTenantNestedInput
+  mediaAssets?: Prisma.MediaAssetUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutAuditLogsInput = {
@@ -682,6 +1042,1056 @@ export type TenantUncheckedUpdateWithoutAuditLogsInput = {
   domains?: Prisma.TenantDomainUncheckedUpdateManyWithoutTenantNestedInput
   settings?: Prisma.TenantSettingsUncheckedUpdateOneWithoutTenantNestedInput
   staff?: Prisma.StaffMembershipUncheckedUpdateManyWithoutTenantNestedInput
+  siteNotices?: Prisma.SiteNoticeUncheckedUpdateManyWithoutTenantNestedInput
+  heroSlides?: Prisma.HomeHeroSlideUncheckedUpdateManyWithoutTenantNestedInput
+  highlights?: Prisma.HomeHighlightUncheckedUpdateManyWithoutTenantNestedInput
+  homeSettings?: Prisma.HomeSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  services?: Prisma.ServiceUncheckedUpdateManyWithoutTenantNestedInput
+  forms?: Prisma.FormDocumentUncheckedUpdateManyWithoutTenantNestedInput
+  newsNotices?: Prisma.NewsNoticeUncheckedUpdateManyWithoutTenantNestedInput
+  faqs?: Prisma.FAQUncheckedUpdateManyWithoutTenantNestedInput
+  contactSettings?: Prisma.ContactSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantCreateWithoutSiteNoticesInput = {
+  id?: string
+  slug: string
+  displayName: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  domains?: Prisma.TenantDomainCreateNestedManyWithoutTenantInput
+  settings?: Prisma.TenantSettingsCreateNestedOneWithoutTenantInput
+  staff?: Prisma.StaffMembershipCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  heroSlides?: Prisma.HomeHeroSlideCreateNestedManyWithoutTenantInput
+  highlights?: Prisma.HomeHighlightCreateNestedManyWithoutTenantInput
+  homeSettings?: Prisma.HomeSettingsCreateNestedOneWithoutTenantInput
+  services?: Prisma.ServiceCreateNestedManyWithoutTenantInput
+  forms?: Prisma.FormDocumentCreateNestedManyWithoutTenantInput
+  newsNotices?: Prisma.NewsNoticeCreateNestedManyWithoutTenantInput
+  faqs?: Prisma.FAQCreateNestedManyWithoutTenantInput
+  contactSettings?: Prisma.ContactSettingsCreateNestedOneWithoutTenantInput
+  mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutTenantInput
+}
+
+export type TenantUncheckedCreateWithoutSiteNoticesInput = {
+  id?: string
+  slug: string
+  displayName: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  domains?: Prisma.TenantDomainUncheckedCreateNestedManyWithoutTenantInput
+  settings?: Prisma.TenantSettingsUncheckedCreateNestedOneWithoutTenantInput
+  staff?: Prisma.StaffMembershipUncheckedCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  heroSlides?: Prisma.HomeHeroSlideUncheckedCreateNestedManyWithoutTenantInput
+  highlights?: Prisma.HomeHighlightUncheckedCreateNestedManyWithoutTenantInput
+  homeSettings?: Prisma.HomeSettingsUncheckedCreateNestedOneWithoutTenantInput
+  services?: Prisma.ServiceUncheckedCreateNestedManyWithoutTenantInput
+  forms?: Prisma.FormDocumentUncheckedCreateNestedManyWithoutTenantInput
+  newsNotices?: Prisma.NewsNoticeUncheckedCreateNestedManyWithoutTenantInput
+  faqs?: Prisma.FAQUncheckedCreateNestedManyWithoutTenantInput
+  contactSettings?: Prisma.ContactSettingsUncheckedCreateNestedOneWithoutTenantInput
+  mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutTenantInput
+}
+
+export type TenantCreateOrConnectWithoutSiteNoticesInput = {
+  where: Prisma.TenantWhereUniqueInput
+  create: Prisma.XOR<Prisma.TenantCreateWithoutSiteNoticesInput, Prisma.TenantUncheckedCreateWithoutSiteNoticesInput>
+}
+
+export type TenantUpsertWithoutSiteNoticesInput = {
+  update: Prisma.XOR<Prisma.TenantUpdateWithoutSiteNoticesInput, Prisma.TenantUncheckedUpdateWithoutSiteNoticesInput>
+  create: Prisma.XOR<Prisma.TenantCreateWithoutSiteNoticesInput, Prisma.TenantUncheckedCreateWithoutSiteNoticesInput>
+  where?: Prisma.TenantWhereInput
+}
+
+export type TenantUpdateToOneWithWhereWithoutSiteNoticesInput = {
+  where?: Prisma.TenantWhereInput
+  data: Prisma.XOR<Prisma.TenantUpdateWithoutSiteNoticesInput, Prisma.TenantUncheckedUpdateWithoutSiteNoticesInput>
+}
+
+export type TenantUpdateWithoutSiteNoticesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  domains?: Prisma.TenantDomainUpdateManyWithoutTenantNestedInput
+  settings?: Prisma.TenantSettingsUpdateOneWithoutTenantNestedInput
+  staff?: Prisma.StaffMembershipUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  heroSlides?: Prisma.HomeHeroSlideUpdateManyWithoutTenantNestedInput
+  highlights?: Prisma.HomeHighlightUpdateManyWithoutTenantNestedInput
+  homeSettings?: Prisma.HomeSettingsUpdateOneWithoutTenantNestedInput
+  services?: Prisma.ServiceUpdateManyWithoutTenantNestedInput
+  forms?: Prisma.FormDocumentUpdateManyWithoutTenantNestedInput
+  newsNotices?: Prisma.NewsNoticeUpdateManyWithoutTenantNestedInput
+  faqs?: Prisma.FAQUpdateManyWithoutTenantNestedInput
+  contactSettings?: Prisma.ContactSettingsUpdateOneWithoutTenantNestedInput
+  mediaAssets?: Prisma.MediaAssetUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantUncheckedUpdateWithoutSiteNoticesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  domains?: Prisma.TenantDomainUncheckedUpdateManyWithoutTenantNestedInput
+  settings?: Prisma.TenantSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  staff?: Prisma.StaffMembershipUncheckedUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  heroSlides?: Prisma.HomeHeroSlideUncheckedUpdateManyWithoutTenantNestedInput
+  highlights?: Prisma.HomeHighlightUncheckedUpdateManyWithoutTenantNestedInput
+  homeSettings?: Prisma.HomeSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  services?: Prisma.ServiceUncheckedUpdateManyWithoutTenantNestedInput
+  forms?: Prisma.FormDocumentUncheckedUpdateManyWithoutTenantNestedInput
+  newsNotices?: Prisma.NewsNoticeUncheckedUpdateManyWithoutTenantNestedInput
+  faqs?: Prisma.FAQUncheckedUpdateManyWithoutTenantNestedInput
+  contactSettings?: Prisma.ContactSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantCreateWithoutHeroSlidesInput = {
+  id?: string
+  slug: string
+  displayName: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  domains?: Prisma.TenantDomainCreateNestedManyWithoutTenantInput
+  settings?: Prisma.TenantSettingsCreateNestedOneWithoutTenantInput
+  staff?: Prisma.StaffMembershipCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  siteNotices?: Prisma.SiteNoticeCreateNestedManyWithoutTenantInput
+  highlights?: Prisma.HomeHighlightCreateNestedManyWithoutTenantInput
+  homeSettings?: Prisma.HomeSettingsCreateNestedOneWithoutTenantInput
+  services?: Prisma.ServiceCreateNestedManyWithoutTenantInput
+  forms?: Prisma.FormDocumentCreateNestedManyWithoutTenantInput
+  newsNotices?: Prisma.NewsNoticeCreateNestedManyWithoutTenantInput
+  faqs?: Prisma.FAQCreateNestedManyWithoutTenantInput
+  contactSettings?: Prisma.ContactSettingsCreateNestedOneWithoutTenantInput
+  mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutTenantInput
+}
+
+export type TenantUncheckedCreateWithoutHeroSlidesInput = {
+  id?: string
+  slug: string
+  displayName: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  domains?: Prisma.TenantDomainUncheckedCreateNestedManyWithoutTenantInput
+  settings?: Prisma.TenantSettingsUncheckedCreateNestedOneWithoutTenantInput
+  staff?: Prisma.StaffMembershipUncheckedCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  siteNotices?: Prisma.SiteNoticeUncheckedCreateNestedManyWithoutTenantInput
+  highlights?: Prisma.HomeHighlightUncheckedCreateNestedManyWithoutTenantInput
+  homeSettings?: Prisma.HomeSettingsUncheckedCreateNestedOneWithoutTenantInput
+  services?: Prisma.ServiceUncheckedCreateNestedManyWithoutTenantInput
+  forms?: Prisma.FormDocumentUncheckedCreateNestedManyWithoutTenantInput
+  newsNotices?: Prisma.NewsNoticeUncheckedCreateNestedManyWithoutTenantInput
+  faqs?: Prisma.FAQUncheckedCreateNestedManyWithoutTenantInput
+  contactSettings?: Prisma.ContactSettingsUncheckedCreateNestedOneWithoutTenantInput
+  mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutTenantInput
+}
+
+export type TenantCreateOrConnectWithoutHeroSlidesInput = {
+  where: Prisma.TenantWhereUniqueInput
+  create: Prisma.XOR<Prisma.TenantCreateWithoutHeroSlidesInput, Prisma.TenantUncheckedCreateWithoutHeroSlidesInput>
+}
+
+export type TenantUpsertWithoutHeroSlidesInput = {
+  update: Prisma.XOR<Prisma.TenantUpdateWithoutHeroSlidesInput, Prisma.TenantUncheckedUpdateWithoutHeroSlidesInput>
+  create: Prisma.XOR<Prisma.TenantCreateWithoutHeroSlidesInput, Prisma.TenantUncheckedCreateWithoutHeroSlidesInput>
+  where?: Prisma.TenantWhereInput
+}
+
+export type TenantUpdateToOneWithWhereWithoutHeroSlidesInput = {
+  where?: Prisma.TenantWhereInput
+  data: Prisma.XOR<Prisma.TenantUpdateWithoutHeroSlidesInput, Prisma.TenantUncheckedUpdateWithoutHeroSlidesInput>
+}
+
+export type TenantUpdateWithoutHeroSlidesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  domains?: Prisma.TenantDomainUpdateManyWithoutTenantNestedInput
+  settings?: Prisma.TenantSettingsUpdateOneWithoutTenantNestedInput
+  staff?: Prisma.StaffMembershipUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  siteNotices?: Prisma.SiteNoticeUpdateManyWithoutTenantNestedInput
+  highlights?: Prisma.HomeHighlightUpdateManyWithoutTenantNestedInput
+  homeSettings?: Prisma.HomeSettingsUpdateOneWithoutTenantNestedInput
+  services?: Prisma.ServiceUpdateManyWithoutTenantNestedInput
+  forms?: Prisma.FormDocumentUpdateManyWithoutTenantNestedInput
+  newsNotices?: Prisma.NewsNoticeUpdateManyWithoutTenantNestedInput
+  faqs?: Prisma.FAQUpdateManyWithoutTenantNestedInput
+  contactSettings?: Prisma.ContactSettingsUpdateOneWithoutTenantNestedInput
+  mediaAssets?: Prisma.MediaAssetUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantUncheckedUpdateWithoutHeroSlidesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  domains?: Prisma.TenantDomainUncheckedUpdateManyWithoutTenantNestedInput
+  settings?: Prisma.TenantSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  staff?: Prisma.StaffMembershipUncheckedUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  siteNotices?: Prisma.SiteNoticeUncheckedUpdateManyWithoutTenantNestedInput
+  highlights?: Prisma.HomeHighlightUncheckedUpdateManyWithoutTenantNestedInput
+  homeSettings?: Prisma.HomeSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  services?: Prisma.ServiceUncheckedUpdateManyWithoutTenantNestedInput
+  forms?: Prisma.FormDocumentUncheckedUpdateManyWithoutTenantNestedInput
+  newsNotices?: Prisma.NewsNoticeUncheckedUpdateManyWithoutTenantNestedInput
+  faqs?: Prisma.FAQUncheckedUpdateManyWithoutTenantNestedInput
+  contactSettings?: Prisma.ContactSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantCreateWithoutHighlightsInput = {
+  id?: string
+  slug: string
+  displayName: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  domains?: Prisma.TenantDomainCreateNestedManyWithoutTenantInput
+  settings?: Prisma.TenantSettingsCreateNestedOneWithoutTenantInput
+  staff?: Prisma.StaffMembershipCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  siteNotices?: Prisma.SiteNoticeCreateNestedManyWithoutTenantInput
+  heroSlides?: Prisma.HomeHeroSlideCreateNestedManyWithoutTenantInput
+  homeSettings?: Prisma.HomeSettingsCreateNestedOneWithoutTenantInput
+  services?: Prisma.ServiceCreateNestedManyWithoutTenantInput
+  forms?: Prisma.FormDocumentCreateNestedManyWithoutTenantInput
+  newsNotices?: Prisma.NewsNoticeCreateNestedManyWithoutTenantInput
+  faqs?: Prisma.FAQCreateNestedManyWithoutTenantInput
+  contactSettings?: Prisma.ContactSettingsCreateNestedOneWithoutTenantInput
+  mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutTenantInput
+}
+
+export type TenantUncheckedCreateWithoutHighlightsInput = {
+  id?: string
+  slug: string
+  displayName: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  domains?: Prisma.TenantDomainUncheckedCreateNestedManyWithoutTenantInput
+  settings?: Prisma.TenantSettingsUncheckedCreateNestedOneWithoutTenantInput
+  staff?: Prisma.StaffMembershipUncheckedCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  siteNotices?: Prisma.SiteNoticeUncheckedCreateNestedManyWithoutTenantInput
+  heroSlides?: Prisma.HomeHeroSlideUncheckedCreateNestedManyWithoutTenantInput
+  homeSettings?: Prisma.HomeSettingsUncheckedCreateNestedOneWithoutTenantInput
+  services?: Prisma.ServiceUncheckedCreateNestedManyWithoutTenantInput
+  forms?: Prisma.FormDocumentUncheckedCreateNestedManyWithoutTenantInput
+  newsNotices?: Prisma.NewsNoticeUncheckedCreateNestedManyWithoutTenantInput
+  faqs?: Prisma.FAQUncheckedCreateNestedManyWithoutTenantInput
+  contactSettings?: Prisma.ContactSettingsUncheckedCreateNestedOneWithoutTenantInput
+  mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutTenantInput
+}
+
+export type TenantCreateOrConnectWithoutHighlightsInput = {
+  where: Prisma.TenantWhereUniqueInput
+  create: Prisma.XOR<Prisma.TenantCreateWithoutHighlightsInput, Prisma.TenantUncheckedCreateWithoutHighlightsInput>
+}
+
+export type TenantUpsertWithoutHighlightsInput = {
+  update: Prisma.XOR<Prisma.TenantUpdateWithoutHighlightsInput, Prisma.TenantUncheckedUpdateWithoutHighlightsInput>
+  create: Prisma.XOR<Prisma.TenantCreateWithoutHighlightsInput, Prisma.TenantUncheckedCreateWithoutHighlightsInput>
+  where?: Prisma.TenantWhereInput
+}
+
+export type TenantUpdateToOneWithWhereWithoutHighlightsInput = {
+  where?: Prisma.TenantWhereInput
+  data: Prisma.XOR<Prisma.TenantUpdateWithoutHighlightsInput, Prisma.TenantUncheckedUpdateWithoutHighlightsInput>
+}
+
+export type TenantUpdateWithoutHighlightsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  domains?: Prisma.TenantDomainUpdateManyWithoutTenantNestedInput
+  settings?: Prisma.TenantSettingsUpdateOneWithoutTenantNestedInput
+  staff?: Prisma.StaffMembershipUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  siteNotices?: Prisma.SiteNoticeUpdateManyWithoutTenantNestedInput
+  heroSlides?: Prisma.HomeHeroSlideUpdateManyWithoutTenantNestedInput
+  homeSettings?: Prisma.HomeSettingsUpdateOneWithoutTenantNestedInput
+  services?: Prisma.ServiceUpdateManyWithoutTenantNestedInput
+  forms?: Prisma.FormDocumentUpdateManyWithoutTenantNestedInput
+  newsNotices?: Prisma.NewsNoticeUpdateManyWithoutTenantNestedInput
+  faqs?: Prisma.FAQUpdateManyWithoutTenantNestedInput
+  contactSettings?: Prisma.ContactSettingsUpdateOneWithoutTenantNestedInput
+  mediaAssets?: Prisma.MediaAssetUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantUncheckedUpdateWithoutHighlightsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  domains?: Prisma.TenantDomainUncheckedUpdateManyWithoutTenantNestedInput
+  settings?: Prisma.TenantSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  staff?: Prisma.StaffMembershipUncheckedUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  siteNotices?: Prisma.SiteNoticeUncheckedUpdateManyWithoutTenantNestedInput
+  heroSlides?: Prisma.HomeHeroSlideUncheckedUpdateManyWithoutTenantNestedInput
+  homeSettings?: Prisma.HomeSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  services?: Prisma.ServiceUncheckedUpdateManyWithoutTenantNestedInput
+  forms?: Prisma.FormDocumentUncheckedUpdateManyWithoutTenantNestedInput
+  newsNotices?: Prisma.NewsNoticeUncheckedUpdateManyWithoutTenantNestedInput
+  faqs?: Prisma.FAQUncheckedUpdateManyWithoutTenantNestedInput
+  contactSettings?: Prisma.ContactSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantCreateWithoutHomeSettingsInput = {
+  id?: string
+  slug: string
+  displayName: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  domains?: Prisma.TenantDomainCreateNestedManyWithoutTenantInput
+  settings?: Prisma.TenantSettingsCreateNestedOneWithoutTenantInput
+  staff?: Prisma.StaffMembershipCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  siteNotices?: Prisma.SiteNoticeCreateNestedManyWithoutTenantInput
+  heroSlides?: Prisma.HomeHeroSlideCreateNestedManyWithoutTenantInput
+  highlights?: Prisma.HomeHighlightCreateNestedManyWithoutTenantInput
+  services?: Prisma.ServiceCreateNestedManyWithoutTenantInput
+  forms?: Prisma.FormDocumentCreateNestedManyWithoutTenantInput
+  newsNotices?: Prisma.NewsNoticeCreateNestedManyWithoutTenantInput
+  faqs?: Prisma.FAQCreateNestedManyWithoutTenantInput
+  contactSettings?: Prisma.ContactSettingsCreateNestedOneWithoutTenantInput
+  mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutTenantInput
+}
+
+export type TenantUncheckedCreateWithoutHomeSettingsInput = {
+  id?: string
+  slug: string
+  displayName: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  domains?: Prisma.TenantDomainUncheckedCreateNestedManyWithoutTenantInput
+  settings?: Prisma.TenantSettingsUncheckedCreateNestedOneWithoutTenantInput
+  staff?: Prisma.StaffMembershipUncheckedCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  siteNotices?: Prisma.SiteNoticeUncheckedCreateNestedManyWithoutTenantInput
+  heroSlides?: Prisma.HomeHeroSlideUncheckedCreateNestedManyWithoutTenantInput
+  highlights?: Prisma.HomeHighlightUncheckedCreateNestedManyWithoutTenantInput
+  services?: Prisma.ServiceUncheckedCreateNestedManyWithoutTenantInput
+  forms?: Prisma.FormDocumentUncheckedCreateNestedManyWithoutTenantInput
+  newsNotices?: Prisma.NewsNoticeUncheckedCreateNestedManyWithoutTenantInput
+  faqs?: Prisma.FAQUncheckedCreateNestedManyWithoutTenantInput
+  contactSettings?: Prisma.ContactSettingsUncheckedCreateNestedOneWithoutTenantInput
+  mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutTenantInput
+}
+
+export type TenantCreateOrConnectWithoutHomeSettingsInput = {
+  where: Prisma.TenantWhereUniqueInput
+  create: Prisma.XOR<Prisma.TenantCreateWithoutHomeSettingsInput, Prisma.TenantUncheckedCreateWithoutHomeSettingsInput>
+}
+
+export type TenantUpsertWithoutHomeSettingsInput = {
+  update: Prisma.XOR<Prisma.TenantUpdateWithoutHomeSettingsInput, Prisma.TenantUncheckedUpdateWithoutHomeSettingsInput>
+  create: Prisma.XOR<Prisma.TenantCreateWithoutHomeSettingsInput, Prisma.TenantUncheckedCreateWithoutHomeSettingsInput>
+  where?: Prisma.TenantWhereInput
+}
+
+export type TenantUpdateToOneWithWhereWithoutHomeSettingsInput = {
+  where?: Prisma.TenantWhereInput
+  data: Prisma.XOR<Prisma.TenantUpdateWithoutHomeSettingsInput, Prisma.TenantUncheckedUpdateWithoutHomeSettingsInput>
+}
+
+export type TenantUpdateWithoutHomeSettingsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  domains?: Prisma.TenantDomainUpdateManyWithoutTenantNestedInput
+  settings?: Prisma.TenantSettingsUpdateOneWithoutTenantNestedInput
+  staff?: Prisma.StaffMembershipUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  siteNotices?: Prisma.SiteNoticeUpdateManyWithoutTenantNestedInput
+  heroSlides?: Prisma.HomeHeroSlideUpdateManyWithoutTenantNestedInput
+  highlights?: Prisma.HomeHighlightUpdateManyWithoutTenantNestedInput
+  services?: Prisma.ServiceUpdateManyWithoutTenantNestedInput
+  forms?: Prisma.FormDocumentUpdateManyWithoutTenantNestedInput
+  newsNotices?: Prisma.NewsNoticeUpdateManyWithoutTenantNestedInput
+  faqs?: Prisma.FAQUpdateManyWithoutTenantNestedInput
+  contactSettings?: Prisma.ContactSettingsUpdateOneWithoutTenantNestedInput
+  mediaAssets?: Prisma.MediaAssetUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantUncheckedUpdateWithoutHomeSettingsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  domains?: Prisma.TenantDomainUncheckedUpdateManyWithoutTenantNestedInput
+  settings?: Prisma.TenantSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  staff?: Prisma.StaffMembershipUncheckedUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  siteNotices?: Prisma.SiteNoticeUncheckedUpdateManyWithoutTenantNestedInput
+  heroSlides?: Prisma.HomeHeroSlideUncheckedUpdateManyWithoutTenantNestedInput
+  highlights?: Prisma.HomeHighlightUncheckedUpdateManyWithoutTenantNestedInput
+  services?: Prisma.ServiceUncheckedUpdateManyWithoutTenantNestedInput
+  forms?: Prisma.FormDocumentUncheckedUpdateManyWithoutTenantNestedInput
+  newsNotices?: Prisma.NewsNoticeUncheckedUpdateManyWithoutTenantNestedInput
+  faqs?: Prisma.FAQUncheckedUpdateManyWithoutTenantNestedInput
+  contactSettings?: Prisma.ContactSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantCreateWithoutServicesInput = {
+  id?: string
+  slug: string
+  displayName: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  domains?: Prisma.TenantDomainCreateNestedManyWithoutTenantInput
+  settings?: Prisma.TenantSettingsCreateNestedOneWithoutTenantInput
+  staff?: Prisma.StaffMembershipCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  siteNotices?: Prisma.SiteNoticeCreateNestedManyWithoutTenantInput
+  heroSlides?: Prisma.HomeHeroSlideCreateNestedManyWithoutTenantInput
+  highlights?: Prisma.HomeHighlightCreateNestedManyWithoutTenantInput
+  homeSettings?: Prisma.HomeSettingsCreateNestedOneWithoutTenantInput
+  forms?: Prisma.FormDocumentCreateNestedManyWithoutTenantInput
+  newsNotices?: Prisma.NewsNoticeCreateNestedManyWithoutTenantInput
+  faqs?: Prisma.FAQCreateNestedManyWithoutTenantInput
+  contactSettings?: Prisma.ContactSettingsCreateNestedOneWithoutTenantInput
+  mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutTenantInput
+}
+
+export type TenantUncheckedCreateWithoutServicesInput = {
+  id?: string
+  slug: string
+  displayName: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  domains?: Prisma.TenantDomainUncheckedCreateNestedManyWithoutTenantInput
+  settings?: Prisma.TenantSettingsUncheckedCreateNestedOneWithoutTenantInput
+  staff?: Prisma.StaffMembershipUncheckedCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  siteNotices?: Prisma.SiteNoticeUncheckedCreateNestedManyWithoutTenantInput
+  heroSlides?: Prisma.HomeHeroSlideUncheckedCreateNestedManyWithoutTenantInput
+  highlights?: Prisma.HomeHighlightUncheckedCreateNestedManyWithoutTenantInput
+  homeSettings?: Prisma.HomeSettingsUncheckedCreateNestedOneWithoutTenantInput
+  forms?: Prisma.FormDocumentUncheckedCreateNestedManyWithoutTenantInput
+  newsNotices?: Prisma.NewsNoticeUncheckedCreateNestedManyWithoutTenantInput
+  faqs?: Prisma.FAQUncheckedCreateNestedManyWithoutTenantInput
+  contactSettings?: Prisma.ContactSettingsUncheckedCreateNestedOneWithoutTenantInput
+  mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutTenantInput
+}
+
+export type TenantCreateOrConnectWithoutServicesInput = {
+  where: Prisma.TenantWhereUniqueInput
+  create: Prisma.XOR<Prisma.TenantCreateWithoutServicesInput, Prisma.TenantUncheckedCreateWithoutServicesInput>
+}
+
+export type TenantUpsertWithoutServicesInput = {
+  update: Prisma.XOR<Prisma.TenantUpdateWithoutServicesInput, Prisma.TenantUncheckedUpdateWithoutServicesInput>
+  create: Prisma.XOR<Prisma.TenantCreateWithoutServicesInput, Prisma.TenantUncheckedCreateWithoutServicesInput>
+  where?: Prisma.TenantWhereInput
+}
+
+export type TenantUpdateToOneWithWhereWithoutServicesInput = {
+  where?: Prisma.TenantWhereInput
+  data: Prisma.XOR<Prisma.TenantUpdateWithoutServicesInput, Prisma.TenantUncheckedUpdateWithoutServicesInput>
+}
+
+export type TenantUpdateWithoutServicesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  domains?: Prisma.TenantDomainUpdateManyWithoutTenantNestedInput
+  settings?: Prisma.TenantSettingsUpdateOneWithoutTenantNestedInput
+  staff?: Prisma.StaffMembershipUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  siteNotices?: Prisma.SiteNoticeUpdateManyWithoutTenantNestedInput
+  heroSlides?: Prisma.HomeHeroSlideUpdateManyWithoutTenantNestedInput
+  highlights?: Prisma.HomeHighlightUpdateManyWithoutTenantNestedInput
+  homeSettings?: Prisma.HomeSettingsUpdateOneWithoutTenantNestedInput
+  forms?: Prisma.FormDocumentUpdateManyWithoutTenantNestedInput
+  newsNotices?: Prisma.NewsNoticeUpdateManyWithoutTenantNestedInput
+  faqs?: Prisma.FAQUpdateManyWithoutTenantNestedInput
+  contactSettings?: Prisma.ContactSettingsUpdateOneWithoutTenantNestedInput
+  mediaAssets?: Prisma.MediaAssetUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantUncheckedUpdateWithoutServicesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  domains?: Prisma.TenantDomainUncheckedUpdateManyWithoutTenantNestedInput
+  settings?: Prisma.TenantSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  staff?: Prisma.StaffMembershipUncheckedUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  siteNotices?: Prisma.SiteNoticeUncheckedUpdateManyWithoutTenantNestedInput
+  heroSlides?: Prisma.HomeHeroSlideUncheckedUpdateManyWithoutTenantNestedInput
+  highlights?: Prisma.HomeHighlightUncheckedUpdateManyWithoutTenantNestedInput
+  homeSettings?: Prisma.HomeSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  forms?: Prisma.FormDocumentUncheckedUpdateManyWithoutTenantNestedInput
+  newsNotices?: Prisma.NewsNoticeUncheckedUpdateManyWithoutTenantNestedInput
+  faqs?: Prisma.FAQUncheckedUpdateManyWithoutTenantNestedInput
+  contactSettings?: Prisma.ContactSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantCreateWithoutFormsInput = {
+  id?: string
+  slug: string
+  displayName: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  domains?: Prisma.TenantDomainCreateNestedManyWithoutTenantInput
+  settings?: Prisma.TenantSettingsCreateNestedOneWithoutTenantInput
+  staff?: Prisma.StaffMembershipCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  siteNotices?: Prisma.SiteNoticeCreateNestedManyWithoutTenantInput
+  heroSlides?: Prisma.HomeHeroSlideCreateNestedManyWithoutTenantInput
+  highlights?: Prisma.HomeHighlightCreateNestedManyWithoutTenantInput
+  homeSettings?: Prisma.HomeSettingsCreateNestedOneWithoutTenantInput
+  services?: Prisma.ServiceCreateNestedManyWithoutTenantInput
+  newsNotices?: Prisma.NewsNoticeCreateNestedManyWithoutTenantInput
+  faqs?: Prisma.FAQCreateNestedManyWithoutTenantInput
+  contactSettings?: Prisma.ContactSettingsCreateNestedOneWithoutTenantInput
+  mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutTenantInput
+}
+
+export type TenantUncheckedCreateWithoutFormsInput = {
+  id?: string
+  slug: string
+  displayName: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  domains?: Prisma.TenantDomainUncheckedCreateNestedManyWithoutTenantInput
+  settings?: Prisma.TenantSettingsUncheckedCreateNestedOneWithoutTenantInput
+  staff?: Prisma.StaffMembershipUncheckedCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  siteNotices?: Prisma.SiteNoticeUncheckedCreateNestedManyWithoutTenantInput
+  heroSlides?: Prisma.HomeHeroSlideUncheckedCreateNestedManyWithoutTenantInput
+  highlights?: Prisma.HomeHighlightUncheckedCreateNestedManyWithoutTenantInput
+  homeSettings?: Prisma.HomeSettingsUncheckedCreateNestedOneWithoutTenantInput
+  services?: Prisma.ServiceUncheckedCreateNestedManyWithoutTenantInput
+  newsNotices?: Prisma.NewsNoticeUncheckedCreateNestedManyWithoutTenantInput
+  faqs?: Prisma.FAQUncheckedCreateNestedManyWithoutTenantInput
+  contactSettings?: Prisma.ContactSettingsUncheckedCreateNestedOneWithoutTenantInput
+  mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutTenantInput
+}
+
+export type TenantCreateOrConnectWithoutFormsInput = {
+  where: Prisma.TenantWhereUniqueInput
+  create: Prisma.XOR<Prisma.TenantCreateWithoutFormsInput, Prisma.TenantUncheckedCreateWithoutFormsInput>
+}
+
+export type TenantUpsertWithoutFormsInput = {
+  update: Prisma.XOR<Prisma.TenantUpdateWithoutFormsInput, Prisma.TenantUncheckedUpdateWithoutFormsInput>
+  create: Prisma.XOR<Prisma.TenantCreateWithoutFormsInput, Prisma.TenantUncheckedCreateWithoutFormsInput>
+  where?: Prisma.TenantWhereInput
+}
+
+export type TenantUpdateToOneWithWhereWithoutFormsInput = {
+  where?: Prisma.TenantWhereInput
+  data: Prisma.XOR<Prisma.TenantUpdateWithoutFormsInput, Prisma.TenantUncheckedUpdateWithoutFormsInput>
+}
+
+export type TenantUpdateWithoutFormsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  domains?: Prisma.TenantDomainUpdateManyWithoutTenantNestedInput
+  settings?: Prisma.TenantSettingsUpdateOneWithoutTenantNestedInput
+  staff?: Prisma.StaffMembershipUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  siteNotices?: Prisma.SiteNoticeUpdateManyWithoutTenantNestedInput
+  heroSlides?: Prisma.HomeHeroSlideUpdateManyWithoutTenantNestedInput
+  highlights?: Prisma.HomeHighlightUpdateManyWithoutTenantNestedInput
+  homeSettings?: Prisma.HomeSettingsUpdateOneWithoutTenantNestedInput
+  services?: Prisma.ServiceUpdateManyWithoutTenantNestedInput
+  newsNotices?: Prisma.NewsNoticeUpdateManyWithoutTenantNestedInput
+  faqs?: Prisma.FAQUpdateManyWithoutTenantNestedInput
+  contactSettings?: Prisma.ContactSettingsUpdateOneWithoutTenantNestedInput
+  mediaAssets?: Prisma.MediaAssetUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantUncheckedUpdateWithoutFormsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  domains?: Prisma.TenantDomainUncheckedUpdateManyWithoutTenantNestedInput
+  settings?: Prisma.TenantSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  staff?: Prisma.StaffMembershipUncheckedUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  siteNotices?: Prisma.SiteNoticeUncheckedUpdateManyWithoutTenantNestedInput
+  heroSlides?: Prisma.HomeHeroSlideUncheckedUpdateManyWithoutTenantNestedInput
+  highlights?: Prisma.HomeHighlightUncheckedUpdateManyWithoutTenantNestedInput
+  homeSettings?: Prisma.HomeSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  services?: Prisma.ServiceUncheckedUpdateManyWithoutTenantNestedInput
+  newsNotices?: Prisma.NewsNoticeUncheckedUpdateManyWithoutTenantNestedInput
+  faqs?: Prisma.FAQUncheckedUpdateManyWithoutTenantNestedInput
+  contactSettings?: Prisma.ContactSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantCreateWithoutNewsNoticesInput = {
+  id?: string
+  slug: string
+  displayName: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  domains?: Prisma.TenantDomainCreateNestedManyWithoutTenantInput
+  settings?: Prisma.TenantSettingsCreateNestedOneWithoutTenantInput
+  staff?: Prisma.StaffMembershipCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  siteNotices?: Prisma.SiteNoticeCreateNestedManyWithoutTenantInput
+  heroSlides?: Prisma.HomeHeroSlideCreateNestedManyWithoutTenantInput
+  highlights?: Prisma.HomeHighlightCreateNestedManyWithoutTenantInput
+  homeSettings?: Prisma.HomeSettingsCreateNestedOneWithoutTenantInput
+  services?: Prisma.ServiceCreateNestedManyWithoutTenantInput
+  forms?: Prisma.FormDocumentCreateNestedManyWithoutTenantInput
+  faqs?: Prisma.FAQCreateNestedManyWithoutTenantInput
+  contactSettings?: Prisma.ContactSettingsCreateNestedOneWithoutTenantInput
+  mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutTenantInput
+}
+
+export type TenantUncheckedCreateWithoutNewsNoticesInput = {
+  id?: string
+  slug: string
+  displayName: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  domains?: Prisma.TenantDomainUncheckedCreateNestedManyWithoutTenantInput
+  settings?: Prisma.TenantSettingsUncheckedCreateNestedOneWithoutTenantInput
+  staff?: Prisma.StaffMembershipUncheckedCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  siteNotices?: Prisma.SiteNoticeUncheckedCreateNestedManyWithoutTenantInput
+  heroSlides?: Prisma.HomeHeroSlideUncheckedCreateNestedManyWithoutTenantInput
+  highlights?: Prisma.HomeHighlightUncheckedCreateNestedManyWithoutTenantInput
+  homeSettings?: Prisma.HomeSettingsUncheckedCreateNestedOneWithoutTenantInput
+  services?: Prisma.ServiceUncheckedCreateNestedManyWithoutTenantInput
+  forms?: Prisma.FormDocumentUncheckedCreateNestedManyWithoutTenantInput
+  faqs?: Prisma.FAQUncheckedCreateNestedManyWithoutTenantInput
+  contactSettings?: Prisma.ContactSettingsUncheckedCreateNestedOneWithoutTenantInput
+  mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutTenantInput
+}
+
+export type TenantCreateOrConnectWithoutNewsNoticesInput = {
+  where: Prisma.TenantWhereUniqueInput
+  create: Prisma.XOR<Prisma.TenantCreateWithoutNewsNoticesInput, Prisma.TenantUncheckedCreateWithoutNewsNoticesInput>
+}
+
+export type TenantUpsertWithoutNewsNoticesInput = {
+  update: Prisma.XOR<Prisma.TenantUpdateWithoutNewsNoticesInput, Prisma.TenantUncheckedUpdateWithoutNewsNoticesInput>
+  create: Prisma.XOR<Prisma.TenantCreateWithoutNewsNoticesInput, Prisma.TenantUncheckedCreateWithoutNewsNoticesInput>
+  where?: Prisma.TenantWhereInput
+}
+
+export type TenantUpdateToOneWithWhereWithoutNewsNoticesInput = {
+  where?: Prisma.TenantWhereInput
+  data: Prisma.XOR<Prisma.TenantUpdateWithoutNewsNoticesInput, Prisma.TenantUncheckedUpdateWithoutNewsNoticesInput>
+}
+
+export type TenantUpdateWithoutNewsNoticesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  domains?: Prisma.TenantDomainUpdateManyWithoutTenantNestedInput
+  settings?: Prisma.TenantSettingsUpdateOneWithoutTenantNestedInput
+  staff?: Prisma.StaffMembershipUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  siteNotices?: Prisma.SiteNoticeUpdateManyWithoutTenantNestedInput
+  heroSlides?: Prisma.HomeHeroSlideUpdateManyWithoutTenantNestedInput
+  highlights?: Prisma.HomeHighlightUpdateManyWithoutTenantNestedInput
+  homeSettings?: Prisma.HomeSettingsUpdateOneWithoutTenantNestedInput
+  services?: Prisma.ServiceUpdateManyWithoutTenantNestedInput
+  forms?: Prisma.FormDocumentUpdateManyWithoutTenantNestedInput
+  faqs?: Prisma.FAQUpdateManyWithoutTenantNestedInput
+  contactSettings?: Prisma.ContactSettingsUpdateOneWithoutTenantNestedInput
+  mediaAssets?: Prisma.MediaAssetUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantUncheckedUpdateWithoutNewsNoticesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  domains?: Prisma.TenantDomainUncheckedUpdateManyWithoutTenantNestedInput
+  settings?: Prisma.TenantSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  staff?: Prisma.StaffMembershipUncheckedUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  siteNotices?: Prisma.SiteNoticeUncheckedUpdateManyWithoutTenantNestedInput
+  heroSlides?: Prisma.HomeHeroSlideUncheckedUpdateManyWithoutTenantNestedInput
+  highlights?: Prisma.HomeHighlightUncheckedUpdateManyWithoutTenantNestedInput
+  homeSettings?: Prisma.HomeSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  services?: Prisma.ServiceUncheckedUpdateManyWithoutTenantNestedInput
+  forms?: Prisma.FormDocumentUncheckedUpdateManyWithoutTenantNestedInput
+  faqs?: Prisma.FAQUncheckedUpdateManyWithoutTenantNestedInput
+  contactSettings?: Prisma.ContactSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantCreateWithoutFaqsInput = {
+  id?: string
+  slug: string
+  displayName: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  domains?: Prisma.TenantDomainCreateNestedManyWithoutTenantInput
+  settings?: Prisma.TenantSettingsCreateNestedOneWithoutTenantInput
+  staff?: Prisma.StaffMembershipCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  siteNotices?: Prisma.SiteNoticeCreateNestedManyWithoutTenantInput
+  heroSlides?: Prisma.HomeHeroSlideCreateNestedManyWithoutTenantInput
+  highlights?: Prisma.HomeHighlightCreateNestedManyWithoutTenantInput
+  homeSettings?: Prisma.HomeSettingsCreateNestedOneWithoutTenantInput
+  services?: Prisma.ServiceCreateNestedManyWithoutTenantInput
+  forms?: Prisma.FormDocumentCreateNestedManyWithoutTenantInput
+  newsNotices?: Prisma.NewsNoticeCreateNestedManyWithoutTenantInput
+  contactSettings?: Prisma.ContactSettingsCreateNestedOneWithoutTenantInput
+  mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutTenantInput
+}
+
+export type TenantUncheckedCreateWithoutFaqsInput = {
+  id?: string
+  slug: string
+  displayName: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  domains?: Prisma.TenantDomainUncheckedCreateNestedManyWithoutTenantInput
+  settings?: Prisma.TenantSettingsUncheckedCreateNestedOneWithoutTenantInput
+  staff?: Prisma.StaffMembershipUncheckedCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  siteNotices?: Prisma.SiteNoticeUncheckedCreateNestedManyWithoutTenantInput
+  heroSlides?: Prisma.HomeHeroSlideUncheckedCreateNestedManyWithoutTenantInput
+  highlights?: Prisma.HomeHighlightUncheckedCreateNestedManyWithoutTenantInput
+  homeSettings?: Prisma.HomeSettingsUncheckedCreateNestedOneWithoutTenantInput
+  services?: Prisma.ServiceUncheckedCreateNestedManyWithoutTenantInput
+  forms?: Prisma.FormDocumentUncheckedCreateNestedManyWithoutTenantInput
+  newsNotices?: Prisma.NewsNoticeUncheckedCreateNestedManyWithoutTenantInput
+  contactSettings?: Prisma.ContactSettingsUncheckedCreateNestedOneWithoutTenantInput
+  mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutTenantInput
+}
+
+export type TenantCreateOrConnectWithoutFaqsInput = {
+  where: Prisma.TenantWhereUniqueInput
+  create: Prisma.XOR<Prisma.TenantCreateWithoutFaqsInput, Prisma.TenantUncheckedCreateWithoutFaqsInput>
+}
+
+export type TenantUpsertWithoutFaqsInput = {
+  update: Prisma.XOR<Prisma.TenantUpdateWithoutFaqsInput, Prisma.TenantUncheckedUpdateWithoutFaqsInput>
+  create: Prisma.XOR<Prisma.TenantCreateWithoutFaqsInput, Prisma.TenantUncheckedCreateWithoutFaqsInput>
+  where?: Prisma.TenantWhereInput
+}
+
+export type TenantUpdateToOneWithWhereWithoutFaqsInput = {
+  where?: Prisma.TenantWhereInput
+  data: Prisma.XOR<Prisma.TenantUpdateWithoutFaqsInput, Prisma.TenantUncheckedUpdateWithoutFaqsInput>
+}
+
+export type TenantUpdateWithoutFaqsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  domains?: Prisma.TenantDomainUpdateManyWithoutTenantNestedInput
+  settings?: Prisma.TenantSettingsUpdateOneWithoutTenantNestedInput
+  staff?: Prisma.StaffMembershipUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  siteNotices?: Prisma.SiteNoticeUpdateManyWithoutTenantNestedInput
+  heroSlides?: Prisma.HomeHeroSlideUpdateManyWithoutTenantNestedInput
+  highlights?: Prisma.HomeHighlightUpdateManyWithoutTenantNestedInput
+  homeSettings?: Prisma.HomeSettingsUpdateOneWithoutTenantNestedInput
+  services?: Prisma.ServiceUpdateManyWithoutTenantNestedInput
+  forms?: Prisma.FormDocumentUpdateManyWithoutTenantNestedInput
+  newsNotices?: Prisma.NewsNoticeUpdateManyWithoutTenantNestedInput
+  contactSettings?: Prisma.ContactSettingsUpdateOneWithoutTenantNestedInput
+  mediaAssets?: Prisma.MediaAssetUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantUncheckedUpdateWithoutFaqsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  domains?: Prisma.TenantDomainUncheckedUpdateManyWithoutTenantNestedInput
+  settings?: Prisma.TenantSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  staff?: Prisma.StaffMembershipUncheckedUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  siteNotices?: Prisma.SiteNoticeUncheckedUpdateManyWithoutTenantNestedInput
+  heroSlides?: Prisma.HomeHeroSlideUncheckedUpdateManyWithoutTenantNestedInput
+  highlights?: Prisma.HomeHighlightUncheckedUpdateManyWithoutTenantNestedInput
+  homeSettings?: Prisma.HomeSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  services?: Prisma.ServiceUncheckedUpdateManyWithoutTenantNestedInput
+  forms?: Prisma.FormDocumentUncheckedUpdateManyWithoutTenantNestedInput
+  newsNotices?: Prisma.NewsNoticeUncheckedUpdateManyWithoutTenantNestedInput
+  contactSettings?: Prisma.ContactSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantCreateWithoutContactSettingsInput = {
+  id?: string
+  slug: string
+  displayName: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  domains?: Prisma.TenantDomainCreateNestedManyWithoutTenantInput
+  settings?: Prisma.TenantSettingsCreateNestedOneWithoutTenantInput
+  staff?: Prisma.StaffMembershipCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  siteNotices?: Prisma.SiteNoticeCreateNestedManyWithoutTenantInput
+  heroSlides?: Prisma.HomeHeroSlideCreateNestedManyWithoutTenantInput
+  highlights?: Prisma.HomeHighlightCreateNestedManyWithoutTenantInput
+  homeSettings?: Prisma.HomeSettingsCreateNestedOneWithoutTenantInput
+  services?: Prisma.ServiceCreateNestedManyWithoutTenantInput
+  forms?: Prisma.FormDocumentCreateNestedManyWithoutTenantInput
+  newsNotices?: Prisma.NewsNoticeCreateNestedManyWithoutTenantInput
+  faqs?: Prisma.FAQCreateNestedManyWithoutTenantInput
+  mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutTenantInput
+}
+
+export type TenantUncheckedCreateWithoutContactSettingsInput = {
+  id?: string
+  slug: string
+  displayName: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  domains?: Prisma.TenantDomainUncheckedCreateNestedManyWithoutTenantInput
+  settings?: Prisma.TenantSettingsUncheckedCreateNestedOneWithoutTenantInput
+  staff?: Prisma.StaffMembershipUncheckedCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  siteNotices?: Prisma.SiteNoticeUncheckedCreateNestedManyWithoutTenantInput
+  heroSlides?: Prisma.HomeHeroSlideUncheckedCreateNestedManyWithoutTenantInput
+  highlights?: Prisma.HomeHighlightUncheckedCreateNestedManyWithoutTenantInput
+  homeSettings?: Prisma.HomeSettingsUncheckedCreateNestedOneWithoutTenantInput
+  services?: Prisma.ServiceUncheckedCreateNestedManyWithoutTenantInput
+  forms?: Prisma.FormDocumentUncheckedCreateNestedManyWithoutTenantInput
+  newsNotices?: Prisma.NewsNoticeUncheckedCreateNestedManyWithoutTenantInput
+  faqs?: Prisma.FAQUncheckedCreateNestedManyWithoutTenantInput
+  mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutTenantInput
+}
+
+export type TenantCreateOrConnectWithoutContactSettingsInput = {
+  where: Prisma.TenantWhereUniqueInput
+  create: Prisma.XOR<Prisma.TenantCreateWithoutContactSettingsInput, Prisma.TenantUncheckedCreateWithoutContactSettingsInput>
+}
+
+export type TenantUpsertWithoutContactSettingsInput = {
+  update: Prisma.XOR<Prisma.TenantUpdateWithoutContactSettingsInput, Prisma.TenantUncheckedUpdateWithoutContactSettingsInput>
+  create: Prisma.XOR<Prisma.TenantCreateWithoutContactSettingsInput, Prisma.TenantUncheckedCreateWithoutContactSettingsInput>
+  where?: Prisma.TenantWhereInput
+}
+
+export type TenantUpdateToOneWithWhereWithoutContactSettingsInput = {
+  where?: Prisma.TenantWhereInput
+  data: Prisma.XOR<Prisma.TenantUpdateWithoutContactSettingsInput, Prisma.TenantUncheckedUpdateWithoutContactSettingsInput>
+}
+
+export type TenantUpdateWithoutContactSettingsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  domains?: Prisma.TenantDomainUpdateManyWithoutTenantNestedInput
+  settings?: Prisma.TenantSettingsUpdateOneWithoutTenantNestedInput
+  staff?: Prisma.StaffMembershipUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  siteNotices?: Prisma.SiteNoticeUpdateManyWithoutTenantNestedInput
+  heroSlides?: Prisma.HomeHeroSlideUpdateManyWithoutTenantNestedInput
+  highlights?: Prisma.HomeHighlightUpdateManyWithoutTenantNestedInput
+  homeSettings?: Prisma.HomeSettingsUpdateOneWithoutTenantNestedInput
+  services?: Prisma.ServiceUpdateManyWithoutTenantNestedInput
+  forms?: Prisma.FormDocumentUpdateManyWithoutTenantNestedInput
+  newsNotices?: Prisma.NewsNoticeUpdateManyWithoutTenantNestedInput
+  faqs?: Prisma.FAQUpdateManyWithoutTenantNestedInput
+  mediaAssets?: Prisma.MediaAssetUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantUncheckedUpdateWithoutContactSettingsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  domains?: Prisma.TenantDomainUncheckedUpdateManyWithoutTenantNestedInput
+  settings?: Prisma.TenantSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  staff?: Prisma.StaffMembershipUncheckedUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  siteNotices?: Prisma.SiteNoticeUncheckedUpdateManyWithoutTenantNestedInput
+  heroSlides?: Prisma.HomeHeroSlideUncheckedUpdateManyWithoutTenantNestedInput
+  highlights?: Prisma.HomeHighlightUncheckedUpdateManyWithoutTenantNestedInput
+  homeSettings?: Prisma.HomeSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  services?: Prisma.ServiceUncheckedUpdateManyWithoutTenantNestedInput
+  forms?: Prisma.FormDocumentUncheckedUpdateManyWithoutTenantNestedInput
+  newsNotices?: Prisma.NewsNoticeUncheckedUpdateManyWithoutTenantNestedInput
+  faqs?: Prisma.FAQUncheckedUpdateManyWithoutTenantNestedInput
+  mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantCreateWithoutMediaAssetsInput = {
+  id?: string
+  slug: string
+  displayName: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  domains?: Prisma.TenantDomainCreateNestedManyWithoutTenantInput
+  settings?: Prisma.TenantSettingsCreateNestedOneWithoutTenantInput
+  staff?: Prisma.StaffMembershipCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  siteNotices?: Prisma.SiteNoticeCreateNestedManyWithoutTenantInput
+  heroSlides?: Prisma.HomeHeroSlideCreateNestedManyWithoutTenantInput
+  highlights?: Prisma.HomeHighlightCreateNestedManyWithoutTenantInput
+  homeSettings?: Prisma.HomeSettingsCreateNestedOneWithoutTenantInput
+  services?: Prisma.ServiceCreateNestedManyWithoutTenantInput
+  forms?: Prisma.FormDocumentCreateNestedManyWithoutTenantInput
+  newsNotices?: Prisma.NewsNoticeCreateNestedManyWithoutTenantInput
+  faqs?: Prisma.FAQCreateNestedManyWithoutTenantInput
+  contactSettings?: Prisma.ContactSettingsCreateNestedOneWithoutTenantInput
+}
+
+export type TenantUncheckedCreateWithoutMediaAssetsInput = {
+  id?: string
+  slug: string
+  displayName: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  domains?: Prisma.TenantDomainUncheckedCreateNestedManyWithoutTenantInput
+  settings?: Prisma.TenantSettingsUncheckedCreateNestedOneWithoutTenantInput
+  staff?: Prisma.StaffMembershipUncheckedCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  siteNotices?: Prisma.SiteNoticeUncheckedCreateNestedManyWithoutTenantInput
+  heroSlides?: Prisma.HomeHeroSlideUncheckedCreateNestedManyWithoutTenantInput
+  highlights?: Prisma.HomeHighlightUncheckedCreateNestedManyWithoutTenantInput
+  homeSettings?: Prisma.HomeSettingsUncheckedCreateNestedOneWithoutTenantInput
+  services?: Prisma.ServiceUncheckedCreateNestedManyWithoutTenantInput
+  forms?: Prisma.FormDocumentUncheckedCreateNestedManyWithoutTenantInput
+  newsNotices?: Prisma.NewsNoticeUncheckedCreateNestedManyWithoutTenantInput
+  faqs?: Prisma.FAQUncheckedCreateNestedManyWithoutTenantInput
+  contactSettings?: Prisma.ContactSettingsUncheckedCreateNestedOneWithoutTenantInput
+}
+
+export type TenantCreateOrConnectWithoutMediaAssetsInput = {
+  where: Prisma.TenantWhereUniqueInput
+  create: Prisma.XOR<Prisma.TenantCreateWithoutMediaAssetsInput, Prisma.TenantUncheckedCreateWithoutMediaAssetsInput>
+}
+
+export type TenantUpsertWithoutMediaAssetsInput = {
+  update: Prisma.XOR<Prisma.TenantUpdateWithoutMediaAssetsInput, Prisma.TenantUncheckedUpdateWithoutMediaAssetsInput>
+  create: Prisma.XOR<Prisma.TenantCreateWithoutMediaAssetsInput, Prisma.TenantUncheckedCreateWithoutMediaAssetsInput>
+  where?: Prisma.TenantWhereInput
+}
+
+export type TenantUpdateToOneWithWhereWithoutMediaAssetsInput = {
+  where?: Prisma.TenantWhereInput
+  data: Prisma.XOR<Prisma.TenantUpdateWithoutMediaAssetsInput, Prisma.TenantUncheckedUpdateWithoutMediaAssetsInput>
+}
+
+export type TenantUpdateWithoutMediaAssetsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  domains?: Prisma.TenantDomainUpdateManyWithoutTenantNestedInput
+  settings?: Prisma.TenantSettingsUpdateOneWithoutTenantNestedInput
+  staff?: Prisma.StaffMembershipUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  siteNotices?: Prisma.SiteNoticeUpdateManyWithoutTenantNestedInput
+  heroSlides?: Prisma.HomeHeroSlideUpdateManyWithoutTenantNestedInput
+  highlights?: Prisma.HomeHighlightUpdateManyWithoutTenantNestedInput
+  homeSettings?: Prisma.HomeSettingsUpdateOneWithoutTenantNestedInput
+  services?: Prisma.ServiceUpdateManyWithoutTenantNestedInput
+  forms?: Prisma.FormDocumentUpdateManyWithoutTenantNestedInput
+  newsNotices?: Prisma.NewsNoticeUpdateManyWithoutTenantNestedInput
+  faqs?: Prisma.FAQUpdateManyWithoutTenantNestedInput
+  contactSettings?: Prisma.ContactSettingsUpdateOneWithoutTenantNestedInput
+}
+
+export type TenantUncheckedUpdateWithoutMediaAssetsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  domains?: Prisma.TenantDomainUncheckedUpdateManyWithoutTenantNestedInput
+  settings?: Prisma.TenantSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  staff?: Prisma.StaffMembershipUncheckedUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  siteNotices?: Prisma.SiteNoticeUncheckedUpdateManyWithoutTenantNestedInput
+  heroSlides?: Prisma.HomeHeroSlideUncheckedUpdateManyWithoutTenantNestedInput
+  highlights?: Prisma.HomeHighlightUncheckedUpdateManyWithoutTenantNestedInput
+  homeSettings?: Prisma.HomeSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  services?: Prisma.ServiceUncheckedUpdateManyWithoutTenantNestedInput
+  forms?: Prisma.FormDocumentUncheckedUpdateManyWithoutTenantNestedInput
+  newsNotices?: Prisma.NewsNoticeUncheckedUpdateManyWithoutTenantNestedInput
+  faqs?: Prisma.FAQUncheckedUpdateManyWithoutTenantNestedInput
+  contactSettings?: Prisma.ContactSettingsUncheckedUpdateOneWithoutTenantNestedInput
 }
 
 
@@ -693,12 +2103,28 @@ export type TenantCountOutputType = {
   domains: number
   staff: number
   auditLogs: number
+  siteNotices: number
+  heroSlides: number
+  highlights: number
+  services: number
+  forms: number
+  newsNotices: number
+  faqs: number
+  mediaAssets: number
 }
 
 export type TenantCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   domains?: boolean | TenantCountOutputTypeCountDomainsArgs
   staff?: boolean | TenantCountOutputTypeCountStaffArgs
   auditLogs?: boolean | TenantCountOutputTypeCountAuditLogsArgs
+  siteNotices?: boolean | TenantCountOutputTypeCountSiteNoticesArgs
+  heroSlides?: boolean | TenantCountOutputTypeCountHeroSlidesArgs
+  highlights?: boolean | TenantCountOutputTypeCountHighlightsArgs
+  services?: boolean | TenantCountOutputTypeCountServicesArgs
+  forms?: boolean | TenantCountOutputTypeCountFormsArgs
+  newsNotices?: boolean | TenantCountOutputTypeCountNewsNoticesArgs
+  faqs?: boolean | TenantCountOutputTypeCountFaqsArgs
+  mediaAssets?: boolean | TenantCountOutputTypeCountMediaAssetsArgs
 }
 
 /**
@@ -732,6 +2158,62 @@ export type TenantCountOutputTypeCountAuditLogsArgs<ExtArgs extends runtime.Type
   where?: Prisma.AuditLogWhereInput
 }
 
+/**
+ * TenantCountOutputType without action
+ */
+export type TenantCountOutputTypeCountSiteNoticesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SiteNoticeWhereInput
+}
+
+/**
+ * TenantCountOutputType without action
+ */
+export type TenantCountOutputTypeCountHeroSlidesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.HomeHeroSlideWhereInput
+}
+
+/**
+ * TenantCountOutputType without action
+ */
+export type TenantCountOutputTypeCountHighlightsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.HomeHighlightWhereInput
+}
+
+/**
+ * TenantCountOutputType without action
+ */
+export type TenantCountOutputTypeCountServicesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ServiceWhereInput
+}
+
+/**
+ * TenantCountOutputType without action
+ */
+export type TenantCountOutputTypeCountFormsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.FormDocumentWhereInput
+}
+
+/**
+ * TenantCountOutputType without action
+ */
+export type TenantCountOutputTypeCountNewsNoticesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.NewsNoticeWhereInput
+}
+
+/**
+ * TenantCountOutputType without action
+ */
+export type TenantCountOutputTypeCountFaqsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.FAQWhereInput
+}
+
+/**
+ * TenantCountOutputType without action
+ */
+export type TenantCountOutputTypeCountMediaAssetsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.MediaAssetWhereInput
+}
+
 
 export type TenantSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -744,6 +2226,16 @@ export type TenantSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   settings?: boolean | Prisma.Tenant$settingsArgs<ExtArgs>
   staff?: boolean | Prisma.Tenant$staffArgs<ExtArgs>
   auditLogs?: boolean | Prisma.Tenant$auditLogsArgs<ExtArgs>
+  siteNotices?: boolean | Prisma.Tenant$siteNoticesArgs<ExtArgs>
+  heroSlides?: boolean | Prisma.Tenant$heroSlidesArgs<ExtArgs>
+  highlights?: boolean | Prisma.Tenant$highlightsArgs<ExtArgs>
+  homeSettings?: boolean | Prisma.Tenant$homeSettingsArgs<ExtArgs>
+  services?: boolean | Prisma.Tenant$servicesArgs<ExtArgs>
+  forms?: boolean | Prisma.Tenant$formsArgs<ExtArgs>
+  newsNotices?: boolean | Prisma.Tenant$newsNoticesArgs<ExtArgs>
+  faqs?: boolean | Prisma.Tenant$faqsArgs<ExtArgs>
+  contactSettings?: boolean | Prisma.Tenant$contactSettingsArgs<ExtArgs>
+  mediaAssets?: boolean | Prisma.Tenant$mediaAssetsArgs<ExtArgs>
   _count?: boolean | Prisma.TenantCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["tenant"]>
 
@@ -780,6 +2272,16 @@ export type TenantInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   settings?: boolean | Prisma.Tenant$settingsArgs<ExtArgs>
   staff?: boolean | Prisma.Tenant$staffArgs<ExtArgs>
   auditLogs?: boolean | Prisma.Tenant$auditLogsArgs<ExtArgs>
+  siteNotices?: boolean | Prisma.Tenant$siteNoticesArgs<ExtArgs>
+  heroSlides?: boolean | Prisma.Tenant$heroSlidesArgs<ExtArgs>
+  highlights?: boolean | Prisma.Tenant$highlightsArgs<ExtArgs>
+  homeSettings?: boolean | Prisma.Tenant$homeSettingsArgs<ExtArgs>
+  services?: boolean | Prisma.Tenant$servicesArgs<ExtArgs>
+  forms?: boolean | Prisma.Tenant$formsArgs<ExtArgs>
+  newsNotices?: boolean | Prisma.Tenant$newsNoticesArgs<ExtArgs>
+  faqs?: boolean | Prisma.Tenant$faqsArgs<ExtArgs>
+  contactSettings?: boolean | Prisma.Tenant$contactSettingsArgs<ExtArgs>
+  mediaAssets?: boolean | Prisma.Tenant$mediaAssetsArgs<ExtArgs>
   _count?: boolean | Prisma.TenantCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type TenantIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -792,6 +2294,16 @@ export type $TenantPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     settings: Prisma.$TenantSettingsPayload<ExtArgs> | null
     staff: Prisma.$StaffMembershipPayload<ExtArgs>[]
     auditLogs: Prisma.$AuditLogPayload<ExtArgs>[]
+    siteNotices: Prisma.$SiteNoticePayload<ExtArgs>[]
+    heroSlides: Prisma.$HomeHeroSlidePayload<ExtArgs>[]
+    highlights: Prisma.$HomeHighlightPayload<ExtArgs>[]
+    homeSettings: Prisma.$HomeSettingsPayload<ExtArgs> | null
+    services: Prisma.$ServicePayload<ExtArgs>[]
+    forms: Prisma.$FormDocumentPayload<ExtArgs>[]
+    newsNotices: Prisma.$NewsNoticePayload<ExtArgs>[]
+    faqs: Prisma.$FAQPayload<ExtArgs>[]
+    contactSettings: Prisma.$ContactSettingsPayload<ExtArgs> | null
+    mediaAssets: Prisma.$MediaAssetPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1198,6 +2710,16 @@ export interface Prisma__TenantClient<T, Null = never, ExtArgs extends runtime.T
   settings<T extends Prisma.Tenant$settingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$settingsArgs<ExtArgs>>): Prisma.Prisma__TenantSettingsClient<runtime.Types.Result.GetResult<Prisma.$TenantSettingsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   staff<T extends Prisma.Tenant$staffArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$staffArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StaffMembershipPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   auditLogs<T extends Prisma.Tenant$auditLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$auditLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  siteNotices<T extends Prisma.Tenant$siteNoticesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$siteNoticesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SiteNoticePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  heroSlides<T extends Prisma.Tenant$heroSlidesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$heroSlidesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$HomeHeroSlidePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  highlights<T extends Prisma.Tenant$highlightsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$highlightsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$HomeHighlightPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  homeSettings<T extends Prisma.Tenant$homeSettingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$homeSettingsArgs<ExtArgs>>): Prisma.Prisma__HomeSettingsClient<runtime.Types.Result.GetResult<Prisma.$HomeSettingsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  services<T extends Prisma.Tenant$servicesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$servicesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ServicePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  forms<T extends Prisma.Tenant$formsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$formsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FormDocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  newsNotices<T extends Prisma.Tenant$newsNoticesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$newsNoticesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NewsNoticePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  faqs<T extends Prisma.Tenant$faqsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$faqsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FAQPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  contactSettings<T extends Prisma.Tenant$contactSettingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$contactSettingsArgs<ExtArgs>>): Prisma.Prisma__ContactSettingsClient<runtime.Types.Result.GetResult<Prisma.$ContactSettingsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  mediaAssets<T extends Prisma.Tenant$mediaAssetsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$mediaAssetsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MediaAssetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1714,6 +3236,236 @@ export type Tenant$auditLogsArgs<ExtArgs extends runtime.Types.Extensions.Intern
   take?: number
   skip?: number
   distinct?: Prisma.AuditLogScalarFieldEnum | Prisma.AuditLogScalarFieldEnum[]
+}
+
+/**
+ * Tenant.siteNotices
+ */
+export type Tenant$siteNoticesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SiteNotice
+   */
+  select?: Prisma.SiteNoticeSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SiteNotice
+   */
+  omit?: Prisma.SiteNoticeOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SiteNoticeInclude<ExtArgs> | null
+  where?: Prisma.SiteNoticeWhereInput
+  orderBy?: Prisma.SiteNoticeOrderByWithRelationInput | Prisma.SiteNoticeOrderByWithRelationInput[]
+  cursor?: Prisma.SiteNoticeWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SiteNoticeScalarFieldEnum | Prisma.SiteNoticeScalarFieldEnum[]
+}
+
+/**
+ * Tenant.heroSlides
+ */
+export type Tenant$heroSlidesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the HomeHeroSlide
+   */
+  select?: Prisma.HomeHeroSlideSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the HomeHeroSlide
+   */
+  omit?: Prisma.HomeHeroSlideOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.HomeHeroSlideInclude<ExtArgs> | null
+  where?: Prisma.HomeHeroSlideWhereInput
+  orderBy?: Prisma.HomeHeroSlideOrderByWithRelationInput | Prisma.HomeHeroSlideOrderByWithRelationInput[]
+  cursor?: Prisma.HomeHeroSlideWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.HomeHeroSlideScalarFieldEnum | Prisma.HomeHeroSlideScalarFieldEnum[]
+}
+
+/**
+ * Tenant.highlights
+ */
+export type Tenant$highlightsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the HomeHighlight
+   */
+  select?: Prisma.HomeHighlightSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the HomeHighlight
+   */
+  omit?: Prisma.HomeHighlightOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.HomeHighlightInclude<ExtArgs> | null
+  where?: Prisma.HomeHighlightWhereInput
+  orderBy?: Prisma.HomeHighlightOrderByWithRelationInput | Prisma.HomeHighlightOrderByWithRelationInput[]
+  cursor?: Prisma.HomeHighlightWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.HomeHighlightScalarFieldEnum | Prisma.HomeHighlightScalarFieldEnum[]
+}
+
+/**
+ * Tenant.homeSettings
+ */
+export type Tenant$homeSettingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the HomeSettings
+   */
+  select?: Prisma.HomeSettingsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the HomeSettings
+   */
+  omit?: Prisma.HomeSettingsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.HomeSettingsInclude<ExtArgs> | null
+  where?: Prisma.HomeSettingsWhereInput
+}
+
+/**
+ * Tenant.services
+ */
+export type Tenant$servicesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Service
+   */
+  select?: Prisma.ServiceSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Service
+   */
+  omit?: Prisma.ServiceOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ServiceInclude<ExtArgs> | null
+  where?: Prisma.ServiceWhereInput
+  orderBy?: Prisma.ServiceOrderByWithRelationInput | Prisma.ServiceOrderByWithRelationInput[]
+  cursor?: Prisma.ServiceWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ServiceScalarFieldEnum | Prisma.ServiceScalarFieldEnum[]
+}
+
+/**
+ * Tenant.forms
+ */
+export type Tenant$formsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the FormDocument
+   */
+  select?: Prisma.FormDocumentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the FormDocument
+   */
+  omit?: Prisma.FormDocumentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.FormDocumentInclude<ExtArgs> | null
+  where?: Prisma.FormDocumentWhereInput
+  orderBy?: Prisma.FormDocumentOrderByWithRelationInput | Prisma.FormDocumentOrderByWithRelationInput[]
+  cursor?: Prisma.FormDocumentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.FormDocumentScalarFieldEnum | Prisma.FormDocumentScalarFieldEnum[]
+}
+
+/**
+ * Tenant.newsNotices
+ */
+export type Tenant$newsNoticesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the NewsNotice
+   */
+  select?: Prisma.NewsNoticeSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the NewsNotice
+   */
+  omit?: Prisma.NewsNoticeOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.NewsNoticeInclude<ExtArgs> | null
+  where?: Prisma.NewsNoticeWhereInput
+  orderBy?: Prisma.NewsNoticeOrderByWithRelationInput | Prisma.NewsNoticeOrderByWithRelationInput[]
+  cursor?: Prisma.NewsNoticeWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.NewsNoticeScalarFieldEnum | Prisma.NewsNoticeScalarFieldEnum[]
+}
+
+/**
+ * Tenant.faqs
+ */
+export type Tenant$faqsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the FAQ
+   */
+  select?: Prisma.FAQSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the FAQ
+   */
+  omit?: Prisma.FAQOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.FAQInclude<ExtArgs> | null
+  where?: Prisma.FAQWhereInput
+  orderBy?: Prisma.FAQOrderByWithRelationInput | Prisma.FAQOrderByWithRelationInput[]
+  cursor?: Prisma.FAQWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.FAQScalarFieldEnum | Prisma.FAQScalarFieldEnum[]
+}
+
+/**
+ * Tenant.contactSettings
+ */
+export type Tenant$contactSettingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ContactSettings
+   */
+  select?: Prisma.ContactSettingsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ContactSettings
+   */
+  omit?: Prisma.ContactSettingsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ContactSettingsInclude<ExtArgs> | null
+  where?: Prisma.ContactSettingsWhereInput
+}
+
+/**
+ * Tenant.mediaAssets
+ */
+export type Tenant$mediaAssetsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the MediaAsset
+   */
+  select?: Prisma.MediaAssetSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the MediaAsset
+   */
+  omit?: Prisma.MediaAssetOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MediaAssetInclude<ExtArgs> | null
+  where?: Prisma.MediaAssetWhereInput
+  orderBy?: Prisma.MediaAssetOrderByWithRelationInput | Prisma.MediaAssetOrderByWithRelationInput[]
+  cursor?: Prisma.MediaAssetWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.MediaAssetScalarFieldEnum | Prisma.MediaAssetScalarFieldEnum[]
 }
 
 /**

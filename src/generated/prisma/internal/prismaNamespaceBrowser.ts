@@ -59,7 +59,17 @@ export const ModelName = {
   Account: 'Account',
   Verification: 'Verification',
   StaffMembership: 'StaffMembership',
-  AuditLog: 'AuditLog'
+  AuditLog: 'AuditLog',
+  SiteNotice: 'SiteNotice',
+  HomeHeroSlide: 'HomeHeroSlide',
+  HomeHighlight: 'HomeHighlight',
+  HomeSettings: 'HomeSettings',
+  Service: 'Service',
+  FormDocument: 'FormDocument',
+  NewsNotice: 'NewsNotice',
+  FAQ: 'FAQ',
+  ContactSettings: 'ContactSettings',
+  MediaAsset: 'MediaAsset'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -199,6 +209,159 @@ export const AuditLogScalarFieldEnum = {
 } as const
 
 export type AuditLogScalarFieldEnum = (typeof AuditLogScalarFieldEnum)[keyof typeof AuditLogScalarFieldEnum]
+
+
+export const SiteNoticeScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  message: 'message',
+  actionText: 'actionText',
+  actionUrl: 'actionUrl',
+  isEnabled: 'isEnabled',
+  startsAt: 'startsAt',
+  endsAt: 'endsAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type SiteNoticeScalarFieldEnum = (typeof SiteNoticeScalarFieldEnum)[keyof typeof SiteNoticeScalarFieldEnum]
+
+
+export const HomeHeroSlideScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  mediaAssetId: 'mediaAssetId',
+  altText: 'altText',
+  sortOrder: 'sortOrder',
+  isEnabled: 'isEnabled',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type HomeHeroSlideScalarFieldEnum = (typeof HomeHeroSlideScalarFieldEnum)[keyof typeof HomeHeroSlideScalarFieldEnum]
+
+
+export const HomeHighlightScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  value: 'value',
+  label: 'label',
+  sortOrder: 'sortOrder',
+  isEnabled: 'isEnabled',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type HomeHighlightScalarFieldEnum = (typeof HomeHighlightScalarFieldEnum)[keyof typeof HomeHighlightScalarFieldEnum]
+
+
+export const HomeSettingsScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  memberAppLabel: 'memberAppLabel',
+  memberAppEnabled: 'memberAppEnabled',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type HomeSettingsScalarFieldEnum = (typeof HomeSettingsScalarFieldEnum)[keyof typeof HomeSettingsScalarFieldEnum]
+
+
+export const ServiceScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  title: 'title',
+  description: 'description',
+  icon: 'icon',
+  sortOrder: 'sortOrder',
+  isEnabled: 'isEnabled',
+  destination: 'destination',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ServiceScalarFieldEnum = (typeof ServiceScalarFieldEnum)[keyof typeof ServiceScalarFieldEnum]
+
+
+export const FormDocumentScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  title: 'title',
+  description: 'description',
+  mediaAssetId: 'mediaAssetId',
+  sortOrder: 'sortOrder',
+  isEnabled: 'isEnabled',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type FormDocumentScalarFieldEnum = (typeof FormDocumentScalarFieldEnum)[keyof typeof FormDocumentScalarFieldEnum]
+
+
+export const NewsNoticeScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  title: 'title',
+  summary: 'summary',
+  publishedAt: 'publishedAt',
+  isPublished: 'isPublished',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type NewsNoticeScalarFieldEnum = (typeof NewsNoticeScalarFieldEnum)[keyof typeof NewsNoticeScalarFieldEnum]
+
+
+export const FAQScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  question: 'question',
+  answer: 'answer',
+  sortOrder: 'sortOrder',
+  isEnabled: 'isEnabled',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type FAQScalarFieldEnum = (typeof FAQScalarFieldEnum)[keyof typeof FAQScalarFieldEnum]
+
+
+export const ContactSettingsScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  organisationName: 'organisationName',
+  streetAddress: 'streetAddress',
+  postalAddress: 'postalAddress',
+  telephone: 'telephone',
+  publicEmail: 'publicEmail',
+  officeHours: 'officeHours',
+  directionsUrl: 'directionsUrl',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ContactSettingsScalarFieldEnum = (typeof ContactSettingsScalarFieldEnum)[keyof typeof ContactSettingsScalarFieldEnum]
+
+
+export const MediaAssetScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  objectKey: 'objectKey',
+  originalFilename: 'originalFilename',
+  mimeType: 'mimeType',
+  purpose: 'purpose',
+  byteSize: 'byteSize',
+  width: 'width',
+  height: 'height',
+  altText: 'altText',
+  createdBy: 'createdBy',
+  retiredAt: 'retiredAt',
+  replacedById: 'replacedById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type MediaAssetScalarFieldEnum = (typeof MediaAssetScalarFieldEnum)[keyof typeof MediaAssetScalarFieldEnum]
 
 
 export const SortOrder = {

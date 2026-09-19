@@ -5,6 +5,8 @@ import { getServerEnvironment } from "@/lib/env";
 import {
   checkR2ClientConnectivity,
   createR2Client,
+  getR2Object,
+  putR2Object,
 } from "@/lib/r2-core";
 
 let client: S3Client | undefined;
@@ -27,4 +29,14 @@ export async function checkR2Connectivity(): Promise<void> {
   await checkR2ClientConnectivity(getR2Client(), {
     bucketName: environment.R2_BUCKET_NAME,
   });
+}
+
+export async function uploadMediaObject(objectKey: string, body: Uint8Array, contentType: string) {
+  const environment = getServerEnvironment();
+  return putR2Object(getR2Client(), { bucketName: environment.R2_BUCKET_NAME }, objectKey, body, contentType);
+}
+
+export async function readMediaObject(objectKey: string) {
+  const environment = getServerEnvironment();
+  return getR2Object(getR2Client(), { bucketName: environment.R2_BUCKET_NAME }, objectKey);
 }

@@ -62,3 +62,53 @@ export type StaffMembership = Prisma.StaffMembershipModel
  * 
  */
 export type AuditLog = Prisma.AuditLogModel
+/**
+ * Model SiteNotice
+ * 
+ */
+export type SiteNotice = Prisma.SiteNoticeModel
+/**
+ * Model HomeHeroSlide
+ * 
+ */
+export type HomeHeroSlide = Prisma.HomeHeroSlideModel
+/**
+ * Model HomeHighlight
+ * 
+ */
+export type HomeHighlight = Prisma.HomeHighlightModel
+/**
+ * Model HomeSettings
+ * 
+ */
+export type HomeSettings = Prisma.HomeSettingsModel
+/**
+ * Model Service
+ * 
+ */
+export type Service = Prisma.ServiceModel
+/**
+ * Model FormDocument
+ * 
+ */
+export type FormDocument = Prisma.FormDocumentModel
+/**
+ * Model NewsNotice
+ * 
+ */
+export type NewsNotice = Prisma.NewsNoticeModel
+/**
+ * Model FAQ
+ * 
+ */
+export type FAQ = Prisma.FAQModel
+/**
+ * Model ContactSettings
+ * 
+ */
+export type ContactSettings = Prisma.ContactSettingsModel
+/**
+ * Model MediaAsset
+ * 
+ */
+export type MediaAsset = Prisma.MediaAssetModel

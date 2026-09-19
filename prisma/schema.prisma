@@ -23,6 +23,16 @@ model Tenant {
   settings    TenantSettings?
   staff       StaffMembership[]
   auditLogs   AuditLog[]
+  siteNotices SiteNotice[]
+  heroSlides HomeHeroSlide[]
+  highlights HomeHighlight[]
+  homeSettings HomeSettings?
+  services Service[]
+  forms FormDocument[]
+  newsNotices NewsNotice[]
+  faqs FAQ[]
+  contactSettings ContactSettings?
+  mediaAssets MediaAsset[]
 
   @@map("tenants")
 }
@@ -66,6 +76,7 @@ model User {
   accounts      Account[]
   memberships   StaffMembership[]
   auditActions  AuditLog[]        @relation("AuditActor")
+  mediaUploads  MediaAsset[]      @relation("MediaCreator")
 
   @@map("users")
 }
@@ -149,4 +160,168 @@ model AuditLog {
   @@index([tenantId, createdAt])
   @@index([actorUserId])
   @@map("audit_logs")
+}
+
+model SiteNotice {
+  id          String   @id @default(cuid())
+  tenantId    String
+  message     String   @db.VarChar(280)
+  actionText  String?  @db.VarChar(80)
+  actionUrl   String?  @db.VarChar(500)
+  isEnabled   Boolean  @default(false)
+  startsAt    DateTime?
+  endsAt      DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  @@unique([tenantId])
+  @@index([tenantId, isEnabled, startsAt, endsAt])
+  @@map("site_notices")
+}
+
+model HomeHeroSlide {
+  id          String   @id @default(cuid())
+  tenantId    String
+  mediaAssetId String?
+  altText     String   @db.VarChar(200)
+  sortOrder   Int      @default(0)
+  isEnabled   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  mediaAsset  MediaAsset? @relation(fields: [mediaAssetId], references: [id], onDelete: SetNull)
+  @@index([tenantId, isEnabled, sortOrder])
+  @@index([tenantId, mediaAssetId])
+  @@map("home_hero_slides")
+}
+
+model HomeHighlight {
+  id        String   @id @default(cuid())
+  tenantId  String
+  value     String   @db.VarChar(80)
+  label     String   @db.VarChar(120)
+  sortOrder Int      @default(0)
+  isEnabled Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  @@index([tenantId, isEnabled, sortOrder])
+  @@map("home_highlights")
+}
+
+model HomeSettings {
+  id             String   @id @default(cuid())
+  tenantId       String
+  memberAppLabel String   @default("Member App — Coming Soon")
+  memberAppEnabled Boolean @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  @@unique([tenantId])
+  @@map("home_settings")
+}
+
+model Service {
+  id          String   @id @default(cuid())
+  tenantId    String
+  title       String   @db.VarChar(120)
+  description String   @db.VarChar(500)
+  icon        String   @db.VarChar(40)
+  sortOrder   Int      @default(0)
+  isEnabled   Boolean  @default(true)
+  destination String?  @db.VarChar(200)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  @@index([tenantId, isEnabled, sortOrder])
+  @@map("services")
+}
+
+model FormDocument {
+  id           String   @id @default(cuid())
+  tenantId     String
+  title        String   @db.VarChar(160)
+  description  String?  @db.VarChar(500)
+  mediaAssetId String?
+  sortOrder    Int      @default(0)
+  isEnabled    Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  tenant       Tenant   @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  mediaAsset   MediaAsset? @relation(fields: [mediaAssetId], references: [id], onDelete: SetNull)
+  @@index([tenantId, isEnabled, sortOrder])
+  @@map("form_documents")
+}
+
+model NewsNotice {
+  id          String   @id @default(cuid())
+  tenantId    String
+  title       String   @db.VarChar(180)
+  summary     String   @db.VarChar(600)
+  publishedAt DateTime?
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  @@index([tenantId, isPublished, publishedAt])
+  @@map("news_notices")
+}
+
+model FAQ {
+  id        String   @id @default(cuid())
+  tenantId  String
+  question  String   @db.VarChar(240)
+  answer    String   @db.VarChar(1200)
+  sortOrder Int      @default(0)
+  isEnabled Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  @@index([tenantId, isEnabled, sortOrder])
+  @@map("faqs")
+}
+
+model ContactSettings {
+  id             String   @id @default(cuid())
+  tenantId       String
+  organisationName String  @db.VarChar(160)
+  streetAddress  String   @db.VarChar(240)
+  postalAddress  String   @db.VarChar(240)
+  telephone      String   @db.VarChar(80)
+  publicEmail    String   @db.VarChar(160)
+  officeHours    String?  @db.VarChar(300)
+  directionsUrl  String?  @db.VarChar(500)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  tenant         Tenant   @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  @@unique([tenantId])
+  @@map("contact_settings")
+}
+
+model MediaAsset {
+  id               String    @id @default(cuid())
+  tenantId         String
+  objectKey        String    @unique
+  originalFilename String    @db.VarChar(255)
+  mimeType         String    @db.VarChar(80)
+  purpose          String    @db.VarChar(40)
+  byteSize         Int
+  width            Int
+  height           Int
+  altText          String?   @db.VarChar(200)
+  createdBy        String?
+  retiredAt        DateTime?
+  replacedById     String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  tenant           Tenant    @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  creator          User?     @relation("MediaCreator", fields: [createdBy], references: [id], onDelete: SetNull)
+  replacedBy       MediaAsset? @relation("MediaReplacement", fields: [replacedById], references: [id], onDelete: SetNull)
+  replacements     MediaAsset[] @relation("MediaReplacement")
+  heroSlides       HomeHeroSlide[]
+  formDocuments    FormDocument[]
+  @@index([tenantId, purpose, retiredAt])
+  @@index([tenantId, createdAt])
+  @@index([createdBy])
+  @@map("media_assets")
 }

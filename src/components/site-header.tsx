@@ -40,7 +40,7 @@ export function SiteHeader() {
             width={174}
             height={122}
             priority
-            className={`h-auto w-[130px] transition-[width] md:w-[150px] ${
+            className={`h-auto w-[92px] transition-[width] sm:w-[118px] md:w-[150px] ${
               compact ? "lg:w-[130px]" : "lg:w-[150px]"
             }`}
           />
@@ -67,13 +67,15 @@ export function SiteHeader() {
         </nav>
 
         <div className="ml-auto flex items-center gap-2 xl:ml-3">
-          <Link
-            href="/membership-services#membership"
-            className="button-secondary hidden lg:inline-flex"
-          >
-            Join SWCU
-          </Link>
-          <Link href="/member-login" className="button-primary">
+          <div className="hidden lg:block">
+            <Link
+              href="/membership-services#membership"
+              className="button-secondary"
+            >
+              Join SWCU
+            </Link>
+          </div>
+          <Link href="/member-login" className="button-primary header-member-login">
             Member Login
           </Link>
           <button

@@ -1,0 +1,359 @@
+"use server";
+
+import { headers } from "next/headers";
+import { revalidatePath } from "next/cache";
+import { z } from "zod";
+import { db } from "@/lib/db";
+import { requireStaffMembership } from "@/lib/authorise";
+import { requireTenant } from "@/lib/tenant";
+import { uploadMedia, uploadDocument, replaceMedia, retireMedia } from "@/lib/media-service";
+
+const idSchema = z.string().cuid();
+const text = (max: number) => z.string().trim().min(1).max(max);
+const dateOrNull = z.preprocess((v) => {
+  if (v === "" || v == null) return null;
+  return new Date(`${String(v)}:00+12:00`);
+}, z.date().nullable());
+const safeActionUrl = z.string().trim().max(500).refine((url) => url === "" || url.startsWith("/") || /^https?:\/\//i.test(url), "Use an internal path or http/https URL.");
+const safeDestination = z.string().trim().max(200).refine((url) => url === "" || url.startsWith("/") || url.startsWith("#"), "Use an internal path or anchor.");
+
+async function staff(roles?: ("ADMINISTRATOR" | "EDITOR")[]) {
+  const tenant = await requireTenant((await headers()).get("host") ?? "");
+  const access = await requireStaffMembership(tenant, roles);
+  return { tenant, userId: access.session.user.id };
+}
+
+function value(form: FormData, key: string) {
+  return form.get(key)?.toString() ?? "";
+}
+
+export async function saveSiteNotice(form: FormData) {
+  const { tenant, userId } = await staff(["ADMINISTRATOR"]);
+  const input = z.object({
+    message: text(280), actionText: z.string().trim().max(80).optional(), actionUrl: safeActionUrl.optional(),
+    isEnabled: z.boolean(), startsAt: dateOrNull, endsAt: dateOrNull,
+  }).parse({
+    message: value(form, "message"), actionText: value(form, "actionText") || undefined, actionUrl: value(form, "actionUrl") || undefined,
+    isEnabled: form.get("isEnabled") === "on", startsAt: value(form, "startsAt"), endsAt: value(form, "endsAt"),
+  });
+  if (input.startsAt && input.endsAt && input.endsAt <= input.startsAt) throw new Error("End date must be after start date.");
+  await db.$transaction(async (tx) => {
+    const before = await tx.siteNotice.findUnique({ where: { tenantId: tenant.id } });
+    const notice = await tx.siteNotice.upsert({
+      where: { tenantId: tenant.id }, update: input, create: { tenantId: tenant.id, ...input },
+    });
+    await tx.auditLog.create({ data: { tenantId: tenant.id, actorUserId: userId, action: "SITE_NOTICE_UPDATE", targetType: "SiteNotice", targetId: notice.id, changeMetadata: { before: before ? { message: before.message, isEnabled: before.isEnabled, startsAt: before.startsAt?.toISOString(), endsAt: before.endsAt?.toISOString() } : null, after: { message: notice.message, isEnabled: notice.isEnabled, startsAt: notice.startsAt?.toISOString(), endsAt: notice.endsAt?.toISOString() } } } });
+  });
+  revalidatePath("/", "layout");
+}
+
+export async function saveHighlight(form: FormData) {
+  const { tenant, userId } = await staff(["ADMINISTRATOR"]);
+  const input = z.object({ id: idSchema.optional(), value: text(80), label: text(120), sortOrder: z.coerce.number().int().min(0).max(100), isEnabled: z.boolean() }).parse({
+    id: value(form, "id") || undefined, value: value(form, "value"), label: value(form, "label"),
+    sortOrder: value(form, "sortOrder"), isEnabled: form.get("isEnabled") === "on",
+  });
+  await db.$transaction(async (tx) => {
+    const before = input.id ? await tx.homeHighlight.findFirst({ where: { id: input.id, tenantId: tenant.id } }) : null;
+    if (input.id && !before) throw new Error("Highlight not found.");
+    const record = input.id
+      ? await tx.homeHighlight.update({ where: { id: input.id }, data: { value: input.value, label: input.label, sortOrder: input.sortOrder, isEnabled: input.isEnabled } })
+      : await tx.homeHighlight.create({ data: { tenantId: tenant.id, value: input.value, label: input.label, sortOrder: input.sortOrder, isEnabled: input.isEnabled } });
+    await tx.auditLog.create({ data: { tenantId: tenant.id, actorUserId: userId, action: "HIGHLIGHT_UPDATE", targetType: "HomeHighlight", targetId: record.id, changeMetadata: { before: before ? { value: before.value, label: before.label, sortOrder: before.sortOrder, isEnabled: before.isEnabled } : null, after: { value: record.value, label: record.label, sortOrder: record.sortOrder, isEnabled: record.isEnabled } } } });
+    return record;
+  });
+  revalidatePath("/");
+}
+
+export async function saveService(form: FormData) {
+  const { tenant, userId } = await staff();
+  const input = z.object({ id: idSchema.optional(), title: text(120), description: text(500), icon: text(40), destination: safeDestination.optional(), sortOrder: z.coerce.number().int().min(0).max(100), isEnabled: z.boolean() }).parse({
+    id: value(form, "id") || undefined, title: value(form, "title"), description: value(form, "description"), icon: value(form, "icon") || "landmark",
+    destination: value(form, "destination") || undefined, sortOrder: value(form, "sortOrder") || "0", isEnabled: form.get("isEnabled") === "on",
+  });
+  await db.$transaction(async (tx) => {
+    let record;
+    let before = null;
+    if (input.id) {
+      before = await tx.service.findFirst({ where: { id: input.id, tenantId: tenant.id } });
+      if (!before) throw new Error("Service not found.");
+      record = await tx.service.update({ where: { id: input.id }, data: input });
+    } else {
+      record = await tx.service.create({ data: { tenantId: tenant.id, ...input } });
+    }
+    await tx.auditLog.create({ data: { tenantId: tenant.id, actorUserId: userId, action: "SERVICE_UPDATE", targetType: "Service", targetId: record.id, changeMetadata: { before: before ? { title: before.title, description: before.description, icon: before.icon, destination: before.destination, sortOrder: before.sortOrder, isEnabled: before.isEnabled } : null, after: { title: record.title, description: record.description, icon: record.icon, destination: record.destination, sortOrder: record.sortOrder, isEnabled: record.isEnabled } } } });
+  });
+  revalidatePath("/");
+}
+
+export async function removeHighlight(form: FormData) {
+  const { tenant, userId } = await staff(["ADMINISTRATOR"]);
+  const id = idSchema.parse(value(form, "id"));
+  const existing = await db.homeHighlight.findFirst({ where: { id, tenantId: tenant.id } });
+  if (!existing) throw new Error("Highlight not found.");
+  await db.$transaction(async (tx) => {
+    await tx.homeHighlight.update({ where: { id }, data: { isEnabled: false } });
+    await tx.auditLog.create({ data: { tenantId: tenant.id, actorUserId: userId, action: "HIGHLIGHT_REMOVE", targetType: "HomeHighlight", targetId: id, changeMetadata: { before: existing, after: { isEnabled: false } } } });
+  });
+  revalidatePath("/");
+}
+
+export async function removeService(form: FormData) {
+  const { tenant, userId } = await staff();
+  const id = idSchema.parse(value(form, "id"));
+  const existing = await db.service.findFirst({ where: { id, tenantId: tenant.id } });
+  if (!existing) throw new Error("Service not found.");
+  await db.$transaction(async (tx) => {
+    await tx.service.update({ where: { id }, data: { isEnabled: false } });
+    await tx.auditLog.create({ data: { tenantId: tenant.id, actorUserId: userId, action: "SERVICE_REMOVE", targetType: "Service", targetId: id, changeMetadata: { before: existing, after: { isEnabled: false } } } });
+  });
+  revalidatePath("/");
+}
+
+export async function toggleHeroSlide(form: FormData) {
+  const { tenant, userId } = await staff();
+  const id = idSchema.parse(value(form, "id"));
+  const current = await db.homeHeroSlide.findFirst({ where: { id, tenantId: tenant.id } });
+  if (!current) throw new Error("Hero slide not found.");
+  const enabled = form.get("isEnabled") === "true";
+  if (!enabled && current.isEnabled) {
+    const activeCount = await db.homeHeroSlide.count({ where: { tenantId: tenant.id, isEnabled: true } });
+    if (activeCount <= 1) throw new Error("Keep at least one active hero slide.");
+  }
+  if (enabled) {
+    const count = await db.homeHeroSlide.count({ where: { tenantId: tenant.id, isEnabled: true } });
+    if (count >= 4 && !current.isEnabled) throw new Error("A maximum of four active hero slides is allowed.");
+  }
+  await db.$transaction(async (tx) => {
+    await tx.homeHeroSlide.update({ where: { id }, data: { isEnabled: enabled } });
+    await tx.auditLog.create({ data: { tenantId: tenant.id, actorUserId: userId, action: enabled ? "HERO_PUBLISH" : "HERO_UNPUBLISH", targetType: "HomeHeroSlide", targetId: id, changeMetadata: { before: { isEnabled: current.isEnabled }, after: { isEnabled: enabled } } } });
+  });
+  revalidatePath("/");
+}
+
+export async function uploadHeroSlide(form: FormData) {
+  const { tenant, userId } = await staff();
+  const file = form.get("file");
+  if (!(file instanceof File)) throw new Error("Choose an image to upload.");
+  const altText = text(200).parse(value(form, "altText"));
+  const activeCount = await db.homeHeroSlide.count({ where: { tenantId: tenant.id, isEnabled: true } });
+  const media = await uploadMedia({ tenant, actorUserId: userId, file, purpose: "hero", altText });
+  try {
+    await db.$transaction(async (tx) => {
+      const created = await tx.homeHeroSlide.create({
+        data: { tenantId: tenant.id, mediaAssetId: media.id, altText, sortOrder: await tx.homeHeroSlide.count({ where: { tenantId: tenant.id } }), isEnabled: activeCount < 4 },
+      });
+      await tx.auditLog.create({ data: { tenantId: tenant.id, actorUserId: userId, action: "HERO_CREATE", targetType: "HomeHeroSlide", targetId: created.id, changeMetadata: { before: null, after: { mediaAssetId: media.id, altText, isEnabled: created.isEnabled, sortOrder: created.sortOrder } } } });
+    });
+  } catch (error) {
+    await db.mediaAsset.update({ where: { id: media.id }, data: { retiredAt: new Date() } }).catch(() => undefined);
+    throw error;
+  }
+  revalidatePath("/");
+}
+
+export async function replaceHeroSlide(form: FormData) {
+  const { tenant, userId } = await staff();
+  const slideId = idSchema.parse(value(form, "slideId"));
+  const file = form.get("file");
+  if (!(file instanceof File)) throw new Error("Choose an image to upload.");
+  const altText = text(200).parse(value(form, "altText"));
+  const slide = await db.homeHeroSlide.findFirst({ where: { id: slideId, tenantId: tenant.id }, include: { mediaAsset: true } });
+  if (!slide) throw new Error("Hero slide not found.");
+  const media = await uploadMedia({ tenant, actorUserId: userId, file, purpose: "hero", altText });
+  try {
+    await db.$transaction(async (tx) => {
+      await tx.homeHeroSlide.update({ where: { id: slide.id }, data: { mediaAssetId: media.id, altText } });
+      if (slide.mediaAsset) await tx.mediaAsset.update({ where: { id: slide.mediaAsset.id }, data: { retiredAt: new Date(), replacedById: media.id } });
+      await tx.auditLog.create({ data: { tenantId: tenant.id, actorUserId: userId, action: "HERO_REPLACE", targetType: "HomeHeroSlide", targetId: slide.id, changeMetadata: { before: { mediaAssetId: slide.mediaAssetId, altText: slide.altText }, after: { mediaAssetId: media.id, altText } } } });
+    });
+  } catch (error) {
+    await db.mediaAsset.update({ where: { id: media.id }, data: { retiredAt: new Date() } }).catch(() => undefined);
+    throw error;
+  }
+  revalidatePath("/");
+}
+
+export async function removeHeroSlide(form: FormData) {
+  const { tenant, userId } = await staff();
+  const id = idSchema.parse(value(form, "id"));
+  const slide = await db.homeHeroSlide.findFirst({ where: { id, tenantId: tenant.id }, include: { mediaAsset: true } });
+  if (!slide) throw new Error("Hero slide not found.");
+  if (slide.isEnabled && await db.homeHeroSlide.count({ where: { tenantId: tenant.id, isEnabled: true } }) <= 1) throw new Error("Keep at least one active hero slide.");
+  await db.$transaction(async (tx) => {
+    await tx.homeHeroSlide.update({ where: { id }, data: { mediaAssetId: null, isEnabled: false } });
+    if (slide.mediaAssetId) await tx.mediaAsset.update({ where: { id: slide.mediaAssetId }, data: { retiredAt: new Date() } });
+    await tx.auditLog.create({ data: { tenantId: tenant.id, actorUserId: userId, action: "HERO_REMOVE", targetType: "HomeHeroSlide", targetId: id, changeMetadata: { before: { mediaAssetId: slide.mediaAssetId, altText: slide.altText }, after: { removed: true } } } });
+  });
+  revalidatePath("/");
+}
+
+export async function reorderHeroSlide(form: FormData) {
+  const { tenant, userId } = await staff();
+  const id = idSchema.parse(value(form, "id"));
+  const sortOrder = z.coerce.number().int().min(0).max(100).parse(value(form, "sortOrder"));
+  const current = await db.homeHeroSlide.findFirst({ where: { id, tenantId: tenant.id } });
+  if (!current) throw new Error("Hero slide not found.");
+  await db.$transaction(async (tx) => {
+    await tx.homeHeroSlide.update({ where: { id }, data: { sortOrder } });
+    await tx.auditLog.create({ data: { tenantId: tenant.id, actorUserId: userId, action: "HERO_REORDER", targetType: "HomeHeroSlide", targetId: id, changeMetadata: { before: { sortOrder: current.sortOrder }, after: { sortOrder } } } });
+  });
+  revalidatePath("/");
+}
+
+export async function saveFaq(form: FormData) {
+  const { tenant, userId } = await staff();
+  const input = z.object({ id: idSchema.optional(), question: text(240), answer: text(1200), sortOrder: z.coerce.number().int().min(0).max(100), isEnabled: z.boolean() }).parse({
+    id: value(form, "id") || undefined, question: value(form, "question"), answer: value(form, "answer"), sortOrder: value(form, "sortOrder") || "0", isEnabled: form.get("isEnabled") === "on",
+  });
+  await db.$transaction(async (tx) => {
+    let record;
+    let before = null;
+    if (input.id) {
+      before = await tx.fAQ.findFirst({ where: { id: input.id, tenantId: tenant.id } });
+      if (!before) throw new Error("FAQ not found.");
+      record = await tx.fAQ.update({ where: { id: input.id }, data: input });
+    } else record = await tx.fAQ.create({ data: { tenantId: tenant.id, ...input } });
+    await tx.auditLog.create({ data: { tenantId: tenant.id, actorUserId: userId, action: "FAQ_UPDATE", targetType: "FAQ", targetId: record.id, changeMetadata: { before: before ? { question: before.question, answer: before.answer, sortOrder: before.sortOrder, isEnabled: before.isEnabled } : null, after: { question: record.question, answer: record.answer, sortOrder: record.sortOrder, isEnabled: record.isEnabled } } } });
+  });
+  revalidatePath("/");
+}
+
+export async function saveFormDocument(form: FormData) {
+  const { tenant, userId } = await staff();
+  const input = z.object({ id: idSchema.optional(), title: text(160), description: z.string().trim().max(500).optional(), mediaAssetId: idSchema.optional(), sortOrder: z.coerce.number().int().min(0).max(100), isEnabled: z.boolean() }).parse({
+    id: value(form, "id") || undefined, title: value(form, "title"), description: value(form, "description") || undefined,
+    mediaAssetId: value(form, "mediaAssetId") || undefined, sortOrder: value(form, "sortOrder") || "0", isEnabled: form.get("isEnabled") === "on",
+  });
+  if (input.mediaAssetId && !(await db.mediaAsset.findFirst({ where: { id: input.mediaAssetId, tenantId: tenant.id, retiredAt: null, mimeType: "application/pdf" } }))) throw new Error("A live PDF media asset is required.");
+  await db.$transaction(async (tx) => {
+    let record;
+    let before = null;
+    if (input.id) {
+      before = await tx.formDocument.findFirst({ where: { id: input.id, tenantId: tenant.id } });
+      if (!before) throw new Error("Document not found.");
+      record = await tx.formDocument.update({ where: { id: input.id }, data: input });
+    } else record = await tx.formDocument.create({ data: { tenantId: tenant.id, ...input } });
+    await tx.auditLog.create({ data: { tenantId: tenant.id, actorUserId: userId, action: "FORM_DOCUMENT_UPDATE", targetType: "FormDocument", targetId: record.id, changeMetadata: { before: before ? { title: before.title, mediaAssetId: before.mediaAssetId, sortOrder: before.sortOrder, isEnabled: before.isEnabled } : null, after: { title: record.title, mediaAssetId: record.mediaAssetId, sortOrder: record.sortOrder, isEnabled: record.isEnabled } } } });
+  });
+  revalidatePath("/");
+}
+
+export async function uploadFormDocument(form: FormData) {
+  const { tenant, userId } = await staff();
+  const file = form.get("file");
+  if (!(file instanceof File)) throw new Error("Choose a PDF document.");
+  const input = z.object({
+    title: text(160),
+    description: z.string().trim().max(500).optional(),
+    sortOrder: z.coerce.number().int().min(0).max(100),
+    isEnabled: z.boolean(),
+  }).parse({
+    title: value(form, "title"),
+    description: value(form, "description") || undefined,
+    sortOrder: value(form, "sortOrder") || "0",
+    isEnabled: form.get("isEnabled") === "on",
+  });
+  const media = await uploadDocument({ tenant, actorUserId: userId, file, altText: input.title });
+  try {
+    await db.$transaction(async (tx) => {
+      const created = await tx.formDocument.create({ data: { tenantId: tenant.id, ...input, mediaAssetId: media.id } });
+      await tx.auditLog.create({ data: { tenantId: tenant.id, actorUserId: userId, action: "FORM_DOCUMENT_CREATE", targetType: "FormDocument", targetId: created.id, changeMetadata: { before: null, after: { title: input.title, description: input.description, sortOrder: input.sortOrder, isEnabled: input.isEnabled, mediaAssetId: media.id } } } });
+    });
+  } catch (error) {
+    await db.mediaAsset.update({ where: { id: media.id }, data: { retiredAt: new Date() } }).catch(() => undefined);
+    throw error;
+  }
+  revalidatePath("/");
+}
+
+export async function removeFormDocument(form: FormData) {
+  const { tenant, userId } = await staff();
+  const id = idSchema.parse(value(form, "id"));
+  const existing = await db.formDocument.findFirst({ where: { id, tenantId: tenant.id } });
+  if (!existing) throw new Error("Document not found.");
+  await db.$transaction(async (tx) => {
+    await tx.formDocument.update({ where: { id }, data: { isEnabled: false, mediaAssetId: null } });
+    await tx.auditLog.create({ data: { tenantId: tenant.id, actorUserId: userId, action: "FORM_DOCUMENT_REMOVE", targetType: "FormDocument", targetId: id, changeMetadata: { before: { title: existing.title, mediaAssetId: existing.mediaAssetId }, after: { removed: true } } } });
+  });
+  revalidatePath("/");
+}
+
+export async function saveNewsNotice(form: FormData) {
+  const { tenant, userId } = await staff();
+  const input = z.object({ id: idSchema.optional(), title: text(180), summary: text(600), publishedAt: dateOrNull, isPublished: z.boolean() }).parse({
+    id: value(form, "id") || undefined, title: value(form, "title"), summary: value(form, "summary"),
+    publishedAt: value(form, "publishedAt"), isPublished: form.get("isPublished") === "on",
+  });
+  await db.$transaction(async (tx) => {
+    let record;
+    let before = null;
+    if (input.id) {
+      before = await tx.newsNotice.findFirst({ where: { id: input.id, tenantId: tenant.id } });
+      if (!before) throw new Error("News notice not found.");
+      record = await tx.newsNotice.update({ where: { id: input.id }, data: input });
+    } else record = await tx.newsNotice.create({ data: { tenantId: tenant.id, ...input } });
+    await tx.auditLog.create({ data: { tenantId: tenant.id, actorUserId: userId, action: input.isPublished ? "NEWS_PUBLISH" : "NEWS_UPDATE", targetType: "NewsNotice", targetId: record.id, changeMetadata: { before: before ? { title: before.title, publishedAt: before.publishedAt?.toISOString(), isPublished: before.isPublished } : null, after: { title: record.title, publishedAt: record.publishedAt?.toISOString(), isPublished: record.isPublished } } } });
+  });
+  revalidatePath("/");
+}
+
+export async function removeNewsNotice(form: FormData) {
+  const { tenant, userId } = await staff();
+  const id = idSchema.parse(value(form, "id"));
+  const existing = await db.newsNotice.findFirst({ where: { id, tenantId: tenant.id } });
+  if (!existing) throw new Error("News notice not found.");
+  await db.$transaction(async (tx) => {
+    await tx.newsNotice.update({ where: { id }, data: { isPublished: false } });
+    await tx.auditLog.create({ data: { tenantId: tenant.id, actorUserId: userId, action: "NEWS_UNPUBLISH", targetType: "NewsNotice", targetId: id, changeMetadata: { before: { isPublished: existing.isPublished }, after: { isPublished: false } } } });
+  });
+  revalidatePath("/");
+}
+
+export async function removeFaq(form: FormData) {
+  const { tenant, userId } = await staff();
+  const id = idSchema.parse(value(form, "id"));
+  const existing = await db.fAQ.findFirst({ where: { id, tenantId: tenant.id } });
+  if (!existing) throw new Error("FAQ not found.");
+  await db.$transaction(async (tx) => {
+    await tx.fAQ.update({ where: { id }, data: { isEnabled: false } });
+    await tx.auditLog.create({ data: { tenantId: tenant.id, actorUserId: userId, action: "FAQ_REMOVE", targetType: "FAQ", targetId: id, changeMetadata: { before: { isEnabled: existing.isEnabled }, after: { isEnabled: false } } } });
+  });
+  revalidatePath("/");
+}
+
+export async function saveContactSettings(form: FormData) {
+  const { tenant, userId } = await staff(["ADMINISTRATOR"]);
+  const input = z.object({ organisationName: text(160), streetAddress: text(240), postalAddress: text(240), telephone: text(80), publicEmail: z.string().email().max(160), officeHours: z.string().trim().max(300).optional(), directionsUrl: z.string().url().max(500).optional() }).parse({
+    organisationName: value(form, "organisationName"), streetAddress: value(form, "streetAddress"), postalAddress: value(form, "postalAddress"),
+    telephone: value(form, "telephone"), publicEmail: value(form, "publicEmail"), officeHours: value(form, "officeHours") || undefined, directionsUrl: value(form, "directionsUrl") || undefined,
+  });
+  await db.$transaction(async (tx) => {
+    const before = await tx.contactSettings.findUnique({ where: { tenantId: tenant.id } });
+    const record = await tx.contactSettings.upsert({ where: { tenantId: tenant.id }, update: input, create: { tenantId: tenant.id, ...input } });
+    await tx.auditLog.create({ data: { tenantId: tenant.id, actorUserId: userId, action: "CONTACT_SETTINGS_UPDATE", targetType: "ContactSettings", targetId: record.id, changeMetadata: { before: before ? { organisationName: before.organisationName, telephone: before.telephone, publicEmail: before.publicEmail } : null, after: { organisationName: record.organisationName, telephone: record.telephone, publicEmail: record.publicEmail } } } });
+  });
+  revalidatePath("/", "layout");
+}
+
+export async function uploadImage(form: FormData) {
+  const { tenant, userId } = await staff();
+  const file = form.get("file");
+  if (!(file instanceof File)) throw new Error("Choose an image to upload.");
+  const purpose = z.enum(["hero", "news", "general"]).parse(value(form, "purpose"));
+  await uploadMedia({ tenant, actorUserId: userId, file, purpose, altText: value(form, "altText") || undefined });
+}
+
+export async function replaceImage(form: FormData) {
+  const { tenant, userId } = await staff();
+  const file = form.get("file");
+  if (!(file instanceof File)) throw new Error("Choose an image to upload.");
+  const mediaId = idSchema.parse(value(form, "mediaId"));
+  await replaceMedia({ tenant, actorUserId: userId, mediaId, file, altText: value(form, "altText") || undefined });
+}
+
+export async function retireImage(form: FormData) {
+  const { tenant, userId } = await staff();
+  await retireMedia(tenant, userId, idSchema.parse(value(form, "mediaId")));
+  revalidatePath("/admin");
+}

@@ -17,6 +17,7 @@
     "db:deploy": "prisma migrate deploy",
     "db:seed": "tsx prisma/seed.ts",
     "check:r2": "tsx scripts/check-r2.ts",
+    "check:media": "NODE_OPTIONS=--conditions=react-server tsx scripts/check-media.ts",
     "check:tenant": "tsx scripts/check-tenant.ts",
     "bootstrap:admin": "tsx scripts/bootstrap-admin.ts"
   },

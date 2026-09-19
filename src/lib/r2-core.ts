@@ -1,4 +1,4 @@
-import { ListObjectsV2Command, S3Client } from "@aws-sdk/client-s3";
+import { GetObjectCommand, ListObjectsV2Command, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 
 export type R2Configuration = {
   endpoint: string;
@@ -29,4 +29,28 @@ export async function checkR2ClientConnectivity(
       MaxKeys: 1,
     }),
   );
+}
+
+export async function putR2Object(
+  client: S3Client,
+  configuration: Pick<R2Configuration, "bucketName">,
+  objectKey: string,
+  body: Uint8Array,
+  contentType: string,
+) {
+  return client.send(new PutObjectCommand({
+    Bucket: configuration.bucketName,
+    Key: objectKey,
+    Body: body,
+    ContentType: contentType,
+    CacheControl: "public, max-age=31536000, immutable",
+  }));
+}
+
+export async function getR2Object(
+  client: S3Client,
+  configuration: Pick<R2Configuration, "bucketName">,
+  objectKey: string,
+) {
+  return client.send(new GetObjectCommand({ Bucket: configuration.bucketName, Key: objectKey }));
 }
