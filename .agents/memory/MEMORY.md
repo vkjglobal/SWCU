@@ -1,0 +1,1 @@
+- [Next.js tenant fail-closed boundary](nextjs-tenant-fail-closed.md) — reject unknown hosts before route rendering; layout-level notFound may still serialize child RSC content.
