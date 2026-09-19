@@ -2,25 +2,72 @@ import { headers } from "next/headers";
 import { db } from "@/lib/db";
 import { requireStaffMembership } from "@/lib/authorise";
 import { requireTenant } from "@/lib/tenant";
-import { toggleHeroSlide, reorderHeroSlide, saveHighlight, saveService, uploadHeroSlide, replaceHeroSlide, removeHeroSlide, removeHighlight, removeService } from "../actions";
+import {
+  removeHeroSlide,
+  removeHighlight,
+  removeService,
+  reorderHeroSlide,
+  replaceHeroSlide,
+  saveHighlight,
+  saveService,
+  toggleHeroSlide,
+  uploadHeroSlide,
+} from "../actions";
+import { AdminWorkflowNotice } from "@/components/admin-workflow-notice";
 
 export default async function HomepageAdminPage() {
   const tenant = await requireTenant((await headers()).get("host") ?? "");
-  await requireStaffMembership(tenant);
+  const { membership } = await requireStaffMembership(tenant);
   const [slides, highlights, services] = await Promise.all([
     db.homeHeroSlide.findMany({ where: { tenantId: tenant.id }, orderBy: { sortOrder: "asc" } }),
     db.homeHighlight.findMany({ where: { tenantId: tenant.id }, orderBy: { sortOrder: "asc" } }),
     db.service.findMany({ where: { tenantId: tenant.id }, orderBy: { sortOrder: "asc" } }),
   ]);
-  return <main className="min-h-screen bg-soft-blue-grey"><div className="site-container py-12">
-    <a href="/admin" className="text-sm font-semibold text-swcu-blue">← Dashboard</a>
-    <p className="eyebrow mt-8">Homepage</p><h1 className="mt-2 font-heading text-4xl font-bold text-deep-navy">Homepage content</h1>
-    <section className="mt-10 rounded-card border border-deep-navy/10 bg-white p-6 shadow-card"><h2 className="font-heading text-xl font-bold text-deep-navy">Hero slides</h2>
-      <p className="mt-1 text-sm text-charcoal/65">Up to four active image slides. Keep at least one active.</p>
-      <form action={uploadHeroSlide} encType="multipart/form-data" className="mt-5 grid gap-3 rounded-xl border border-dashed border-deep-navy/20 p-4 sm:grid-cols-[1fr_1fr_auto]"><label className="text-sm font-semibold">Image<input name="file" type="file" accept="image/jpeg,image/png,image/webp" required className="mt-2 block w-full text-sm"/></label><label className="text-sm font-semibold">Accessible alt text<input name="altText" required maxLength={200} className="mt-2 w-full rounded border p-2"/></label><button className="self-end rounded bg-swcu-blue px-4 py-2 font-semibold text-white">Upload slide</button></form>
-      <div className="mt-5 space-y-3">{slides.map((slide) => <div key={slide.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-soft-blue-grey p-4"><span className="text-sm font-semibold">{slide.altText}</span><div className="flex flex-wrap items-center gap-3"><form action={reorderHeroSlide} className="flex items-center gap-2"><input type="hidden" name="id" value={slide.id}/><label className="sr-only" htmlFor={`order-${slide.id}`}>Order</label><input id={`order-${slide.id}`} name="sortOrder" defaultValue={slide.sortOrder} className="w-14 rounded border p-1 text-center" /><button className="text-xs font-semibold text-swcu-blue">Save order</button></form><form action={toggleHeroSlide}><input type="hidden" name="id" value={slide.id}/><input type="hidden" name="isEnabled" value={String(!slide.isEnabled)}/><button className="text-xs font-semibold text-swcu-red">{slide.isEnabled ? "Hide" : "Show"}</button></form><form action={replaceHeroSlide} encType="multipart/form-data" className="flex items-center gap-2"><input type="hidden" name="slideId" value={slide.id}/><input name="file" type="file" accept="image/jpeg,image/png,image/webp" required className="max-w-36 text-xs"/><input name="altText" defaultValue={slide.altText} required className="w-36 rounded border p-1 text-xs"/><button className="text-xs font-semibold text-ocean-teal">Replace</button></form><form action={removeHeroSlide}><input type="hidden" name="id" value={slide.id}/><button className="text-xs font-semibold text-swcu-red">Remove</button></form></div></div>)}</div>
-    </section>
-     <section className="mt-6 rounded-card border border-deep-navy/10 bg-white p-6 shadow-card"><h2 className="font-heading text-xl font-bold text-deep-navy">Highlights (Administrator)</h2><form action={saveHighlight} className="mt-5 grid gap-3 sm:grid-cols-4"><input name="value" placeholder="1,500+" required className="rounded border p-2"/><input name="label" placeholder="Members" required className="rounded border p-2"/><input name="sortOrder" type="number" defaultValue="0" className="rounded border p-2"/><label className="flex items-center gap-2 text-sm"><input name="isEnabled" type="checkbox" defaultChecked/> Visible <button className="rounded bg-swcu-blue px-4 py-2 font-semibold text-white">Add</button></label></form><div className="mt-4 space-y-2">{highlights.map((item)=><div key={item.id} className="flex flex-wrap items-center gap-2 rounded bg-soft-blue-grey p-2"><form action={saveHighlight} className="flex flex-wrap gap-2"><input type="hidden" name="id" value={item.id}/><input name="value" defaultValue={item.value} className="w-24 rounded border p-1"/><input name="label" defaultValue={item.label} className="w-40 rounded border p-1"/><input name="sortOrder" type="number" defaultValue={item.sortOrder} className="w-16 rounded border p-1"/><label className="text-xs"><input name="isEnabled" type="checkbox" defaultChecked={item.isEnabled}/> Visible</label><button className="text-xs font-semibold text-swcu-blue">Save</button></form><form action={removeHighlight}><input type="hidden" name="id" value={item.id}/><button className="text-xs font-semibold text-swcu-red">Remove</button></form></div>)}</div></section>
-     <section className="mt-6 rounded-card border border-deep-navy/10 bg-white p-6 shadow-card"><h2 className="font-heading text-xl font-bold text-deep-navy">Services</h2><form action={saveService} className="mt-5 grid gap-3 sm:grid-cols-2"><input name="title" placeholder="Service title" required className="rounded border p-2"/><input name="icon" placeholder="Icon identifier" defaultValue="landmark" className="rounded border p-2"/><textarea name="description" placeholder="Short approved description" required className="rounded border p-2"/><input name="destination" placeholder="#services" className="rounded border p-2"/><input name="sortOrder" type="number" defaultValue="0" className="rounded border p-2"/><label className="flex items-center gap-2 text-sm"><input name="isEnabled" type="checkbox" defaultChecked/> Visible</label><button className="w-fit rounded bg-swcu-blue px-4 py-2 font-semibold text-white">Add service</button></form><ul className="mt-5 space-y-2 text-sm">{services.map((item)=><li key={item.id} className="border-b pb-2"><form action={saveService} className="grid gap-2 sm:grid-cols-2"><input type="hidden" name="id" value={item.id}/><input name="title" defaultValue={item.title} required className="rounded border p-1"/><input name="description" defaultValue={item.description} required className="rounded border p-1"/><input name="icon" defaultValue={item.icon} className="rounded border p-1"/><input name="destination" defaultValue={item.destination ?? ""} placeholder="#services" className="rounded border p-1"/><input name="sortOrder" type="number" defaultValue={item.sortOrder} className="rounded border p-1"/><label className="text-xs"><input name="isEnabled" type="checkbox" defaultChecked={item.isEnabled}/> Visible</label><button className="text-xs font-semibold text-swcu-blue">Save</button></form><form action={removeService} className="mt-1"><input type="hidden" name="id" value={item.id}/><button className="text-xs font-semibold text-swcu-red">Remove</button></form></li>)}</ul></section>
-  </div></main>;
+  const editor = membership.role === "EDITOR";
+  return (
+    <main className="min-h-screen bg-soft-blue-grey">
+      <div className="site-container py-12">
+        <a href="/admin" className="text-sm font-semibold text-swcu-blue">← Dashboard</a>
+        <p className="eyebrow mt-8">Homepage</p>
+        <h1 className="mt-2 font-heading text-4xl font-bold text-deep-navy">Homepage content</h1>
+        <AdminWorkflowNotice editor={editor} />
+        <section className="mt-10 rounded-card border border-deep-navy/10 bg-white p-6 shadow-card">
+          <h2 className="font-heading text-xl font-bold text-deep-navy">Hero slides</h2>
+          <p className="mt-1 text-sm text-charcoal/65">Up to four active image slides. Keep at least one active.</p>
+          <form action={uploadHeroSlide} encType="multipart/form-data" className="mt-5 grid gap-3 rounded-xl border border-dashed border-deep-navy/20 p-4 sm:grid-cols-[1fr_1fr_auto]">
+            <label className="text-sm font-semibold">Image<input name="file" type="file" accept="image/jpeg,image/png,image/webp" required className="mt-2 block w-full text-sm" /></label>
+            <label className="text-sm font-semibold">Accessible alt text<input name="altText" required maxLength={200} className="mt-2 w-full rounded border p-2" /></label>
+            <button className="self-end rounded bg-swcu-blue px-4 py-2 font-semibold text-white">{editor ? "Save Draft" : "Publish"}</button>
+          </form>
+          <div className="mt-5 space-y-3">
+            {slides.map((slide) => (
+              <div key={slide.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-soft-blue-grey p-4">
+                <span className="text-sm font-semibold">{slide.altText}</span>
+                <div className="flex flex-wrap items-center gap-3">
+                  <form action={reorderHeroSlide} className="flex items-center gap-2"><input type="hidden" name="id" value={slide.id} /><label className="sr-only" htmlFor={`order-${slide.id}`}>Order</label><input id={`order-${slide.id}`} name="sortOrder" defaultValue={slide.sortOrder} className="w-14 rounded border p-1 text-center" /><button className="text-xs font-semibold text-swcu-blue">{editor ? "Save Draft" : "Save order"}</button></form>
+                  <form action={toggleHeroSlide}><input type="hidden" name="id" value={slide.id} /><input type="hidden" name="isEnabled" value={String(!slide.isEnabled)} /><button className="text-xs font-semibold text-swcu-red">{editor ? `Propose ${slide.isEnabled ? "hide" : "show"}` : slide.isEnabled ? "Hide" : "Show"}</button></form>
+                  <form action={replaceHeroSlide} encType="multipart/form-data" className="flex items-center gap-2"><input type="hidden" name="slideId" value={slide.id} /><input name="file" type="file" accept="image/jpeg,image/png,image/webp" required className="max-w-36 text-xs" /><input name="altText" defaultValue={slide.altText} required className="w-36 rounded border p-1 text-xs" /><button className="text-xs font-semibold text-ocean-teal">{editor ? "Propose replacement" : "Replace"}</button></form>
+                  <form action={removeHeroSlide}><input type="hidden" name="id" value={slide.id} /><button className="text-xs font-semibold text-swcu-red">{editor ? "Propose removal" : "Remove"}</button></form>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+        {membership.role === "ADMINISTRATOR" && (
+          <>
+            <section className="mt-6 rounded-card border border-deep-navy/10 bg-white p-6 shadow-card">
+              <h2 className="font-heading text-xl font-bold text-deep-navy">Highlights (Administrator)</h2>
+              <form action={saveHighlight} className="mt-5 grid gap-3 sm:grid-cols-4"><input name="value" placeholder="1,500+" required className="rounded border p-2" /><input name="label" placeholder="Members" required className="rounded border p-2" /><input name="sortOrder" type="number" defaultValue="0" className="rounded border p-2" /><label className="flex items-center gap-2 text-sm"><input name="isEnabled" type="checkbox" defaultChecked /> Visible <button className="rounded bg-swcu-blue px-4 py-2 font-semibold text-white">Add</button></label></form>
+              <div className="mt-4 space-y-2">{highlights.map((item) => <div key={item.id} className="flex flex-wrap items-center gap-2 rounded bg-soft-blue-grey p-2"><form action={saveHighlight} className="flex flex-wrap gap-2"><input type="hidden" name="id" value={item.id} /><input name="value" defaultValue={item.value} className="w-24 rounded border p-1" /><input name="label" defaultValue={item.label} className="w-40 rounded border p-1" /><input name="sortOrder" type="number" defaultValue={item.sortOrder} className="w-16 rounded border p-1" /><label className="text-xs"><input name="isEnabled" type="checkbox" defaultChecked={item.isEnabled} /> Visible</label><button className="text-xs font-semibold text-swcu-blue">Save</button></form><form action={removeHighlight}><input type="hidden" name="id" value={item.id} /><button className="text-xs font-semibold text-swcu-red">Remove</button></form></div>)}</div>
+            </section>
+            <section className="mt-6 rounded-card border border-deep-navy/10 bg-white p-6 shadow-card">
+              <h2 className="font-heading text-xl font-bold text-deep-navy">Services</h2>
+              <form action={saveService} className="mt-5 grid gap-3 sm:grid-cols-2"><input name="title" placeholder="Service title" required className="rounded border p-2" /><input name="icon" placeholder="Icon identifier" defaultValue="landmark" className="rounded border p-2" /><textarea name="description" placeholder="Short approved description" required className="rounded border p-2" /><input name="destination" placeholder="#services" className="rounded border p-2" /><input name="sortOrder" type="number" defaultValue="0" className="rounded border p-2" /><label className="flex items-center gap-2 text-sm"><input name="isEnabled" type="checkbox" defaultChecked /> Visible</label><button className="w-fit rounded bg-swcu-blue px-4 py-2 font-semibold text-white">Add service</button></form>
+              <ul className="mt-5 space-y-2 text-sm">{services.map((item) => <li key={item.id} className="border-b pb-2"><form action={saveService} className="grid gap-2 sm:grid-cols-2"><input type="hidden" name="id" value={item.id} /><input name="title" defaultValue={item.title} required className="rounded border p-1" /><input name="description" defaultValue={item.description} required className="rounded border p-1" /><input name="icon" defaultValue={item.icon} className="rounded border p-1" /><input name="destination" defaultValue={item.destination ?? ""} placeholder="#services" className="rounded border p-1" /><input name="sortOrder" type="number" defaultValue={item.sortOrder} className="rounded border p-1" /><label className="text-xs"><input name="isEnabled" type="checkbox" defaultChecked={item.isEnabled} /> Visible</label><button className="text-xs font-semibold text-swcu-blue">Save</button></form><form action={removeService} className="mt-1"><input type="hidden" name="id" value={item.id} /><button className="text-xs font-semibold text-swcu-red">Remove</button></form></li>)}</ul>
+            </section>
+          </>
+        )}
+      </div>
+    </main>
+  );
 }

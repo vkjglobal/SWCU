@@ -12,6 +12,32 @@ enum StaffRole {
   EDITOR
 }
 
+enum CmsDraftStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum CmsDraftKind {
+  SITE_NOTICE
+  NEWS
+  FAQ
+  FORM_DOCUMENT
+  HERO
+  MEDIA
+}
+
+enum CmsDraftOperation {
+  CREATE
+  UPDATE
+  REMOVE
+  REPLACE
+  REORDER
+  TOGGLE
+  UPLOAD
+  RETIRE
+}
+
 model Tenant {
   id          String            @id @default(cuid())
   slug        String            @unique
@@ -33,6 +59,7 @@ model Tenant {
   faqs FAQ[]
   contactSettings ContactSettings?
   mediaAssets MediaAsset[]
+  cmsDrafts   CmsDraft[] @relation("DraftTenant")
 
   @@map("tenants")
 }
@@ -77,6 +104,8 @@ model User {
   memberships   StaffMembership[]
   auditActions  AuditLog[]        @relation("AuditActor")
   mediaUploads  MediaAsset[]      @relation("MediaCreator")
+  createdDrafts CmsDraft[]       @relation("DraftCreator")
+  publishedDrafts CmsDraft[]     @relation("DraftPublisher")
 
   @@map("users")
 }
@@ -318,10 +347,37 @@ model MediaAsset {
   creator          User?     @relation("MediaCreator", fields: [createdBy], references: [id], onDelete: SetNull)
   replacedBy       MediaAsset? @relation("MediaReplacement", fields: [replacedById], references: [id], onDelete: SetNull)
   replacements     MediaAsset[] @relation("MediaReplacement")
+  cmsDrafts        CmsDraft[] @relation("DraftMedia")
   heroSlides       HomeHeroSlide[]
   formDocuments    FormDocument[]
   @@index([tenantId, purpose, retiredAt])
   @@index([tenantId, createdAt])
   @@index([createdBy])
   @@map("media_assets")
+}
+
+model CmsDraft {
+  id            String           @id @default(cuid())
+  tenantId      String
+  kind          CmsDraftKind
+  operation     CmsDraftOperation
+  status        CmsDraftStatus   @default(DRAFT)
+  targetId      String?
+  payload       Json
+  mediaAssetId  String?
+  createdBy     String
+  publishedBy   String?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  publishedAt   DateTime?
+  tenant        Tenant           @relation("DraftTenant", fields: [tenantId], references: [id], onDelete: Restrict)
+  creator       User             @relation("DraftCreator", fields: [createdBy], references: [id], onDelete: Restrict)
+  publisher     User?            @relation("DraftPublisher", fields: [publishedBy], references: [id], onDelete: SetNull)
+  mediaAsset    MediaAsset?      @relation("DraftMedia", fields: [mediaAssetId], references: [id], onDelete: SetNull)
+
+  @@index([tenantId, status, createdAt])
+  @@index([tenantId, kind, targetId, status])
+  @@index([createdBy, status])
+  @@index([mediaAssetId])
+  @@map("cms_drafts")
 }

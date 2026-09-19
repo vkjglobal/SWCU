@@ -39,7 +39,7 @@ export function SiteFooter() {
         <div className="site-container border-b border-white/10 py-5 text-sm leading-6 text-white/75">
           <p className="font-heading font-semibold text-white">Important Information</p>
           <p className="mt-2 max-w-4xl">
-            Security reminder: SWCU will never ask you to disclose your password, PIN or security/verification code by email, phone, chat or through an unsolicited link. If you are unsure, contact SWCU using the contact details published on this website.
+            SWCU will never ask you to disclose your password, PIN or security/verification code by email, phone, chat or through an unsolicited link. If you are unsure, contact SWCU using the contact details published on this website.
           </p>
         </div>
         <div className="site-container flex flex-col gap-3 py-5 text-sm text-white/65 md:flex-row md:items-center md:justify-between">

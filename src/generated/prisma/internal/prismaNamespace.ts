@@ -415,7 +415,8 @@ export const ModelName = {
   NewsNotice: 'NewsNotice',
   FAQ: 'FAQ',
   ContactSettings: 'ContactSettings',
-  MediaAsset: 'MediaAsset'
+  MediaAsset: 'MediaAsset',
+  CmsDraft: 'CmsDraft'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -431,7 +432,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "tenant" | "tenantDomain" | "tenantSettings" | "user" | "session" | "account" | "verification" | "staffMembership" | "auditLog" | "siteNotice" | "homeHeroSlide" | "homeHighlight" | "homeSettings" | "service" | "formDocument" | "newsNotice" | "fAQ" | "contactSettings" | "mediaAsset"
+    modelProps: "tenant" | "tenantDomain" | "tenantSettings" | "user" | "session" | "account" | "verification" | "staffMembership" | "auditLog" | "siteNotice" | "homeHeroSlide" | "homeHighlight" | "homeSettings" | "service" | "formDocument" | "newsNotice" | "fAQ" | "contactSettings" | "mediaAsset" | "cmsDraft"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1841,6 +1842,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    CmsDraft: {
+      payload: Prisma.$CmsDraftPayload<ExtArgs>
+      fields: Prisma.CmsDraftFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CmsDraftFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CmsDraftPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CmsDraftFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CmsDraftPayload>
+        }
+        findFirst: {
+          args: Prisma.CmsDraftFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CmsDraftPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CmsDraftFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CmsDraftPayload>
+        }
+        findMany: {
+          args: Prisma.CmsDraftFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CmsDraftPayload>[]
+        }
+        create: {
+          args: Prisma.CmsDraftCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CmsDraftPayload>
+        }
+        createMany: {
+          args: Prisma.CmsDraftCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CmsDraftCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CmsDraftPayload>[]
+        }
+        delete: {
+          args: Prisma.CmsDraftDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CmsDraftPayload>
+        }
+        update: {
+          args: Prisma.CmsDraftUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CmsDraftPayload>
+        }
+        deleteMany: {
+          args: Prisma.CmsDraftDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CmsDraftUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CmsDraftUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CmsDraftPayload>[]
+        }
+        upsert: {
+          args: Prisma.CmsDraftUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CmsDraftPayload>
+        }
+        aggregate: {
+          args: Prisma.CmsDraftAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCmsDraft>
+        }
+        groupBy: {
+          args: Prisma.CmsDraftGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CmsDraftGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CmsDraftCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CmsDraftCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -2156,6 +2231,25 @@ export const MediaAssetScalarFieldEnum = {
 export type MediaAssetScalarFieldEnum = (typeof MediaAssetScalarFieldEnum)[keyof typeof MediaAssetScalarFieldEnum]
 
 
+export const CmsDraftScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  kind: 'kind',
+  operation: 'operation',
+  status: 'status',
+  targetId: 'targetId',
+  payload: 'payload',
+  mediaAssetId: 'mediaAssetId',
+  createdBy: 'createdBy',
+  publishedBy: 'publishedBy',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  publishedAt: 'publishedAt'
+} as const
+
+export type CmsDraftScalarFieldEnum = (typeof CmsDraftScalarFieldEnum)[keyof typeof CmsDraftScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -2170,6 +2264,13 @@ export const NullableJsonNullValueInput = {
 } as const
 
 export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
+
+
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
 export const QueryMode = {
@@ -2277,6 +2378,48 @@ export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'In
  * Reference to a field of type 'Int[]'
  */
 export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+/**
+ * Reference to a field of type 'CmsDraftKind'
+ */
+export type EnumCmsDraftKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CmsDraftKind'>
+    
+
+
+/**
+ * Reference to a field of type 'CmsDraftKind[]'
+ */
+export type ListEnumCmsDraftKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CmsDraftKind[]'>
+    
+
+
+/**
+ * Reference to a field of type 'CmsDraftOperation'
+ */
+export type EnumCmsDraftOperationFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CmsDraftOperation'>
+    
+
+
+/**
+ * Reference to a field of type 'CmsDraftOperation[]'
+ */
+export type ListEnumCmsDraftOperationFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CmsDraftOperation[]'>
+    
+
+
+/**
+ * Reference to a field of type 'CmsDraftStatus'
+ */
+export type EnumCmsDraftStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CmsDraftStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'CmsDraftStatus[]'
+ */
+export type ListEnumCmsDraftStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CmsDraftStatus[]'>
     
 
 
@@ -2463,6 +2606,7 @@ export type GlobalOmitConfig = {
   fAQ?: Prisma.FAQOmit
   contactSettings?: Prisma.ContactSettingsOmit
   mediaAsset?: Prisma.MediaAssetOmit
+  cmsDraft?: Prisma.CmsDraftOmit
 }
 
 /* Types for Logging */

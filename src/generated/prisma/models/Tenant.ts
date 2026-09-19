@@ -204,6 +204,7 @@ export type TenantWhereInput = {
   faqs?: Prisma.FAQListRelationFilter
   contactSettings?: Prisma.XOR<Prisma.ContactSettingsNullableScalarRelationFilter, Prisma.ContactSettingsWhereInput> | null
   mediaAssets?: Prisma.MediaAssetListRelationFilter
+  cmsDrafts?: Prisma.CmsDraftListRelationFilter
 }
 
 export type TenantOrderByWithRelationInput = {
@@ -227,6 +228,7 @@ export type TenantOrderByWithRelationInput = {
   faqs?: Prisma.FAQOrderByRelationAggregateInput
   contactSettings?: Prisma.ContactSettingsOrderByWithRelationInput
   mediaAssets?: Prisma.MediaAssetOrderByRelationAggregateInput
+  cmsDrafts?: Prisma.CmsDraftOrderByRelationAggregateInput
 }
 
 export type TenantWhereUniqueInput = Prisma.AtLeast<{
@@ -253,6 +255,7 @@ export type TenantWhereUniqueInput = Prisma.AtLeast<{
   faqs?: Prisma.FAQListRelationFilter
   contactSettings?: Prisma.XOR<Prisma.ContactSettingsNullableScalarRelationFilter, Prisma.ContactSettingsWhereInput> | null
   mediaAssets?: Prisma.MediaAssetListRelationFilter
+  cmsDrafts?: Prisma.CmsDraftListRelationFilter
 }, "id" | "slug">
 
 export type TenantOrderByWithAggregationInput = {
@@ -300,6 +303,7 @@ export type TenantCreateInput = {
   faqs?: Prisma.FAQCreateNestedManyWithoutTenantInput
   contactSettings?: Prisma.ContactSettingsCreateNestedOneWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutTenantInput
+  cmsDrafts?: Prisma.CmsDraftCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateInput = {
@@ -323,6 +327,7 @@ export type TenantUncheckedCreateInput = {
   faqs?: Prisma.FAQUncheckedCreateNestedManyWithoutTenantInput
   contactSettings?: Prisma.ContactSettingsUncheckedCreateNestedOneWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutTenantInput
+  cmsDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUpdateInput = {
@@ -346,6 +351,7 @@ export type TenantUpdateInput = {
   faqs?: Prisma.FAQUpdateManyWithoutTenantNestedInput
   contactSettings?: Prisma.ContactSettingsUpdateOneWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUpdateManyWithoutTenantNestedInput
+  cmsDrafts?: Prisma.CmsDraftUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateInput = {
@@ -369,6 +375,7 @@ export type TenantUncheckedUpdateInput = {
   faqs?: Prisma.FAQUncheckedUpdateManyWithoutTenantNestedInput
   contactSettings?: Prisma.ContactSettingsUncheckedUpdateOneWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutTenantNestedInput
+  cmsDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateManyInput = {
@@ -638,6 +645,20 @@ export type TenantUpdateOneRequiredWithoutMediaAssetsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutMediaAssetsInput, Prisma.TenantUpdateWithoutMediaAssetsInput>, Prisma.TenantUncheckedUpdateWithoutMediaAssetsInput>
 }
 
+export type TenantCreateNestedOneWithoutCmsDraftsInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutCmsDraftsInput, Prisma.TenantUncheckedCreateWithoutCmsDraftsInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutCmsDraftsInput
+  connect?: Prisma.TenantWhereUniqueInput
+}
+
+export type TenantUpdateOneRequiredWithoutCmsDraftsNestedInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutCmsDraftsInput, Prisma.TenantUncheckedCreateWithoutCmsDraftsInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutCmsDraftsInput
+  upsert?: Prisma.TenantUpsertWithoutCmsDraftsInput
+  connect?: Prisma.TenantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutCmsDraftsInput, Prisma.TenantUpdateWithoutCmsDraftsInput>, Prisma.TenantUncheckedUpdateWithoutCmsDraftsInput>
+}
+
 export type TenantCreateWithoutDomainsInput = {
   id?: string
   slug: string
@@ -658,6 +679,7 @@ export type TenantCreateWithoutDomainsInput = {
   faqs?: Prisma.FAQCreateNestedManyWithoutTenantInput
   contactSettings?: Prisma.ContactSettingsCreateNestedOneWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutTenantInput
+  cmsDrafts?: Prisma.CmsDraftCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutDomainsInput = {
@@ -680,6 +702,7 @@ export type TenantUncheckedCreateWithoutDomainsInput = {
   faqs?: Prisma.FAQUncheckedCreateNestedManyWithoutTenantInput
   contactSettings?: Prisma.ContactSettingsUncheckedCreateNestedOneWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutTenantInput
+  cmsDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutDomainsInput = {
@@ -718,6 +741,7 @@ export type TenantUpdateWithoutDomainsInput = {
   faqs?: Prisma.FAQUpdateManyWithoutTenantNestedInput
   contactSettings?: Prisma.ContactSettingsUpdateOneWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUpdateManyWithoutTenantNestedInput
+  cmsDrafts?: Prisma.CmsDraftUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutDomainsInput = {
@@ -740,6 +764,7 @@ export type TenantUncheckedUpdateWithoutDomainsInput = {
   faqs?: Prisma.FAQUncheckedUpdateManyWithoutTenantNestedInput
   contactSettings?: Prisma.ContactSettingsUncheckedUpdateOneWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutTenantNestedInput
+  cmsDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutSettingsInput = {
@@ -762,6 +787,7 @@ export type TenantCreateWithoutSettingsInput = {
   faqs?: Prisma.FAQCreateNestedManyWithoutTenantInput
   contactSettings?: Prisma.ContactSettingsCreateNestedOneWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutTenantInput
+  cmsDrafts?: Prisma.CmsDraftCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutSettingsInput = {
@@ -784,6 +810,7 @@ export type TenantUncheckedCreateWithoutSettingsInput = {
   faqs?: Prisma.FAQUncheckedCreateNestedManyWithoutTenantInput
   contactSettings?: Prisma.ContactSettingsUncheckedCreateNestedOneWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutTenantInput
+  cmsDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutSettingsInput = {
@@ -822,6 +849,7 @@ export type TenantUpdateWithoutSettingsInput = {
   faqs?: Prisma.FAQUpdateManyWithoutTenantNestedInput
   contactSettings?: Prisma.ContactSettingsUpdateOneWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUpdateManyWithoutTenantNestedInput
+  cmsDrafts?: Prisma.CmsDraftUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutSettingsInput = {
@@ -844,6 +872,7 @@ export type TenantUncheckedUpdateWithoutSettingsInput = {
   faqs?: Prisma.FAQUncheckedUpdateManyWithoutTenantNestedInput
   contactSettings?: Prisma.ContactSettingsUncheckedUpdateOneWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutTenantNestedInput
+  cmsDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutStaffInput = {
@@ -866,6 +895,7 @@ export type TenantCreateWithoutStaffInput = {
   faqs?: Prisma.FAQCreateNestedManyWithoutTenantInput
   contactSettings?: Prisma.ContactSettingsCreateNestedOneWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutTenantInput
+  cmsDrafts?: Prisma.CmsDraftCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutStaffInput = {
@@ -888,6 +918,7 @@ export type TenantUncheckedCreateWithoutStaffInput = {
   faqs?: Prisma.FAQUncheckedCreateNestedManyWithoutTenantInput
   contactSettings?: Prisma.ContactSettingsUncheckedCreateNestedOneWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutTenantInput
+  cmsDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutStaffInput = {
@@ -926,6 +957,7 @@ export type TenantUpdateWithoutStaffInput = {
   faqs?: Prisma.FAQUpdateManyWithoutTenantNestedInput
   contactSettings?: Prisma.ContactSettingsUpdateOneWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUpdateManyWithoutTenantNestedInput
+  cmsDrafts?: Prisma.CmsDraftUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutStaffInput = {
@@ -948,6 +980,7 @@ export type TenantUncheckedUpdateWithoutStaffInput = {
   faqs?: Prisma.FAQUncheckedUpdateManyWithoutTenantNestedInput
   contactSettings?: Prisma.ContactSettingsUncheckedUpdateOneWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutTenantNestedInput
+  cmsDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutAuditLogsInput = {
@@ -970,6 +1003,7 @@ export type TenantCreateWithoutAuditLogsInput = {
   faqs?: Prisma.FAQCreateNestedManyWithoutTenantInput
   contactSettings?: Prisma.ContactSettingsCreateNestedOneWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutTenantInput
+  cmsDrafts?: Prisma.CmsDraftCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutAuditLogsInput = {
@@ -992,6 +1026,7 @@ export type TenantUncheckedCreateWithoutAuditLogsInput = {
   faqs?: Prisma.FAQUncheckedCreateNestedManyWithoutTenantInput
   contactSettings?: Prisma.ContactSettingsUncheckedCreateNestedOneWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutTenantInput
+  cmsDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutAuditLogsInput = {
@@ -1030,6 +1065,7 @@ export type TenantUpdateWithoutAuditLogsInput = {
   faqs?: Prisma.FAQUpdateManyWithoutTenantNestedInput
   contactSettings?: Prisma.ContactSettingsUpdateOneWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUpdateManyWithoutTenantNestedInput
+  cmsDrafts?: Prisma.CmsDraftUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutAuditLogsInput = {
@@ -1052,6 +1088,7 @@ export type TenantUncheckedUpdateWithoutAuditLogsInput = {
   faqs?: Prisma.FAQUncheckedUpdateManyWithoutTenantNestedInput
   contactSettings?: Prisma.ContactSettingsUncheckedUpdateOneWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutTenantNestedInput
+  cmsDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutSiteNoticesInput = {
@@ -1074,6 +1111,7 @@ export type TenantCreateWithoutSiteNoticesInput = {
   faqs?: Prisma.FAQCreateNestedManyWithoutTenantInput
   contactSettings?: Prisma.ContactSettingsCreateNestedOneWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutTenantInput
+  cmsDrafts?: Prisma.CmsDraftCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutSiteNoticesInput = {
@@ -1096,6 +1134,7 @@ export type TenantUncheckedCreateWithoutSiteNoticesInput = {
   faqs?: Prisma.FAQUncheckedCreateNestedManyWithoutTenantInput
   contactSettings?: Prisma.ContactSettingsUncheckedCreateNestedOneWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutTenantInput
+  cmsDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutSiteNoticesInput = {
@@ -1134,6 +1173,7 @@ export type TenantUpdateWithoutSiteNoticesInput = {
   faqs?: Prisma.FAQUpdateManyWithoutTenantNestedInput
   contactSettings?: Prisma.ContactSettingsUpdateOneWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUpdateManyWithoutTenantNestedInput
+  cmsDrafts?: Prisma.CmsDraftUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutSiteNoticesInput = {
@@ -1156,6 +1196,7 @@ export type TenantUncheckedUpdateWithoutSiteNoticesInput = {
   faqs?: Prisma.FAQUncheckedUpdateManyWithoutTenantNestedInput
   contactSettings?: Prisma.ContactSettingsUncheckedUpdateOneWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutTenantNestedInput
+  cmsDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutHeroSlidesInput = {
@@ -1178,6 +1219,7 @@ export type TenantCreateWithoutHeroSlidesInput = {
   faqs?: Prisma.FAQCreateNestedManyWithoutTenantInput
   contactSettings?: Prisma.ContactSettingsCreateNestedOneWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutTenantInput
+  cmsDrafts?: Prisma.CmsDraftCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutHeroSlidesInput = {
@@ -1200,6 +1242,7 @@ export type TenantUncheckedCreateWithoutHeroSlidesInput = {
   faqs?: Prisma.FAQUncheckedCreateNestedManyWithoutTenantInput
   contactSettings?: Prisma.ContactSettingsUncheckedCreateNestedOneWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutTenantInput
+  cmsDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutHeroSlidesInput = {
@@ -1238,6 +1281,7 @@ export type TenantUpdateWithoutHeroSlidesInput = {
   faqs?: Prisma.FAQUpdateManyWithoutTenantNestedInput
   contactSettings?: Prisma.ContactSettingsUpdateOneWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUpdateManyWithoutTenantNestedInput
+  cmsDrafts?: Prisma.CmsDraftUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutHeroSlidesInput = {
@@ -1260,6 +1304,7 @@ export type TenantUncheckedUpdateWithoutHeroSlidesInput = {
   faqs?: Prisma.FAQUncheckedUpdateManyWithoutTenantNestedInput
   contactSettings?: Prisma.ContactSettingsUncheckedUpdateOneWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutTenantNestedInput
+  cmsDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutHighlightsInput = {
@@ -1282,6 +1327,7 @@ export type TenantCreateWithoutHighlightsInput = {
   faqs?: Prisma.FAQCreateNestedManyWithoutTenantInput
   contactSettings?: Prisma.ContactSettingsCreateNestedOneWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutTenantInput
+  cmsDrafts?: Prisma.CmsDraftCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutHighlightsInput = {
@@ -1304,6 +1350,7 @@ export type TenantUncheckedCreateWithoutHighlightsInput = {
   faqs?: Prisma.FAQUncheckedCreateNestedManyWithoutTenantInput
   contactSettings?: Prisma.ContactSettingsUncheckedCreateNestedOneWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutTenantInput
+  cmsDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutHighlightsInput = {
@@ -1342,6 +1389,7 @@ export type TenantUpdateWithoutHighlightsInput = {
   faqs?: Prisma.FAQUpdateManyWithoutTenantNestedInput
   contactSettings?: Prisma.ContactSettingsUpdateOneWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUpdateManyWithoutTenantNestedInput
+  cmsDrafts?: Prisma.CmsDraftUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutHighlightsInput = {
@@ -1364,6 +1412,7 @@ export type TenantUncheckedUpdateWithoutHighlightsInput = {
   faqs?: Prisma.FAQUncheckedUpdateManyWithoutTenantNestedInput
   contactSettings?: Prisma.ContactSettingsUncheckedUpdateOneWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutTenantNestedInput
+  cmsDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutHomeSettingsInput = {
@@ -1386,6 +1435,7 @@ export type TenantCreateWithoutHomeSettingsInput = {
   faqs?: Prisma.FAQCreateNestedManyWithoutTenantInput
   contactSettings?: Prisma.ContactSettingsCreateNestedOneWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutTenantInput
+  cmsDrafts?: Prisma.CmsDraftCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutHomeSettingsInput = {
@@ -1408,6 +1458,7 @@ export type TenantUncheckedCreateWithoutHomeSettingsInput = {
   faqs?: Prisma.FAQUncheckedCreateNestedManyWithoutTenantInput
   contactSettings?: Prisma.ContactSettingsUncheckedCreateNestedOneWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutTenantInput
+  cmsDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutHomeSettingsInput = {
@@ -1446,6 +1497,7 @@ export type TenantUpdateWithoutHomeSettingsInput = {
   faqs?: Prisma.FAQUpdateManyWithoutTenantNestedInput
   contactSettings?: Prisma.ContactSettingsUpdateOneWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUpdateManyWithoutTenantNestedInput
+  cmsDrafts?: Prisma.CmsDraftUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutHomeSettingsInput = {
@@ -1468,6 +1520,7 @@ export type TenantUncheckedUpdateWithoutHomeSettingsInput = {
   faqs?: Prisma.FAQUncheckedUpdateManyWithoutTenantNestedInput
   contactSettings?: Prisma.ContactSettingsUncheckedUpdateOneWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutTenantNestedInput
+  cmsDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutServicesInput = {
@@ -1490,6 +1543,7 @@ export type TenantCreateWithoutServicesInput = {
   faqs?: Prisma.FAQCreateNestedManyWithoutTenantInput
   contactSettings?: Prisma.ContactSettingsCreateNestedOneWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutTenantInput
+  cmsDrafts?: Prisma.CmsDraftCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutServicesInput = {
@@ -1512,6 +1566,7 @@ export type TenantUncheckedCreateWithoutServicesInput = {
   faqs?: Prisma.FAQUncheckedCreateNestedManyWithoutTenantInput
   contactSettings?: Prisma.ContactSettingsUncheckedCreateNestedOneWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutTenantInput
+  cmsDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutServicesInput = {
@@ -1550,6 +1605,7 @@ export type TenantUpdateWithoutServicesInput = {
   faqs?: Prisma.FAQUpdateManyWithoutTenantNestedInput
   contactSettings?: Prisma.ContactSettingsUpdateOneWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUpdateManyWithoutTenantNestedInput
+  cmsDrafts?: Prisma.CmsDraftUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutServicesInput = {
@@ -1572,6 +1628,7 @@ export type TenantUncheckedUpdateWithoutServicesInput = {
   faqs?: Prisma.FAQUncheckedUpdateManyWithoutTenantNestedInput
   contactSettings?: Prisma.ContactSettingsUncheckedUpdateOneWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutTenantNestedInput
+  cmsDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutFormsInput = {
@@ -1594,6 +1651,7 @@ export type TenantCreateWithoutFormsInput = {
   faqs?: Prisma.FAQCreateNestedManyWithoutTenantInput
   contactSettings?: Prisma.ContactSettingsCreateNestedOneWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutTenantInput
+  cmsDrafts?: Prisma.CmsDraftCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutFormsInput = {
@@ -1616,6 +1674,7 @@ export type TenantUncheckedCreateWithoutFormsInput = {
   faqs?: Prisma.FAQUncheckedCreateNestedManyWithoutTenantInput
   contactSettings?: Prisma.ContactSettingsUncheckedCreateNestedOneWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutTenantInput
+  cmsDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutFormsInput = {
@@ -1654,6 +1713,7 @@ export type TenantUpdateWithoutFormsInput = {
   faqs?: Prisma.FAQUpdateManyWithoutTenantNestedInput
   contactSettings?: Prisma.ContactSettingsUpdateOneWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUpdateManyWithoutTenantNestedInput
+  cmsDrafts?: Prisma.CmsDraftUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutFormsInput = {
@@ -1676,6 +1736,7 @@ export type TenantUncheckedUpdateWithoutFormsInput = {
   faqs?: Prisma.FAQUncheckedUpdateManyWithoutTenantNestedInput
   contactSettings?: Prisma.ContactSettingsUncheckedUpdateOneWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutTenantNestedInput
+  cmsDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutNewsNoticesInput = {
@@ -1698,6 +1759,7 @@ export type TenantCreateWithoutNewsNoticesInput = {
   faqs?: Prisma.FAQCreateNestedManyWithoutTenantInput
   contactSettings?: Prisma.ContactSettingsCreateNestedOneWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutTenantInput
+  cmsDrafts?: Prisma.CmsDraftCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutNewsNoticesInput = {
@@ -1720,6 +1782,7 @@ export type TenantUncheckedCreateWithoutNewsNoticesInput = {
   faqs?: Prisma.FAQUncheckedCreateNestedManyWithoutTenantInput
   contactSettings?: Prisma.ContactSettingsUncheckedCreateNestedOneWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutTenantInput
+  cmsDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutNewsNoticesInput = {
@@ -1758,6 +1821,7 @@ export type TenantUpdateWithoutNewsNoticesInput = {
   faqs?: Prisma.FAQUpdateManyWithoutTenantNestedInput
   contactSettings?: Prisma.ContactSettingsUpdateOneWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUpdateManyWithoutTenantNestedInput
+  cmsDrafts?: Prisma.CmsDraftUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutNewsNoticesInput = {
@@ -1780,6 +1844,7 @@ export type TenantUncheckedUpdateWithoutNewsNoticesInput = {
   faqs?: Prisma.FAQUncheckedUpdateManyWithoutTenantNestedInput
   contactSettings?: Prisma.ContactSettingsUncheckedUpdateOneWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutTenantNestedInput
+  cmsDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutFaqsInput = {
@@ -1802,6 +1867,7 @@ export type TenantCreateWithoutFaqsInput = {
   newsNotices?: Prisma.NewsNoticeCreateNestedManyWithoutTenantInput
   contactSettings?: Prisma.ContactSettingsCreateNestedOneWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutTenantInput
+  cmsDrafts?: Prisma.CmsDraftCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutFaqsInput = {
@@ -1824,6 +1890,7 @@ export type TenantUncheckedCreateWithoutFaqsInput = {
   newsNotices?: Prisma.NewsNoticeUncheckedCreateNestedManyWithoutTenantInput
   contactSettings?: Prisma.ContactSettingsUncheckedCreateNestedOneWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutTenantInput
+  cmsDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutFaqsInput = {
@@ -1862,6 +1929,7 @@ export type TenantUpdateWithoutFaqsInput = {
   newsNotices?: Prisma.NewsNoticeUpdateManyWithoutTenantNestedInput
   contactSettings?: Prisma.ContactSettingsUpdateOneWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUpdateManyWithoutTenantNestedInput
+  cmsDrafts?: Prisma.CmsDraftUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutFaqsInput = {
@@ -1884,6 +1952,7 @@ export type TenantUncheckedUpdateWithoutFaqsInput = {
   newsNotices?: Prisma.NewsNoticeUncheckedUpdateManyWithoutTenantNestedInput
   contactSettings?: Prisma.ContactSettingsUncheckedUpdateOneWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutTenantNestedInput
+  cmsDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutContactSettingsInput = {
@@ -1906,6 +1975,7 @@ export type TenantCreateWithoutContactSettingsInput = {
   newsNotices?: Prisma.NewsNoticeCreateNestedManyWithoutTenantInput
   faqs?: Prisma.FAQCreateNestedManyWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutTenantInput
+  cmsDrafts?: Prisma.CmsDraftCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutContactSettingsInput = {
@@ -1928,6 +1998,7 @@ export type TenantUncheckedCreateWithoutContactSettingsInput = {
   newsNotices?: Prisma.NewsNoticeUncheckedCreateNestedManyWithoutTenantInput
   faqs?: Prisma.FAQUncheckedCreateNestedManyWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutTenantInput
+  cmsDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutContactSettingsInput = {
@@ -1966,6 +2037,7 @@ export type TenantUpdateWithoutContactSettingsInput = {
   newsNotices?: Prisma.NewsNoticeUpdateManyWithoutTenantNestedInput
   faqs?: Prisma.FAQUpdateManyWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUpdateManyWithoutTenantNestedInput
+  cmsDrafts?: Prisma.CmsDraftUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutContactSettingsInput = {
@@ -1988,6 +2060,7 @@ export type TenantUncheckedUpdateWithoutContactSettingsInput = {
   newsNotices?: Prisma.NewsNoticeUncheckedUpdateManyWithoutTenantNestedInput
   faqs?: Prisma.FAQUncheckedUpdateManyWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutTenantNestedInput
+  cmsDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutMediaAssetsInput = {
@@ -2010,6 +2083,7 @@ export type TenantCreateWithoutMediaAssetsInput = {
   newsNotices?: Prisma.NewsNoticeCreateNestedManyWithoutTenantInput
   faqs?: Prisma.FAQCreateNestedManyWithoutTenantInput
   contactSettings?: Prisma.ContactSettingsCreateNestedOneWithoutTenantInput
+  cmsDrafts?: Prisma.CmsDraftCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutMediaAssetsInput = {
@@ -2032,6 +2106,7 @@ export type TenantUncheckedCreateWithoutMediaAssetsInput = {
   newsNotices?: Prisma.NewsNoticeUncheckedCreateNestedManyWithoutTenantInput
   faqs?: Prisma.FAQUncheckedCreateNestedManyWithoutTenantInput
   contactSettings?: Prisma.ContactSettingsUncheckedCreateNestedOneWithoutTenantInput
+  cmsDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutMediaAssetsInput = {
@@ -2070,6 +2145,7 @@ export type TenantUpdateWithoutMediaAssetsInput = {
   newsNotices?: Prisma.NewsNoticeUpdateManyWithoutTenantNestedInput
   faqs?: Prisma.FAQUpdateManyWithoutTenantNestedInput
   contactSettings?: Prisma.ContactSettingsUpdateOneWithoutTenantNestedInput
+  cmsDrafts?: Prisma.CmsDraftUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutMediaAssetsInput = {
@@ -2092,6 +2168,115 @@ export type TenantUncheckedUpdateWithoutMediaAssetsInput = {
   newsNotices?: Prisma.NewsNoticeUncheckedUpdateManyWithoutTenantNestedInput
   faqs?: Prisma.FAQUncheckedUpdateManyWithoutTenantNestedInput
   contactSettings?: Prisma.ContactSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  cmsDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantCreateWithoutCmsDraftsInput = {
+  id?: string
+  slug: string
+  displayName: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  domains?: Prisma.TenantDomainCreateNestedManyWithoutTenantInput
+  settings?: Prisma.TenantSettingsCreateNestedOneWithoutTenantInput
+  staff?: Prisma.StaffMembershipCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  siteNotices?: Prisma.SiteNoticeCreateNestedManyWithoutTenantInput
+  heroSlides?: Prisma.HomeHeroSlideCreateNestedManyWithoutTenantInput
+  highlights?: Prisma.HomeHighlightCreateNestedManyWithoutTenantInput
+  homeSettings?: Prisma.HomeSettingsCreateNestedOneWithoutTenantInput
+  services?: Prisma.ServiceCreateNestedManyWithoutTenantInput
+  forms?: Prisma.FormDocumentCreateNestedManyWithoutTenantInput
+  newsNotices?: Prisma.NewsNoticeCreateNestedManyWithoutTenantInput
+  faqs?: Prisma.FAQCreateNestedManyWithoutTenantInput
+  contactSettings?: Prisma.ContactSettingsCreateNestedOneWithoutTenantInput
+  mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutTenantInput
+}
+
+export type TenantUncheckedCreateWithoutCmsDraftsInput = {
+  id?: string
+  slug: string
+  displayName: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  domains?: Prisma.TenantDomainUncheckedCreateNestedManyWithoutTenantInput
+  settings?: Prisma.TenantSettingsUncheckedCreateNestedOneWithoutTenantInput
+  staff?: Prisma.StaffMembershipUncheckedCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  siteNotices?: Prisma.SiteNoticeUncheckedCreateNestedManyWithoutTenantInput
+  heroSlides?: Prisma.HomeHeroSlideUncheckedCreateNestedManyWithoutTenantInput
+  highlights?: Prisma.HomeHighlightUncheckedCreateNestedManyWithoutTenantInput
+  homeSettings?: Prisma.HomeSettingsUncheckedCreateNestedOneWithoutTenantInput
+  services?: Prisma.ServiceUncheckedCreateNestedManyWithoutTenantInput
+  forms?: Prisma.FormDocumentUncheckedCreateNestedManyWithoutTenantInput
+  newsNotices?: Prisma.NewsNoticeUncheckedCreateNestedManyWithoutTenantInput
+  faqs?: Prisma.FAQUncheckedCreateNestedManyWithoutTenantInput
+  contactSettings?: Prisma.ContactSettingsUncheckedCreateNestedOneWithoutTenantInput
+  mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutTenantInput
+}
+
+export type TenantCreateOrConnectWithoutCmsDraftsInput = {
+  where: Prisma.TenantWhereUniqueInput
+  create: Prisma.XOR<Prisma.TenantCreateWithoutCmsDraftsInput, Prisma.TenantUncheckedCreateWithoutCmsDraftsInput>
+}
+
+export type TenantUpsertWithoutCmsDraftsInput = {
+  update: Prisma.XOR<Prisma.TenantUpdateWithoutCmsDraftsInput, Prisma.TenantUncheckedUpdateWithoutCmsDraftsInput>
+  create: Prisma.XOR<Prisma.TenantCreateWithoutCmsDraftsInput, Prisma.TenantUncheckedCreateWithoutCmsDraftsInput>
+  where?: Prisma.TenantWhereInput
+}
+
+export type TenantUpdateToOneWithWhereWithoutCmsDraftsInput = {
+  where?: Prisma.TenantWhereInput
+  data: Prisma.XOR<Prisma.TenantUpdateWithoutCmsDraftsInput, Prisma.TenantUncheckedUpdateWithoutCmsDraftsInput>
+}
+
+export type TenantUpdateWithoutCmsDraftsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  domains?: Prisma.TenantDomainUpdateManyWithoutTenantNestedInput
+  settings?: Prisma.TenantSettingsUpdateOneWithoutTenantNestedInput
+  staff?: Prisma.StaffMembershipUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  siteNotices?: Prisma.SiteNoticeUpdateManyWithoutTenantNestedInput
+  heroSlides?: Prisma.HomeHeroSlideUpdateManyWithoutTenantNestedInput
+  highlights?: Prisma.HomeHighlightUpdateManyWithoutTenantNestedInput
+  homeSettings?: Prisma.HomeSettingsUpdateOneWithoutTenantNestedInput
+  services?: Prisma.ServiceUpdateManyWithoutTenantNestedInput
+  forms?: Prisma.FormDocumentUpdateManyWithoutTenantNestedInput
+  newsNotices?: Prisma.NewsNoticeUpdateManyWithoutTenantNestedInput
+  faqs?: Prisma.FAQUpdateManyWithoutTenantNestedInput
+  contactSettings?: Prisma.ContactSettingsUpdateOneWithoutTenantNestedInput
+  mediaAssets?: Prisma.MediaAssetUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantUncheckedUpdateWithoutCmsDraftsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  domains?: Prisma.TenantDomainUncheckedUpdateManyWithoutTenantNestedInput
+  settings?: Prisma.TenantSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  staff?: Prisma.StaffMembershipUncheckedUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  siteNotices?: Prisma.SiteNoticeUncheckedUpdateManyWithoutTenantNestedInput
+  heroSlides?: Prisma.HomeHeroSlideUncheckedUpdateManyWithoutTenantNestedInput
+  highlights?: Prisma.HomeHighlightUncheckedUpdateManyWithoutTenantNestedInput
+  homeSettings?: Prisma.HomeSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  services?: Prisma.ServiceUncheckedUpdateManyWithoutTenantNestedInput
+  forms?: Prisma.FormDocumentUncheckedUpdateManyWithoutTenantNestedInput
+  newsNotices?: Prisma.NewsNoticeUncheckedUpdateManyWithoutTenantNestedInput
+  faqs?: Prisma.FAQUncheckedUpdateManyWithoutTenantNestedInput
+  contactSettings?: Prisma.ContactSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 
@@ -2111,6 +2296,7 @@ export type TenantCountOutputType = {
   newsNotices: number
   faqs: number
   mediaAssets: number
+  cmsDrafts: number
 }
 
 export type TenantCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2125,6 +2311,7 @@ export type TenantCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions
   newsNotices?: boolean | TenantCountOutputTypeCountNewsNoticesArgs
   faqs?: boolean | TenantCountOutputTypeCountFaqsArgs
   mediaAssets?: boolean | TenantCountOutputTypeCountMediaAssetsArgs
+  cmsDrafts?: boolean | TenantCountOutputTypeCountCmsDraftsArgs
 }
 
 /**
@@ -2214,6 +2401,13 @@ export type TenantCountOutputTypeCountMediaAssetsArgs<ExtArgs extends runtime.Ty
   where?: Prisma.MediaAssetWhereInput
 }
 
+/**
+ * TenantCountOutputType without action
+ */
+export type TenantCountOutputTypeCountCmsDraftsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CmsDraftWhereInput
+}
+
 
 export type TenantSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -2236,6 +2430,7 @@ export type TenantSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   faqs?: boolean | Prisma.Tenant$faqsArgs<ExtArgs>
   contactSettings?: boolean | Prisma.Tenant$contactSettingsArgs<ExtArgs>
   mediaAssets?: boolean | Prisma.Tenant$mediaAssetsArgs<ExtArgs>
+  cmsDrafts?: boolean | Prisma.Tenant$cmsDraftsArgs<ExtArgs>
   _count?: boolean | Prisma.TenantCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["tenant"]>
 
@@ -2282,6 +2477,7 @@ export type TenantInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   faqs?: boolean | Prisma.Tenant$faqsArgs<ExtArgs>
   contactSettings?: boolean | Prisma.Tenant$contactSettingsArgs<ExtArgs>
   mediaAssets?: boolean | Prisma.Tenant$mediaAssetsArgs<ExtArgs>
+  cmsDrafts?: boolean | Prisma.Tenant$cmsDraftsArgs<ExtArgs>
   _count?: boolean | Prisma.TenantCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type TenantIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -2304,6 +2500,7 @@ export type $TenantPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     faqs: Prisma.$FAQPayload<ExtArgs>[]
     contactSettings: Prisma.$ContactSettingsPayload<ExtArgs> | null
     mediaAssets: Prisma.$MediaAssetPayload<ExtArgs>[]
+    cmsDrafts: Prisma.$CmsDraftPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2720,6 +2917,7 @@ export interface Prisma__TenantClient<T, Null = never, ExtArgs extends runtime.T
   faqs<T extends Prisma.Tenant$faqsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$faqsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FAQPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   contactSettings<T extends Prisma.Tenant$contactSettingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$contactSettingsArgs<ExtArgs>>): Prisma.Prisma__ContactSettingsClient<runtime.Types.Result.GetResult<Prisma.$ContactSettingsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   mediaAssets<T extends Prisma.Tenant$mediaAssetsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$mediaAssetsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MediaAssetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  cmsDrafts<T extends Prisma.Tenant$cmsDraftsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$cmsDraftsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CmsDraftPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3466,6 +3664,30 @@ export type Tenant$mediaAssetsArgs<ExtArgs extends runtime.Types.Extensions.Inte
   take?: number
   skip?: number
   distinct?: Prisma.MediaAssetScalarFieldEnum | Prisma.MediaAssetScalarFieldEnum[]
+}
+
+/**
+ * Tenant.cmsDrafts
+ */
+export type Tenant$cmsDraftsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CmsDraft
+   */
+  select?: Prisma.CmsDraftSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the CmsDraft
+   */
+  omit?: Prisma.CmsDraftOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CmsDraftInclude<ExtArgs> | null
+  where?: Prisma.CmsDraftWhereInput
+  orderBy?: Prisma.CmsDraftOrderByWithRelationInput | Prisma.CmsDraftOrderByWithRelationInput[]
+  cursor?: Prisma.CmsDraftWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.CmsDraftScalarFieldEnum | Prisma.CmsDraftScalarFieldEnum[]
 }
 
 /**

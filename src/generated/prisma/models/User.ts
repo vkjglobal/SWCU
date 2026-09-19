@@ -203,6 +203,8 @@ export type UserWhereInput = {
   memberships?: Prisma.StaffMembershipListRelationFilter
   auditActions?: Prisma.AuditLogListRelationFilter
   mediaUploads?: Prisma.MediaAssetListRelationFilter
+  createdDrafts?: Prisma.CmsDraftListRelationFilter
+  publishedDrafts?: Prisma.CmsDraftListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -218,6 +220,8 @@ export type UserOrderByWithRelationInput = {
   memberships?: Prisma.StaffMembershipOrderByRelationAggregateInput
   auditActions?: Prisma.AuditLogOrderByRelationAggregateInput
   mediaUploads?: Prisma.MediaAssetOrderByRelationAggregateInput
+  createdDrafts?: Prisma.CmsDraftOrderByRelationAggregateInput
+  publishedDrafts?: Prisma.CmsDraftOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -236,6 +240,8 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   memberships?: Prisma.StaffMembershipListRelationFilter
   auditActions?: Prisma.AuditLogListRelationFilter
   mediaUploads?: Prisma.MediaAssetListRelationFilter
+  createdDrafts?: Prisma.CmsDraftListRelationFilter
+  publishedDrafts?: Prisma.CmsDraftListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -277,6 +283,8 @@ export type UserCreateInput = {
   memberships?: Prisma.StaffMembershipCreateNestedManyWithoutUserInput
   auditActions?: Prisma.AuditLogCreateNestedManyWithoutActorInput
   mediaUploads?: Prisma.MediaAssetCreateNestedManyWithoutCreatorInput
+  createdDrafts?: Prisma.CmsDraftCreateNestedManyWithoutCreatorInput
+  publishedDrafts?: Prisma.CmsDraftCreateNestedManyWithoutPublisherInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -292,6 +300,8 @@ export type UserUncheckedCreateInput = {
   memberships?: Prisma.StaffMembershipUncheckedCreateNestedManyWithoutUserInput
   auditActions?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
   mediaUploads?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutCreatorInput
+  createdDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutCreatorInput
+  publishedDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutPublisherInput
 }
 
 export type UserUpdateInput = {
@@ -307,6 +317,8 @@ export type UserUpdateInput = {
   memberships?: Prisma.StaffMembershipUpdateManyWithoutUserNestedInput
   auditActions?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   mediaUploads?: Prisma.MediaAssetUpdateManyWithoutCreatorNestedInput
+  createdDrafts?: Prisma.CmsDraftUpdateManyWithoutCreatorNestedInput
+  publishedDrafts?: Prisma.CmsDraftUpdateManyWithoutPublisherNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -322,6 +334,8 @@ export type UserUncheckedUpdateInput = {
   memberships?: Prisma.StaffMembershipUncheckedUpdateManyWithoutUserNestedInput
   auditActions?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
   mediaUploads?: Prisma.MediaAssetUncheckedUpdateManyWithoutCreatorNestedInput
+  createdDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutCreatorNestedInput
+  publishedDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutPublisherNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -468,6 +482,36 @@ export type UserUpdateOneWithoutMediaUploadsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutMediaUploadsInput, Prisma.UserUpdateWithoutMediaUploadsInput>, Prisma.UserUncheckedUpdateWithoutMediaUploadsInput>
 }
 
+export type UserCreateNestedOneWithoutCreatedDraftsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCreatedDraftsInput, Prisma.UserUncheckedCreateWithoutCreatedDraftsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCreatedDraftsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserCreateNestedOneWithoutPublishedDraftsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPublishedDraftsInput, Prisma.UserUncheckedCreateWithoutPublishedDraftsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPublishedDraftsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutCreatedDraftsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCreatedDraftsInput, Prisma.UserUncheckedCreateWithoutCreatedDraftsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCreatedDraftsInput
+  upsert?: Prisma.UserUpsertWithoutCreatedDraftsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCreatedDraftsInput, Prisma.UserUpdateWithoutCreatedDraftsInput>, Prisma.UserUncheckedUpdateWithoutCreatedDraftsInput>
+}
+
+export type UserUpdateOneWithoutPublishedDraftsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPublishedDraftsInput, Prisma.UserUncheckedCreateWithoutPublishedDraftsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPublishedDraftsInput
+  upsert?: Prisma.UserUpsertWithoutPublishedDraftsInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutPublishedDraftsInput, Prisma.UserUpdateWithoutPublishedDraftsInput>, Prisma.UserUncheckedUpdateWithoutPublishedDraftsInput>
+}
+
 export type UserCreateWithoutSessionsInput = {
   id: string
   name: string
@@ -480,6 +524,8 @@ export type UserCreateWithoutSessionsInput = {
   memberships?: Prisma.StaffMembershipCreateNestedManyWithoutUserInput
   auditActions?: Prisma.AuditLogCreateNestedManyWithoutActorInput
   mediaUploads?: Prisma.MediaAssetCreateNestedManyWithoutCreatorInput
+  createdDrafts?: Prisma.CmsDraftCreateNestedManyWithoutCreatorInput
+  publishedDrafts?: Prisma.CmsDraftCreateNestedManyWithoutPublisherInput
 }
 
 export type UserUncheckedCreateWithoutSessionsInput = {
@@ -494,6 +540,8 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   memberships?: Prisma.StaffMembershipUncheckedCreateNestedManyWithoutUserInput
   auditActions?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
   mediaUploads?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutCreatorInput
+  createdDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutCreatorInput
+  publishedDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutPublisherInput
 }
 
 export type UserCreateOrConnectWithoutSessionsInput = {
@@ -524,6 +572,8 @@ export type UserUpdateWithoutSessionsInput = {
   memberships?: Prisma.StaffMembershipUpdateManyWithoutUserNestedInput
   auditActions?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   mediaUploads?: Prisma.MediaAssetUpdateManyWithoutCreatorNestedInput
+  createdDrafts?: Prisma.CmsDraftUpdateManyWithoutCreatorNestedInput
+  publishedDrafts?: Prisma.CmsDraftUpdateManyWithoutPublisherNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -538,6 +588,8 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   memberships?: Prisma.StaffMembershipUncheckedUpdateManyWithoutUserNestedInput
   auditActions?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
   mediaUploads?: Prisma.MediaAssetUncheckedUpdateManyWithoutCreatorNestedInput
+  createdDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutCreatorNestedInput
+  publishedDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutPublisherNestedInput
 }
 
 export type UserCreateWithoutAccountsInput = {
@@ -552,6 +604,8 @@ export type UserCreateWithoutAccountsInput = {
   memberships?: Prisma.StaffMembershipCreateNestedManyWithoutUserInput
   auditActions?: Prisma.AuditLogCreateNestedManyWithoutActorInput
   mediaUploads?: Prisma.MediaAssetCreateNestedManyWithoutCreatorInput
+  createdDrafts?: Prisma.CmsDraftCreateNestedManyWithoutCreatorInput
+  publishedDrafts?: Prisma.CmsDraftCreateNestedManyWithoutPublisherInput
 }
 
 export type UserUncheckedCreateWithoutAccountsInput = {
@@ -566,6 +620,8 @@ export type UserUncheckedCreateWithoutAccountsInput = {
   memberships?: Prisma.StaffMembershipUncheckedCreateNestedManyWithoutUserInput
   auditActions?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
   mediaUploads?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutCreatorInput
+  createdDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutCreatorInput
+  publishedDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutPublisherInput
 }
 
 export type UserCreateOrConnectWithoutAccountsInput = {
@@ -596,6 +652,8 @@ export type UserUpdateWithoutAccountsInput = {
   memberships?: Prisma.StaffMembershipUpdateManyWithoutUserNestedInput
   auditActions?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   mediaUploads?: Prisma.MediaAssetUpdateManyWithoutCreatorNestedInput
+  createdDrafts?: Prisma.CmsDraftUpdateManyWithoutCreatorNestedInput
+  publishedDrafts?: Prisma.CmsDraftUpdateManyWithoutPublisherNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAccountsInput = {
@@ -610,6 +668,8 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
   memberships?: Prisma.StaffMembershipUncheckedUpdateManyWithoutUserNestedInput
   auditActions?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
   mediaUploads?: Prisma.MediaAssetUncheckedUpdateManyWithoutCreatorNestedInput
+  createdDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutCreatorNestedInput
+  publishedDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutPublisherNestedInput
 }
 
 export type UserCreateWithoutMembershipsInput = {
@@ -624,6 +684,8 @@ export type UserCreateWithoutMembershipsInput = {
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   auditActions?: Prisma.AuditLogCreateNestedManyWithoutActorInput
   mediaUploads?: Prisma.MediaAssetCreateNestedManyWithoutCreatorInput
+  createdDrafts?: Prisma.CmsDraftCreateNestedManyWithoutCreatorInput
+  publishedDrafts?: Prisma.CmsDraftCreateNestedManyWithoutPublisherInput
 }
 
 export type UserUncheckedCreateWithoutMembershipsInput = {
@@ -638,6 +700,8 @@ export type UserUncheckedCreateWithoutMembershipsInput = {
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   auditActions?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
   mediaUploads?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutCreatorInput
+  createdDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutCreatorInput
+  publishedDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutPublisherInput
 }
 
 export type UserCreateOrConnectWithoutMembershipsInput = {
@@ -668,6 +732,8 @@ export type UserUpdateWithoutMembershipsInput = {
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   auditActions?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
   mediaUploads?: Prisma.MediaAssetUpdateManyWithoutCreatorNestedInput
+  createdDrafts?: Prisma.CmsDraftUpdateManyWithoutCreatorNestedInput
+  publishedDrafts?: Prisma.CmsDraftUpdateManyWithoutPublisherNestedInput
 }
 
 export type UserUncheckedUpdateWithoutMembershipsInput = {
@@ -682,6 +748,8 @@ export type UserUncheckedUpdateWithoutMembershipsInput = {
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   auditActions?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
   mediaUploads?: Prisma.MediaAssetUncheckedUpdateManyWithoutCreatorNestedInput
+  createdDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutCreatorNestedInput
+  publishedDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutPublisherNestedInput
 }
 
 export type UserCreateWithoutAuditActionsInput = {
@@ -696,6 +764,8 @@ export type UserCreateWithoutAuditActionsInput = {
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   memberships?: Prisma.StaffMembershipCreateNestedManyWithoutUserInput
   mediaUploads?: Prisma.MediaAssetCreateNestedManyWithoutCreatorInput
+  createdDrafts?: Prisma.CmsDraftCreateNestedManyWithoutCreatorInput
+  publishedDrafts?: Prisma.CmsDraftCreateNestedManyWithoutPublisherInput
 }
 
 export type UserUncheckedCreateWithoutAuditActionsInput = {
@@ -710,6 +780,8 @@ export type UserUncheckedCreateWithoutAuditActionsInput = {
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   memberships?: Prisma.StaffMembershipUncheckedCreateNestedManyWithoutUserInput
   mediaUploads?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutCreatorInput
+  createdDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutCreatorInput
+  publishedDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutPublisherInput
 }
 
 export type UserCreateOrConnectWithoutAuditActionsInput = {
@@ -740,6 +812,8 @@ export type UserUpdateWithoutAuditActionsInput = {
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   memberships?: Prisma.StaffMembershipUpdateManyWithoutUserNestedInput
   mediaUploads?: Prisma.MediaAssetUpdateManyWithoutCreatorNestedInput
+  createdDrafts?: Prisma.CmsDraftUpdateManyWithoutCreatorNestedInput
+  publishedDrafts?: Prisma.CmsDraftUpdateManyWithoutPublisherNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAuditActionsInput = {
@@ -754,6 +828,8 @@ export type UserUncheckedUpdateWithoutAuditActionsInput = {
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   memberships?: Prisma.StaffMembershipUncheckedUpdateManyWithoutUserNestedInput
   mediaUploads?: Prisma.MediaAssetUncheckedUpdateManyWithoutCreatorNestedInput
+  createdDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutCreatorNestedInput
+  publishedDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutPublisherNestedInput
 }
 
 export type UserCreateWithoutMediaUploadsInput = {
@@ -768,6 +844,8 @@ export type UserCreateWithoutMediaUploadsInput = {
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   memberships?: Prisma.StaffMembershipCreateNestedManyWithoutUserInput
   auditActions?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  createdDrafts?: Prisma.CmsDraftCreateNestedManyWithoutCreatorInput
+  publishedDrafts?: Prisma.CmsDraftCreateNestedManyWithoutPublisherInput
 }
 
 export type UserUncheckedCreateWithoutMediaUploadsInput = {
@@ -782,6 +860,8 @@ export type UserUncheckedCreateWithoutMediaUploadsInput = {
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   memberships?: Prisma.StaffMembershipUncheckedCreateNestedManyWithoutUserInput
   auditActions?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  createdDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutCreatorInput
+  publishedDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutPublisherInput
 }
 
 export type UserCreateOrConnectWithoutMediaUploadsInput = {
@@ -812,6 +892,8 @@ export type UserUpdateWithoutMediaUploadsInput = {
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   memberships?: Prisma.StaffMembershipUpdateManyWithoutUserNestedInput
   auditActions?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  createdDrafts?: Prisma.CmsDraftUpdateManyWithoutCreatorNestedInput
+  publishedDrafts?: Prisma.CmsDraftUpdateManyWithoutPublisherNestedInput
 }
 
 export type UserUncheckedUpdateWithoutMediaUploadsInput = {
@@ -826,6 +908,168 @@ export type UserUncheckedUpdateWithoutMediaUploadsInput = {
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   memberships?: Prisma.StaffMembershipUncheckedUpdateManyWithoutUserNestedInput
   auditActions?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  createdDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutCreatorNestedInput
+  publishedDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutPublisherNestedInput
+}
+
+export type UserCreateWithoutCreatedDraftsInput = {
+  id: string
+  name: string
+  email: string
+  emailVerified?: boolean
+  image?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  memberships?: Prisma.StaffMembershipCreateNestedManyWithoutUserInput
+  auditActions?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  mediaUploads?: Prisma.MediaAssetCreateNestedManyWithoutCreatorInput
+  publishedDrafts?: Prisma.CmsDraftCreateNestedManyWithoutPublisherInput
+}
+
+export type UserUncheckedCreateWithoutCreatedDraftsInput = {
+  id: string
+  name: string
+  email: string
+  emailVerified?: boolean
+  image?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  memberships?: Prisma.StaffMembershipUncheckedCreateNestedManyWithoutUserInput
+  auditActions?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  mediaUploads?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutCreatorInput
+  publishedDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutPublisherInput
+}
+
+export type UserCreateOrConnectWithoutCreatedDraftsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutCreatedDraftsInput, Prisma.UserUncheckedCreateWithoutCreatedDraftsInput>
+}
+
+export type UserCreateWithoutPublishedDraftsInput = {
+  id: string
+  name: string
+  email: string
+  emailVerified?: boolean
+  image?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  memberships?: Prisma.StaffMembershipCreateNestedManyWithoutUserInput
+  auditActions?: Prisma.AuditLogCreateNestedManyWithoutActorInput
+  mediaUploads?: Prisma.MediaAssetCreateNestedManyWithoutCreatorInput
+  createdDrafts?: Prisma.CmsDraftCreateNestedManyWithoutCreatorInput
+}
+
+export type UserUncheckedCreateWithoutPublishedDraftsInput = {
+  id: string
+  name: string
+  email: string
+  emailVerified?: boolean
+  image?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  memberships?: Prisma.StaffMembershipUncheckedCreateNestedManyWithoutUserInput
+  auditActions?: Prisma.AuditLogUncheckedCreateNestedManyWithoutActorInput
+  mediaUploads?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutCreatorInput
+  createdDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutCreatorInput
+}
+
+export type UserCreateOrConnectWithoutPublishedDraftsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutPublishedDraftsInput, Prisma.UserUncheckedCreateWithoutPublishedDraftsInput>
+}
+
+export type UserUpsertWithoutCreatedDraftsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutCreatedDraftsInput, Prisma.UserUncheckedUpdateWithoutCreatedDraftsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutCreatedDraftsInput, Prisma.UserUncheckedCreateWithoutCreatedDraftsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutCreatedDraftsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutCreatedDraftsInput, Prisma.UserUncheckedUpdateWithoutCreatedDraftsInput>
+}
+
+export type UserUpdateWithoutCreatedDraftsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  memberships?: Prisma.StaffMembershipUpdateManyWithoutUserNestedInput
+  auditActions?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  mediaUploads?: Prisma.MediaAssetUpdateManyWithoutCreatorNestedInput
+  publishedDrafts?: Prisma.CmsDraftUpdateManyWithoutPublisherNestedInput
+}
+
+export type UserUncheckedUpdateWithoutCreatedDraftsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  memberships?: Prisma.StaffMembershipUncheckedUpdateManyWithoutUserNestedInput
+  auditActions?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  mediaUploads?: Prisma.MediaAssetUncheckedUpdateManyWithoutCreatorNestedInput
+  publishedDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutPublisherNestedInput
+}
+
+export type UserUpsertWithoutPublishedDraftsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutPublishedDraftsInput, Prisma.UserUncheckedUpdateWithoutPublishedDraftsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutPublishedDraftsInput, Prisma.UserUncheckedCreateWithoutPublishedDraftsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutPublishedDraftsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutPublishedDraftsInput, Prisma.UserUncheckedUpdateWithoutPublishedDraftsInput>
+}
+
+export type UserUpdateWithoutPublishedDraftsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  memberships?: Prisma.StaffMembershipUpdateManyWithoutUserNestedInput
+  auditActions?: Prisma.AuditLogUpdateManyWithoutActorNestedInput
+  mediaUploads?: Prisma.MediaAssetUpdateManyWithoutCreatorNestedInput
+  createdDrafts?: Prisma.CmsDraftUpdateManyWithoutCreatorNestedInput
+}
+
+export type UserUncheckedUpdateWithoutPublishedDraftsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  memberships?: Prisma.StaffMembershipUncheckedUpdateManyWithoutUserNestedInput
+  auditActions?: Prisma.AuditLogUncheckedUpdateManyWithoutActorNestedInput
+  mediaUploads?: Prisma.MediaAssetUncheckedUpdateManyWithoutCreatorNestedInput
+  createdDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutCreatorNestedInput
 }
 
 
@@ -839,6 +1083,8 @@ export type UserCountOutputType = {
   memberships: number
   auditActions: number
   mediaUploads: number
+  createdDrafts: number
+  publishedDrafts: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -847,6 +1093,8 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   memberships?: boolean | UserCountOutputTypeCountMembershipsArgs
   auditActions?: boolean | UserCountOutputTypeCountAuditActionsArgs
   mediaUploads?: boolean | UserCountOutputTypeCountMediaUploadsArgs
+  createdDrafts?: boolean | UserCountOutputTypeCountCreatedDraftsArgs
+  publishedDrafts?: boolean | UserCountOutputTypeCountPublishedDraftsArgs
 }
 
 /**
@@ -894,6 +1142,20 @@ export type UserCountOutputTypeCountMediaUploadsArgs<ExtArgs extends runtime.Typ
   where?: Prisma.MediaAssetWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountCreatedDraftsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CmsDraftWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountPublishedDraftsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CmsDraftWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -908,6 +1170,8 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   memberships?: boolean | Prisma.User$membershipsArgs<ExtArgs>
   auditActions?: boolean | Prisma.User$auditActionsArgs<ExtArgs>
   mediaUploads?: boolean | Prisma.User$mediaUploadsArgs<ExtArgs>
+  createdDrafts?: boolean | Prisma.User$createdDraftsArgs<ExtArgs>
+  publishedDrafts?: boolean | Prisma.User$publishedDraftsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -948,6 +1212,8 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   memberships?: boolean | Prisma.User$membershipsArgs<ExtArgs>
   auditActions?: boolean | Prisma.User$auditActionsArgs<ExtArgs>
   mediaUploads?: boolean | Prisma.User$mediaUploadsArgs<ExtArgs>
+  createdDrafts?: boolean | Prisma.User$createdDraftsArgs<ExtArgs>
+  publishedDrafts?: boolean | Prisma.User$publishedDraftsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -961,6 +1227,8 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     memberships: Prisma.$StaffMembershipPayload<ExtArgs>[]
     auditActions: Prisma.$AuditLogPayload<ExtArgs>[]
     mediaUploads: Prisma.$MediaAssetPayload<ExtArgs>[]
+    createdDrafts: Prisma.$CmsDraftPayload<ExtArgs>[]
+    publishedDrafts: Prisma.$CmsDraftPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1369,6 +1637,8 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   memberships<T extends Prisma.User$membershipsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$membershipsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StaffMembershipPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   auditActions<T extends Prisma.User$auditActionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$auditActionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   mediaUploads<T extends Prisma.User$mediaUploadsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$mediaUploadsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MediaAssetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  createdDrafts<T extends Prisma.User$createdDraftsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$createdDraftsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CmsDraftPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  publishedDrafts<T extends Prisma.User$publishedDraftsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$publishedDraftsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CmsDraftPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1915,6 +2185,54 @@ export type User$mediaUploadsArgs<ExtArgs extends runtime.Types.Extensions.Inter
   take?: number
   skip?: number
   distinct?: Prisma.MediaAssetScalarFieldEnum | Prisma.MediaAssetScalarFieldEnum[]
+}
+
+/**
+ * User.createdDrafts
+ */
+export type User$createdDraftsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CmsDraft
+   */
+  select?: Prisma.CmsDraftSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the CmsDraft
+   */
+  omit?: Prisma.CmsDraftOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CmsDraftInclude<ExtArgs> | null
+  where?: Prisma.CmsDraftWhereInput
+  orderBy?: Prisma.CmsDraftOrderByWithRelationInput | Prisma.CmsDraftOrderByWithRelationInput[]
+  cursor?: Prisma.CmsDraftWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.CmsDraftScalarFieldEnum | Prisma.CmsDraftScalarFieldEnum[]
+}
+
+/**
+ * User.publishedDrafts
+ */
+export type User$publishedDraftsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CmsDraft
+   */
+  select?: Prisma.CmsDraftSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the CmsDraft
+   */
+  omit?: Prisma.CmsDraftOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CmsDraftInclude<ExtArgs> | null
+  where?: Prisma.CmsDraftWhereInput
+  orderBy?: Prisma.CmsDraftOrderByWithRelationInput | Prisma.CmsDraftOrderByWithRelationInput[]
+  cursor?: Prisma.CmsDraftWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.CmsDraftScalarFieldEnum | Prisma.CmsDraftScalarFieldEnum[]
 }
 
 /**

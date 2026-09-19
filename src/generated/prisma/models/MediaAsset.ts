@@ -308,6 +308,7 @@ export type MediaAssetWhereInput = {
   creator?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   replacedBy?: Prisma.XOR<Prisma.MediaAssetNullableScalarRelationFilter, Prisma.MediaAssetWhereInput> | null
   replacements?: Prisma.MediaAssetListRelationFilter
+  cmsDrafts?: Prisma.CmsDraftListRelationFilter
   heroSlides?: Prisma.HomeHeroSlideListRelationFilter
   formDocuments?: Prisma.FormDocumentListRelationFilter
 }
@@ -332,6 +333,7 @@ export type MediaAssetOrderByWithRelationInput = {
   creator?: Prisma.UserOrderByWithRelationInput
   replacedBy?: Prisma.MediaAssetOrderByWithRelationInput
   replacements?: Prisma.MediaAssetOrderByRelationAggregateInput
+  cmsDrafts?: Prisma.CmsDraftOrderByRelationAggregateInput
   heroSlides?: Prisma.HomeHeroSlideOrderByRelationAggregateInput
   formDocuments?: Prisma.FormDocumentOrderByRelationAggregateInput
 }
@@ -359,6 +361,7 @@ export type MediaAssetWhereUniqueInput = Prisma.AtLeast<{
   creator?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   replacedBy?: Prisma.XOR<Prisma.MediaAssetNullableScalarRelationFilter, Prisma.MediaAssetWhereInput> | null
   replacements?: Prisma.MediaAssetListRelationFilter
+  cmsDrafts?: Prisma.CmsDraftListRelationFilter
   heroSlides?: Prisma.HomeHeroSlideListRelationFilter
   formDocuments?: Prisma.FormDocumentListRelationFilter
 }, "id" | "objectKey">
@@ -424,6 +427,7 @@ export type MediaAssetCreateInput = {
   creator?: Prisma.UserCreateNestedOneWithoutMediaUploadsInput
   replacedBy?: Prisma.MediaAssetCreateNestedOneWithoutReplacementsInput
   replacements?: Prisma.MediaAssetCreateNestedManyWithoutReplacedByInput
+  cmsDrafts?: Prisma.CmsDraftCreateNestedManyWithoutMediaAssetInput
   heroSlides?: Prisma.HomeHeroSlideCreateNestedManyWithoutMediaAssetInput
   formDocuments?: Prisma.FormDocumentCreateNestedManyWithoutMediaAssetInput
 }
@@ -445,6 +449,7 @@ export type MediaAssetUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   replacements?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutReplacedByInput
+  cmsDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutMediaAssetInput
   heroSlides?: Prisma.HomeHeroSlideUncheckedCreateNestedManyWithoutMediaAssetInput
   formDocuments?: Prisma.FormDocumentUncheckedCreateNestedManyWithoutMediaAssetInput
 }
@@ -466,6 +471,7 @@ export type MediaAssetUpdateInput = {
   creator?: Prisma.UserUpdateOneWithoutMediaUploadsNestedInput
   replacedBy?: Prisma.MediaAssetUpdateOneWithoutReplacementsNestedInput
   replacements?: Prisma.MediaAssetUpdateManyWithoutReplacedByNestedInput
+  cmsDrafts?: Prisma.CmsDraftUpdateManyWithoutMediaAssetNestedInput
   heroSlides?: Prisma.HomeHeroSlideUpdateManyWithoutMediaAssetNestedInput
   formDocuments?: Prisma.FormDocumentUpdateManyWithoutMediaAssetNestedInput
 }
@@ -487,6 +493,7 @@ export type MediaAssetUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   replacements?: Prisma.MediaAssetUncheckedUpdateManyWithoutReplacedByNestedInput
+  cmsDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutMediaAssetNestedInput
   heroSlides?: Prisma.HomeHeroSlideUncheckedUpdateManyWithoutMediaAssetNestedInput
   formDocuments?: Prisma.FormDocumentUncheckedUpdateManyWithoutMediaAssetNestedInput
 }
@@ -797,6 +804,22 @@ export type MediaAssetUncheckedUpdateManyWithoutReplacedByNestedInput = {
   deleteMany?: Prisma.MediaAssetScalarWhereInput | Prisma.MediaAssetScalarWhereInput[]
 }
 
+export type MediaAssetCreateNestedOneWithoutCmsDraftsInput = {
+  create?: Prisma.XOR<Prisma.MediaAssetCreateWithoutCmsDraftsInput, Prisma.MediaAssetUncheckedCreateWithoutCmsDraftsInput>
+  connectOrCreate?: Prisma.MediaAssetCreateOrConnectWithoutCmsDraftsInput
+  connect?: Prisma.MediaAssetWhereUniqueInput
+}
+
+export type MediaAssetUpdateOneWithoutCmsDraftsNestedInput = {
+  create?: Prisma.XOR<Prisma.MediaAssetCreateWithoutCmsDraftsInput, Prisma.MediaAssetUncheckedCreateWithoutCmsDraftsInput>
+  connectOrCreate?: Prisma.MediaAssetCreateOrConnectWithoutCmsDraftsInput
+  upsert?: Prisma.MediaAssetUpsertWithoutCmsDraftsInput
+  disconnect?: Prisma.MediaAssetWhereInput | boolean
+  delete?: Prisma.MediaAssetWhereInput | boolean
+  connect?: Prisma.MediaAssetWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.MediaAssetUpdateToOneWithWhereWithoutCmsDraftsInput, Prisma.MediaAssetUpdateWithoutCmsDraftsInput>, Prisma.MediaAssetUncheckedUpdateWithoutCmsDraftsInput>
+}
+
 export type MediaAssetCreateWithoutTenantInput = {
   id?: string
   objectKey: string
@@ -813,6 +836,7 @@ export type MediaAssetCreateWithoutTenantInput = {
   creator?: Prisma.UserCreateNestedOneWithoutMediaUploadsInput
   replacedBy?: Prisma.MediaAssetCreateNestedOneWithoutReplacementsInput
   replacements?: Prisma.MediaAssetCreateNestedManyWithoutReplacedByInput
+  cmsDrafts?: Prisma.CmsDraftCreateNestedManyWithoutMediaAssetInput
   heroSlides?: Prisma.HomeHeroSlideCreateNestedManyWithoutMediaAssetInput
   formDocuments?: Prisma.FormDocumentCreateNestedManyWithoutMediaAssetInput
 }
@@ -833,6 +857,7 @@ export type MediaAssetUncheckedCreateWithoutTenantInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   replacements?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutReplacedByInput
+  cmsDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutMediaAssetInput
   heroSlides?: Prisma.HomeHeroSlideUncheckedCreateNestedManyWithoutMediaAssetInput
   formDocuments?: Prisma.FormDocumentUncheckedCreateNestedManyWithoutMediaAssetInput
 }
@@ -900,6 +925,7 @@ export type MediaAssetCreateWithoutCreatorInput = {
   tenant: Prisma.TenantCreateNestedOneWithoutMediaAssetsInput
   replacedBy?: Prisma.MediaAssetCreateNestedOneWithoutReplacementsInput
   replacements?: Prisma.MediaAssetCreateNestedManyWithoutReplacedByInput
+  cmsDrafts?: Prisma.CmsDraftCreateNestedManyWithoutMediaAssetInput
   heroSlides?: Prisma.HomeHeroSlideCreateNestedManyWithoutMediaAssetInput
   formDocuments?: Prisma.FormDocumentCreateNestedManyWithoutMediaAssetInput
 }
@@ -920,6 +946,7 @@ export type MediaAssetUncheckedCreateWithoutCreatorInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   replacements?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutReplacedByInput
+  cmsDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutMediaAssetInput
   heroSlides?: Prisma.HomeHeroSlideUncheckedCreateNestedManyWithoutMediaAssetInput
   formDocuments?: Prisma.FormDocumentUncheckedCreateNestedManyWithoutMediaAssetInput
 }
@@ -967,6 +994,7 @@ export type MediaAssetCreateWithoutHeroSlidesInput = {
   creator?: Prisma.UserCreateNestedOneWithoutMediaUploadsInput
   replacedBy?: Prisma.MediaAssetCreateNestedOneWithoutReplacementsInput
   replacements?: Prisma.MediaAssetCreateNestedManyWithoutReplacedByInput
+  cmsDrafts?: Prisma.CmsDraftCreateNestedManyWithoutMediaAssetInput
   formDocuments?: Prisma.FormDocumentCreateNestedManyWithoutMediaAssetInput
 }
 
@@ -987,6 +1015,7 @@ export type MediaAssetUncheckedCreateWithoutHeroSlidesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   replacements?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutReplacedByInput
+  cmsDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutMediaAssetInput
   formDocuments?: Prisma.FormDocumentUncheckedCreateNestedManyWithoutMediaAssetInput
 }
 
@@ -1023,6 +1052,7 @@ export type MediaAssetUpdateWithoutHeroSlidesInput = {
   creator?: Prisma.UserUpdateOneWithoutMediaUploadsNestedInput
   replacedBy?: Prisma.MediaAssetUpdateOneWithoutReplacementsNestedInput
   replacements?: Prisma.MediaAssetUpdateManyWithoutReplacedByNestedInput
+  cmsDrafts?: Prisma.CmsDraftUpdateManyWithoutMediaAssetNestedInput
   formDocuments?: Prisma.FormDocumentUpdateManyWithoutMediaAssetNestedInput
 }
 
@@ -1043,6 +1073,7 @@ export type MediaAssetUncheckedUpdateWithoutHeroSlidesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   replacements?: Prisma.MediaAssetUncheckedUpdateManyWithoutReplacedByNestedInput
+  cmsDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutMediaAssetNestedInput
   formDocuments?: Prisma.FormDocumentUncheckedUpdateManyWithoutMediaAssetNestedInput
 }
 
@@ -1063,6 +1094,7 @@ export type MediaAssetCreateWithoutFormDocumentsInput = {
   creator?: Prisma.UserCreateNestedOneWithoutMediaUploadsInput
   replacedBy?: Prisma.MediaAssetCreateNestedOneWithoutReplacementsInput
   replacements?: Prisma.MediaAssetCreateNestedManyWithoutReplacedByInput
+  cmsDrafts?: Prisma.CmsDraftCreateNestedManyWithoutMediaAssetInput
   heroSlides?: Prisma.HomeHeroSlideCreateNestedManyWithoutMediaAssetInput
 }
 
@@ -1083,6 +1115,7 @@ export type MediaAssetUncheckedCreateWithoutFormDocumentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   replacements?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutReplacedByInput
+  cmsDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutMediaAssetInput
   heroSlides?: Prisma.HomeHeroSlideUncheckedCreateNestedManyWithoutMediaAssetInput
 }
 
@@ -1119,6 +1152,7 @@ export type MediaAssetUpdateWithoutFormDocumentsInput = {
   creator?: Prisma.UserUpdateOneWithoutMediaUploadsNestedInput
   replacedBy?: Prisma.MediaAssetUpdateOneWithoutReplacementsNestedInput
   replacements?: Prisma.MediaAssetUpdateManyWithoutReplacedByNestedInput
+  cmsDrafts?: Prisma.CmsDraftUpdateManyWithoutMediaAssetNestedInput
   heroSlides?: Prisma.HomeHeroSlideUpdateManyWithoutMediaAssetNestedInput
 }
 
@@ -1139,6 +1173,7 @@ export type MediaAssetUncheckedUpdateWithoutFormDocumentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   replacements?: Prisma.MediaAssetUncheckedUpdateManyWithoutReplacedByNestedInput
+  cmsDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutMediaAssetNestedInput
   heroSlides?: Prisma.HomeHeroSlideUncheckedUpdateManyWithoutMediaAssetNestedInput
 }
 
@@ -1158,6 +1193,7 @@ export type MediaAssetCreateWithoutReplacementsInput = {
   tenant: Prisma.TenantCreateNestedOneWithoutMediaAssetsInput
   creator?: Prisma.UserCreateNestedOneWithoutMediaUploadsInput
   replacedBy?: Prisma.MediaAssetCreateNestedOneWithoutReplacementsInput
+  cmsDrafts?: Prisma.CmsDraftCreateNestedManyWithoutMediaAssetInput
   heroSlides?: Prisma.HomeHeroSlideCreateNestedManyWithoutMediaAssetInput
   formDocuments?: Prisma.FormDocumentCreateNestedManyWithoutMediaAssetInput
 }
@@ -1178,6 +1214,7 @@ export type MediaAssetUncheckedCreateWithoutReplacementsInput = {
   replacedById?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  cmsDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutMediaAssetInput
   heroSlides?: Prisma.HomeHeroSlideUncheckedCreateNestedManyWithoutMediaAssetInput
   formDocuments?: Prisma.FormDocumentUncheckedCreateNestedManyWithoutMediaAssetInput
 }
@@ -1203,6 +1240,7 @@ export type MediaAssetCreateWithoutReplacedByInput = {
   tenant: Prisma.TenantCreateNestedOneWithoutMediaAssetsInput
   creator?: Prisma.UserCreateNestedOneWithoutMediaUploadsInput
   replacements?: Prisma.MediaAssetCreateNestedManyWithoutReplacedByInput
+  cmsDrafts?: Prisma.CmsDraftCreateNestedManyWithoutMediaAssetInput
   heroSlides?: Prisma.HomeHeroSlideCreateNestedManyWithoutMediaAssetInput
   formDocuments?: Prisma.FormDocumentCreateNestedManyWithoutMediaAssetInput
 }
@@ -1223,6 +1261,7 @@ export type MediaAssetUncheckedCreateWithoutReplacedByInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   replacements?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutReplacedByInput
+  cmsDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutMediaAssetInput
   heroSlides?: Prisma.HomeHeroSlideUncheckedCreateNestedManyWithoutMediaAssetInput
   formDocuments?: Prisma.FormDocumentUncheckedCreateNestedManyWithoutMediaAssetInput
 }
@@ -1264,6 +1303,7 @@ export type MediaAssetUpdateWithoutReplacementsInput = {
   tenant?: Prisma.TenantUpdateOneRequiredWithoutMediaAssetsNestedInput
   creator?: Prisma.UserUpdateOneWithoutMediaUploadsNestedInput
   replacedBy?: Prisma.MediaAssetUpdateOneWithoutReplacementsNestedInput
+  cmsDrafts?: Prisma.CmsDraftUpdateManyWithoutMediaAssetNestedInput
   heroSlides?: Prisma.HomeHeroSlideUpdateManyWithoutMediaAssetNestedInput
   formDocuments?: Prisma.FormDocumentUpdateManyWithoutMediaAssetNestedInput
 }
@@ -1284,6 +1324,7 @@ export type MediaAssetUncheckedUpdateWithoutReplacementsInput = {
   replacedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  cmsDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutMediaAssetNestedInput
   heroSlides?: Prisma.HomeHeroSlideUncheckedUpdateManyWithoutMediaAssetNestedInput
   formDocuments?: Prisma.FormDocumentUncheckedUpdateManyWithoutMediaAssetNestedInput
 }
@@ -1302,6 +1343,106 @@ export type MediaAssetUpdateWithWhereUniqueWithoutReplacedByInput = {
 export type MediaAssetUpdateManyWithWhereWithoutReplacedByInput = {
   where: Prisma.MediaAssetScalarWhereInput
   data: Prisma.XOR<Prisma.MediaAssetUpdateManyMutationInput, Prisma.MediaAssetUncheckedUpdateManyWithoutReplacedByInput>
+}
+
+export type MediaAssetCreateWithoutCmsDraftsInput = {
+  id?: string
+  objectKey: string
+  originalFilename: string
+  mimeType: string
+  purpose: string
+  byteSize: number
+  width: number
+  height: number
+  altText?: string | null
+  retiredAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tenant: Prisma.TenantCreateNestedOneWithoutMediaAssetsInput
+  creator?: Prisma.UserCreateNestedOneWithoutMediaUploadsInput
+  replacedBy?: Prisma.MediaAssetCreateNestedOneWithoutReplacementsInput
+  replacements?: Prisma.MediaAssetCreateNestedManyWithoutReplacedByInput
+  heroSlides?: Prisma.HomeHeroSlideCreateNestedManyWithoutMediaAssetInput
+  formDocuments?: Prisma.FormDocumentCreateNestedManyWithoutMediaAssetInput
+}
+
+export type MediaAssetUncheckedCreateWithoutCmsDraftsInput = {
+  id?: string
+  tenantId: string
+  objectKey: string
+  originalFilename: string
+  mimeType: string
+  purpose: string
+  byteSize: number
+  width: number
+  height: number
+  altText?: string | null
+  createdBy?: string | null
+  retiredAt?: Date | string | null
+  replacedById?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  replacements?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutReplacedByInput
+  heroSlides?: Prisma.HomeHeroSlideUncheckedCreateNestedManyWithoutMediaAssetInput
+  formDocuments?: Prisma.FormDocumentUncheckedCreateNestedManyWithoutMediaAssetInput
+}
+
+export type MediaAssetCreateOrConnectWithoutCmsDraftsInput = {
+  where: Prisma.MediaAssetWhereUniqueInput
+  create: Prisma.XOR<Prisma.MediaAssetCreateWithoutCmsDraftsInput, Prisma.MediaAssetUncheckedCreateWithoutCmsDraftsInput>
+}
+
+export type MediaAssetUpsertWithoutCmsDraftsInput = {
+  update: Prisma.XOR<Prisma.MediaAssetUpdateWithoutCmsDraftsInput, Prisma.MediaAssetUncheckedUpdateWithoutCmsDraftsInput>
+  create: Prisma.XOR<Prisma.MediaAssetCreateWithoutCmsDraftsInput, Prisma.MediaAssetUncheckedCreateWithoutCmsDraftsInput>
+  where?: Prisma.MediaAssetWhereInput
+}
+
+export type MediaAssetUpdateToOneWithWhereWithoutCmsDraftsInput = {
+  where?: Prisma.MediaAssetWhereInput
+  data: Prisma.XOR<Prisma.MediaAssetUpdateWithoutCmsDraftsInput, Prisma.MediaAssetUncheckedUpdateWithoutCmsDraftsInput>
+}
+
+export type MediaAssetUpdateWithoutCmsDraftsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  objectKey?: Prisma.StringFieldUpdateOperationsInput | string
+  originalFilename?: Prisma.StringFieldUpdateOperationsInput | string
+  mimeType?: Prisma.StringFieldUpdateOperationsInput | string
+  purpose?: Prisma.StringFieldUpdateOperationsInput | string
+  byteSize?: Prisma.IntFieldUpdateOperationsInput | number
+  width?: Prisma.IntFieldUpdateOperationsInput | number
+  height?: Prisma.IntFieldUpdateOperationsInput | number
+  altText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  retiredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tenant?: Prisma.TenantUpdateOneRequiredWithoutMediaAssetsNestedInput
+  creator?: Prisma.UserUpdateOneWithoutMediaUploadsNestedInput
+  replacedBy?: Prisma.MediaAssetUpdateOneWithoutReplacementsNestedInput
+  replacements?: Prisma.MediaAssetUpdateManyWithoutReplacedByNestedInput
+  heroSlides?: Prisma.HomeHeroSlideUpdateManyWithoutMediaAssetNestedInput
+  formDocuments?: Prisma.FormDocumentUpdateManyWithoutMediaAssetNestedInput
+}
+
+export type MediaAssetUncheckedUpdateWithoutCmsDraftsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  tenantId?: Prisma.StringFieldUpdateOperationsInput | string
+  objectKey?: Prisma.StringFieldUpdateOperationsInput | string
+  originalFilename?: Prisma.StringFieldUpdateOperationsInput | string
+  mimeType?: Prisma.StringFieldUpdateOperationsInput | string
+  purpose?: Prisma.StringFieldUpdateOperationsInput | string
+  byteSize?: Prisma.IntFieldUpdateOperationsInput | number
+  width?: Prisma.IntFieldUpdateOperationsInput | number
+  height?: Prisma.IntFieldUpdateOperationsInput | number
+  altText?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  retiredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  replacedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  replacements?: Prisma.MediaAssetUncheckedUpdateManyWithoutReplacedByNestedInput
+  heroSlides?: Prisma.HomeHeroSlideUncheckedUpdateManyWithoutMediaAssetNestedInput
+  formDocuments?: Prisma.FormDocumentUncheckedUpdateManyWithoutMediaAssetNestedInput
 }
 
 export type MediaAssetCreateManyTenantInput = {
@@ -1337,6 +1478,7 @@ export type MediaAssetUpdateWithoutTenantInput = {
   creator?: Prisma.UserUpdateOneWithoutMediaUploadsNestedInput
   replacedBy?: Prisma.MediaAssetUpdateOneWithoutReplacementsNestedInput
   replacements?: Prisma.MediaAssetUpdateManyWithoutReplacedByNestedInput
+  cmsDrafts?: Prisma.CmsDraftUpdateManyWithoutMediaAssetNestedInput
   heroSlides?: Prisma.HomeHeroSlideUpdateManyWithoutMediaAssetNestedInput
   formDocuments?: Prisma.FormDocumentUpdateManyWithoutMediaAssetNestedInput
 }
@@ -1357,6 +1499,7 @@ export type MediaAssetUncheckedUpdateWithoutTenantInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   replacements?: Prisma.MediaAssetUncheckedUpdateManyWithoutReplacedByNestedInput
+  cmsDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutMediaAssetNestedInput
   heroSlides?: Prisma.HomeHeroSlideUncheckedUpdateManyWithoutMediaAssetNestedInput
   formDocuments?: Prisma.FormDocumentUncheckedUpdateManyWithoutMediaAssetNestedInput
 }
@@ -1411,6 +1554,7 @@ export type MediaAssetUpdateWithoutCreatorInput = {
   tenant?: Prisma.TenantUpdateOneRequiredWithoutMediaAssetsNestedInput
   replacedBy?: Prisma.MediaAssetUpdateOneWithoutReplacementsNestedInput
   replacements?: Prisma.MediaAssetUpdateManyWithoutReplacedByNestedInput
+  cmsDrafts?: Prisma.CmsDraftUpdateManyWithoutMediaAssetNestedInput
   heroSlides?: Prisma.HomeHeroSlideUpdateManyWithoutMediaAssetNestedInput
   formDocuments?: Prisma.FormDocumentUpdateManyWithoutMediaAssetNestedInput
 }
@@ -1431,6 +1575,7 @@ export type MediaAssetUncheckedUpdateWithoutCreatorInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   replacements?: Prisma.MediaAssetUncheckedUpdateManyWithoutReplacedByNestedInput
+  cmsDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutMediaAssetNestedInput
   heroSlides?: Prisma.HomeHeroSlideUncheckedUpdateManyWithoutMediaAssetNestedInput
   formDocuments?: Prisma.FormDocumentUncheckedUpdateManyWithoutMediaAssetNestedInput
 }
@@ -1485,6 +1630,7 @@ export type MediaAssetUpdateWithoutReplacedByInput = {
   tenant?: Prisma.TenantUpdateOneRequiredWithoutMediaAssetsNestedInput
   creator?: Prisma.UserUpdateOneWithoutMediaUploadsNestedInput
   replacements?: Prisma.MediaAssetUpdateManyWithoutReplacedByNestedInput
+  cmsDrafts?: Prisma.CmsDraftUpdateManyWithoutMediaAssetNestedInput
   heroSlides?: Prisma.HomeHeroSlideUpdateManyWithoutMediaAssetNestedInput
   formDocuments?: Prisma.FormDocumentUpdateManyWithoutMediaAssetNestedInput
 }
@@ -1505,6 +1651,7 @@ export type MediaAssetUncheckedUpdateWithoutReplacedByInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   replacements?: Prisma.MediaAssetUncheckedUpdateManyWithoutReplacedByNestedInput
+  cmsDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutMediaAssetNestedInput
   heroSlides?: Prisma.HomeHeroSlideUncheckedUpdateManyWithoutMediaAssetNestedInput
   formDocuments?: Prisma.FormDocumentUncheckedUpdateManyWithoutMediaAssetNestedInput
 }
@@ -1533,12 +1680,14 @@ export type MediaAssetUncheckedUpdateManyWithoutReplacedByInput = {
 
 export type MediaAssetCountOutputType = {
   replacements: number
+  cmsDrafts: number
   heroSlides: number
   formDocuments: number
 }
 
 export type MediaAssetCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   replacements?: boolean | MediaAssetCountOutputTypeCountReplacementsArgs
+  cmsDrafts?: boolean | MediaAssetCountOutputTypeCountCmsDraftsArgs
   heroSlides?: boolean | MediaAssetCountOutputTypeCountHeroSlidesArgs
   formDocuments?: boolean | MediaAssetCountOutputTypeCountFormDocumentsArgs
 }
@@ -1558,6 +1707,13 @@ export type MediaAssetCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.E
  */
 export type MediaAssetCountOutputTypeCountReplacementsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.MediaAssetWhereInput
+}
+
+/**
+ * MediaAssetCountOutputType without action
+ */
+export type MediaAssetCountOutputTypeCountCmsDraftsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CmsDraftWhereInput
 }
 
 /**
@@ -1595,6 +1751,7 @@ export type MediaAssetSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   creator?: boolean | Prisma.MediaAsset$creatorArgs<ExtArgs>
   replacedBy?: boolean | Prisma.MediaAsset$replacedByArgs<ExtArgs>
   replacements?: boolean | Prisma.MediaAsset$replacementsArgs<ExtArgs>
+  cmsDrafts?: boolean | Prisma.MediaAsset$cmsDraftsArgs<ExtArgs>
   heroSlides?: boolean | Prisma.MediaAsset$heroSlidesArgs<ExtArgs>
   formDocuments?: boolean | Prisma.MediaAsset$formDocumentsArgs<ExtArgs>
   _count?: boolean | Prisma.MediaAssetCountOutputTypeDefaultArgs<ExtArgs>
@@ -1666,6 +1823,7 @@ export type MediaAssetInclude<ExtArgs extends runtime.Types.Extensions.InternalA
   creator?: boolean | Prisma.MediaAsset$creatorArgs<ExtArgs>
   replacedBy?: boolean | Prisma.MediaAsset$replacedByArgs<ExtArgs>
   replacements?: boolean | Prisma.MediaAsset$replacementsArgs<ExtArgs>
+  cmsDrafts?: boolean | Prisma.MediaAsset$cmsDraftsArgs<ExtArgs>
   heroSlides?: boolean | Prisma.MediaAsset$heroSlidesArgs<ExtArgs>
   formDocuments?: boolean | Prisma.MediaAsset$formDocumentsArgs<ExtArgs>
   _count?: boolean | Prisma.MediaAssetCountOutputTypeDefaultArgs<ExtArgs>
@@ -1688,6 +1846,7 @@ export type $MediaAssetPayload<ExtArgs extends runtime.Types.Extensions.Internal
     creator: Prisma.$UserPayload<ExtArgs> | null
     replacedBy: Prisma.$MediaAssetPayload<ExtArgs> | null
     replacements: Prisma.$MediaAssetPayload<ExtArgs>[]
+    cmsDrafts: Prisma.$CmsDraftPayload<ExtArgs>[]
     heroSlides: Prisma.$HomeHeroSlidePayload<ExtArgs>[]
     formDocuments: Prisma.$FormDocumentPayload<ExtArgs>[]
   }
@@ -2105,6 +2264,7 @@ export interface Prisma__MediaAssetClient<T, Null = never, ExtArgs extends runti
   creator<T extends Prisma.MediaAsset$creatorArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.MediaAsset$creatorArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   replacedBy<T extends Prisma.MediaAsset$replacedByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.MediaAsset$replacedByArgs<ExtArgs>>): Prisma.Prisma__MediaAssetClient<runtime.Types.Result.GetResult<Prisma.$MediaAssetPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   replacements<T extends Prisma.MediaAsset$replacementsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.MediaAsset$replacementsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MediaAssetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  cmsDrafts<T extends Prisma.MediaAsset$cmsDraftsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.MediaAsset$cmsDraftsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CmsDraftPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   heroSlides<T extends Prisma.MediaAsset$heroSlidesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.MediaAsset$heroSlidesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$HomeHeroSlidePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   formDocuments<T extends Prisma.MediaAsset$formDocumentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.MediaAsset$formDocumentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FormDocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
@@ -2611,6 +2771,30 @@ export type MediaAsset$replacementsArgs<ExtArgs extends runtime.Types.Extensions
   take?: number
   skip?: number
   distinct?: Prisma.MediaAssetScalarFieldEnum | Prisma.MediaAssetScalarFieldEnum[]
+}
+
+/**
+ * MediaAsset.cmsDrafts
+ */
+export type MediaAsset$cmsDraftsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CmsDraft
+   */
+  select?: Prisma.CmsDraftSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the CmsDraft
+   */
+  omit?: Prisma.CmsDraftOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CmsDraftInclude<ExtArgs> | null
+  where?: Prisma.CmsDraftWhereInput
+  orderBy?: Prisma.CmsDraftOrderByWithRelationInput | Prisma.CmsDraftOrderByWithRelationInput[]
+  cursor?: Prisma.CmsDraftWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.CmsDraftScalarFieldEnum | Prisma.CmsDraftScalarFieldEnum[]
 }
 
 /**

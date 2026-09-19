@@ -44,6 +44,7 @@ async function createRecord(input: { tenant: ResolvedTenant; actorUserId: string
   const objectKey = createMediaObjectKey({ tenantSlug: input.tenant.slug, category, extension: prepared.extension });
   await uploadMediaObject(objectKey, prepared.bytes, prepared.mimeType);
   return db.$transaction(async (tx) => {
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${input.tenant.id}, 0))`;
     const record = await tx.mediaAsset.create({ data: {
       tenantId: input.tenant.id, objectKey, originalFilename: input.file.name.slice(0, 255),
       mimeType: prepared.mimeType, purpose: input.purpose, byteSize: prepared.bytes.byteLength,
@@ -70,6 +71,7 @@ export async function replaceMedia(input: { tenant: ResolvedTenant; actorUserId:
   const objectKey = createMediaObjectKey({ tenantSlug: input.tenant.slug, category: isPdf ? "documents/forms" : `images/${existing.purpose}`, extension: prepared.extension });
   await uploadMediaObject(objectKey, prepared.bytes, prepared.mimeType);
   return db.$transaction(async (tx) => {
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${input.tenant.id}, 0))`;
     const replacement = await tx.mediaAsset.create({ data: { tenantId: input.tenant.id, objectKey, originalFilename: input.file.name.slice(0, 255), mimeType: prepared.mimeType, purpose: existing.purpose, byteSize: prepared.bytes.byteLength, width: prepared.width, height: prepared.height, altText: input.altText ?? existing.altText, createdBy: input.actorUserId } });
     const heroRefs = await tx.homeHeroSlide.updateMany({ where: { tenantId: input.tenant.id, mediaAssetId: existing.id }, data: { mediaAssetId: replacement.id } });
     const formRefs = await tx.formDocument.updateMany({ where: { tenantId: input.tenant.id, mediaAssetId: existing.id }, data: { mediaAssetId: replacement.id } });
@@ -83,6 +85,10 @@ export async function retireMedia(tenant: ResolvedTenant, actorUserId: string, m
   const existing = await db.mediaAsset.findFirst({ where: { id: mediaId, tenantId: tenant.id, retiredAt: null } });
   if (!existing) throw new Error("Media asset not found.");
   return db.$transaction(async (tx) => {
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${tenant.id}, 0))`;
+    const activeHeroRefs = await tx.homeHeroSlide.count({ where: { tenantId: tenant.id, mediaAssetId: existing.id, isEnabled: true } });
+    const activeHeroCount = await tx.homeHeroSlide.count({ where: { tenantId: tenant.id, isEnabled: true } });
+    if (activeHeroCount - activeHeroRefs < 1) throw new Error("Keep at least one active hero slide.");
     const heroRefs = await tx.homeHeroSlide.updateMany({ where: { tenantId: tenant.id, mediaAssetId: existing.id }, data: { mediaAssetId: null, isEnabled: false } });
     const formRefs = await tx.formDocument.updateMany({ where: { tenantId: tenant.id, mediaAssetId: existing.id }, data: { mediaAssetId: null } });
     const retired = await tx.mediaAsset.update({ where: { id: existing.id }, data: { retiredAt: new Date() } });

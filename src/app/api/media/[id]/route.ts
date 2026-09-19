@@ -4,6 +4,8 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { readMediaObject } from "@/lib/r2";
 import { requireTenant } from "@/lib/tenant";
+import { mediaCacheControl } from "@/lib/media-cache";
+import { canServeMedia } from "@/lib/media-access";
 
 export const runtime = "nodejs";
 
@@ -41,10 +43,7 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
           },
         })
       : null;
-    if (
-      !membership?.isActive ||
-      !["ADMINISTRATOR", "EDITOR"].includes(membership.role)
-    ) {
+    if (!canServeMedia({ isPublished, membershipRole: membership?.role, membershipActive: membership?.isActive })) {
       return NextResponse.json({ error: "Media not found" }, { status: 404 });
     }
   }
@@ -54,7 +53,7 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
   return new NextResponse(Buffer.from(bytes), {
     headers: {
       "Content-Type": asset.mimeType,
-      "Cache-Control": "public, max-age=3600",
+       "Cache-Control": mediaCacheControl(isPublished),
       "X-Content-Type-Options": "nosniff",
     },
   });

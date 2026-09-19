@@ -69,7 +69,8 @@ export const ModelName = {
   NewsNotice: 'NewsNotice',
   FAQ: 'FAQ',
   ContactSettings: 'ContactSettings',
-  MediaAsset: 'MediaAsset'
+  MediaAsset: 'MediaAsset',
+  CmsDraft: 'CmsDraft'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -364,6 +365,25 @@ export const MediaAssetScalarFieldEnum = {
 export type MediaAssetScalarFieldEnum = (typeof MediaAssetScalarFieldEnum)[keyof typeof MediaAssetScalarFieldEnum]
 
 
+export const CmsDraftScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  kind: 'kind',
+  operation: 'operation',
+  status: 'status',
+  targetId: 'targetId',
+  payload: 'payload',
+  mediaAssetId: 'mediaAssetId',
+  createdBy: 'createdBy',
+  publishedBy: 'publishedBy',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  publishedAt: 'publishedAt'
+} as const
+
+export type CmsDraftScalarFieldEnum = (typeof CmsDraftScalarFieldEnum)[keyof typeof CmsDraftScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -378,6 +398,13 @@ export const NullableJsonNullValueInput = {
 } as const
 
 export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
+
+
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
 export const QueryMode = {

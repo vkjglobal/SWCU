@@ -112,3 +112,8 @@ export type ContactSettings = Prisma.ContactSettingsModel
  * 
  */
 export type MediaAsset = Prisma.MediaAssetModel
+/**
+ * Model CmsDraft
+ * 
+ */
+export type CmsDraft = Prisma.CmsDraftModel

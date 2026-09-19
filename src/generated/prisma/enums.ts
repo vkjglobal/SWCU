@@ -15,3 +15,38 @@ export const StaffRole = {
 } as const
 
 export type StaffRole = (typeof StaffRole)[keyof typeof StaffRole]
+
+
+export const CmsDraftStatus = {
+  DRAFT: 'DRAFT',
+  PUBLISHED: 'PUBLISHED',
+  ARCHIVED: 'ARCHIVED'
+} as const
+
+export type CmsDraftStatus = (typeof CmsDraftStatus)[keyof typeof CmsDraftStatus]
+
+
+export const CmsDraftKind = {
+  SITE_NOTICE: 'SITE_NOTICE',
+  NEWS: 'NEWS',
+  FAQ: 'FAQ',
+  FORM_DOCUMENT: 'FORM_DOCUMENT',
+  HERO: 'HERO',
+  MEDIA: 'MEDIA'
+} as const
+
+export type CmsDraftKind = (typeof CmsDraftKind)[keyof typeof CmsDraftKind]
+
+
+export const CmsDraftOperation = {
+  CREATE: 'CREATE',
+  UPDATE: 'UPDATE',
+  REMOVE: 'REMOVE',
+  REPLACE: 'REPLACE',
+  REORDER: 'REORDER',
+  TOGGLE: 'TOGGLE',
+  UPLOAD: 'UPLOAD',
+  RETIRE: 'RETIRE'
+} as const
+
+export type CmsDraftOperation = (typeof CmsDraftOperation)[keyof typeof CmsDraftOperation]
