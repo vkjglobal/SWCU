@@ -66,6 +66,11 @@ const approvedPages = [
     heading: "Death Benefit Scheme",
     body: "SWCU’s Special Death Benefit Scheme is designed to provide support to the families and beneficiaries of members who pass away. Claims are handled under the Scheme’s approved rules.",
   },
+  {
+    slot: "IMPORTANT_INFORMATION",
+    heading: "Important Information",
+    body: "Repayment figures are estimates only. Actual repayments, terms and loan approval are subject to SWCU requirements and approval.\n\nSWCU will never ask you to disclose your password, PIN or security/verification code by email, phone, chat or through an unsolicited link. If you are unsure, contact SWCU using the contact details published on this website.",
+  },
 ] as const;
 
 async function seed() {

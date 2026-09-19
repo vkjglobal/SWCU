@@ -347,10 +347,12 @@ model ContactSettings {
   publicEmail    String   @db.VarChar(160)
   officeHours    String?  @db.VarChar(300)
   directionsUrl  String?  @db.VarChar(500)
+  contactMapMediaAssetId String? @unique
   notificationRecipients Json?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
   tenant         Tenant   @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  contactMapMediaAsset MediaAsset? @relation("ContactMapMedia", fields: [contactMapMediaAssetId], references: [id], onDelete: SetNull)
   @@unique([tenantId])
   @@map("contact_settings")
 }
@@ -380,6 +382,7 @@ model MediaAsset {
   formDocuments    FormDocument[]
   pageContent      PageContent[]
   leadershipRecords LeadershipRecord[]
+  contactMapSettings ContactSettings? @relation("ContactMapMedia")
   @@index([tenantId, purpose, retiredAt])
   @@index([tenantId, createdAt])
   @@index([createdBy])

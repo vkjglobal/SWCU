@@ -55,7 +55,7 @@ async function createRecord(input: { tenant: ResolvedTenant; actorUserId: string
   });
 }
 
-export async function uploadMedia(input: { tenant: ResolvedTenant; actorUserId: string; file: File; purpose: "hero" | "news" | "general"; altText?: string }) {
+export async function uploadMedia(input: { tenant: ResolvedTenant; actorUserId: string; file: File; purpose: "hero" | "news" | "general" | "contact-map"; altText?: string }) {
   return createRecord(input);
 }
 
@@ -66,6 +66,7 @@ export async function uploadDocument(input: { tenant: ResolvedTenant; actorUserI
 export async function replaceMedia(input: { tenant: ResolvedTenant; actorUserId: string; mediaId: string; file: File; altText?: string }) {
   const existing = await db.mediaAsset.findFirst({ where: { id: input.mediaId, tenantId: input.tenant.id, retiredAt: null } });
   if (!existing) throw new Error("Media asset not found.");
+  if (existing.purpose === "contact-map") throw new Error("Contact Map assets must use the dedicated Contact Map workflow.");
   const isPdf = existing.mimeType === "application/pdf";
   const prepared = isPdf ? await preparePdf(input.file) : await prepareImage(input.file);
   const objectKey = createMediaObjectKey({ tenantSlug: input.tenant.slug, category: isPdf ? "documents/forms" : `images/${existing.purpose}`, extension: prepared.extension });
@@ -75,8 +76,9 @@ export async function replaceMedia(input: { tenant: ResolvedTenant; actorUserId:
     const replacement = await tx.mediaAsset.create({ data: { tenantId: input.tenant.id, objectKey, originalFilename: input.file.name.slice(0, 255), mimeType: prepared.mimeType, purpose: existing.purpose, byteSize: prepared.bytes.byteLength, width: prepared.width, height: prepared.height, altText: input.altText ?? existing.altText, createdBy: input.actorUserId } });
     const heroRefs = await tx.homeHeroSlide.updateMany({ where: { tenantId: input.tenant.id, mediaAssetId: existing.id }, data: { mediaAssetId: replacement.id } });
     const formRefs = await tx.formDocument.updateMany({ where: { tenantId: input.tenant.id, mediaAssetId: existing.id }, data: { mediaAssetId: replacement.id } });
+     const contactMapRefs = await tx.contactSettings.updateMany({ where: { tenantId: input.tenant.id, contactMapMediaAssetId: existing.id }, data: { contactMapMediaAssetId: replacement.id } });
     await tx.mediaAsset.update({ where: { id: existing.id }, data: { retiredAt: new Date(), replacedById: replacement.id } });
-    await tx.auditLog.create({ data: { tenantId: input.tenant.id, actorUserId: input.actorUserId, action: "MEDIA_REPLACE", targetType: "MediaAsset", targetId: existing.id, changeMetadata: { before: { mediaId: existing.id, objectKey: existing.objectKey }, after: { mediaId: replacement.id, objectKey, heroReferences: heroRefs.count, formReferences: formRefs.count } } } });
+     await tx.auditLog.create({ data: { tenantId: input.tenant.id, actorUserId: input.actorUserId, action: "MEDIA_REPLACE", targetType: "MediaAsset", targetId: existing.id, changeMetadata: { before: { mediaId: existing.id, objectKey: existing.objectKey }, after: { mediaId: replacement.id, objectKey, heroReferences: heroRefs.count, formReferences: formRefs.count, contactMapReferences: contactMapRefs.count } } } });
     return replacement;
   });
 }
@@ -84,15 +86,96 @@ export async function replaceMedia(input: { tenant: ResolvedTenant; actorUserId:
 export async function retireMedia(tenant: ResolvedTenant, actorUserId: string, mediaId: string) {
   const existing = await db.mediaAsset.findFirst({ where: { id: mediaId, tenantId: tenant.id, retiredAt: null } });
   if (!existing) throw new Error("Media asset not found.");
+  if (existing.purpose === "contact-map") throw new Error("Contact Map assets must use the dedicated Contact Map workflow.");
   return db.$transaction(async (tx) => {
     await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${tenant.id}, 0))`;
     const activeHeroRefs = await tx.homeHeroSlide.count({ where: { tenantId: tenant.id, mediaAssetId: existing.id, isEnabled: true } });
     const activeHeroCount = await tx.homeHeroSlide.count({ where: { tenantId: tenant.id, isEnabled: true } });
-    if (activeHeroCount - activeHeroRefs < 1) throw new Error("Keep at least one active hero slide.");
+    if (activeHeroRefs > 0 && activeHeroCount - activeHeroRefs < 1) throw new Error("Keep at least one active hero slide.");
     const heroRefs = await tx.homeHeroSlide.updateMany({ where: { tenantId: tenant.id, mediaAssetId: existing.id }, data: { mediaAssetId: null, isEnabled: false } });
     const formRefs = await tx.formDocument.updateMany({ where: { tenantId: tenant.id, mediaAssetId: existing.id }, data: { mediaAssetId: null } });
+    const contactMapRefs = await tx.contactSettings.updateMany({ where: { tenantId: tenant.id, contactMapMediaAssetId: existing.id }, data: { contactMapMediaAssetId: null } });
     const retired = await tx.mediaAsset.update({ where: { id: existing.id }, data: { retiredAt: new Date() } });
-    await tx.auditLog.create({ data: { tenantId: tenant.id, actorUserId, action: "MEDIA_RETIRE", targetType: "MediaAsset", targetId: existing.id, changeMetadata: { before: { mediaId: existing.id }, after: { detachedHeroReferences: heroRefs.count, detachedFormReferences: formRefs.count } } } });
+    await tx.auditLog.create({ data: { tenantId: tenant.id, actorUserId, action: "MEDIA_RETIRE", targetType: "MediaAsset", targetId: existing.id, changeMetadata: { before: { mediaId: existing.id }, after: { detachedHeroReferences: heroRefs.count, detachedFormReferences: formRefs.count, detachedContactMapReferences: contactMapRefs.count } } } });
     return retired;
+  });
+}
+
+type ContactMapSlotOperation = "UPLOAD" | "REPLACE";
+
+/**
+ * Atomically advances the single Contact Map generation. The caller must upload
+ * the new object first; this transaction is the authoritative slot transition.
+ * A stale writer's uploaded row is retired outside the transaction.
+ */
+export async function attachContactMapGeneration(input: {
+  tenant: ResolvedTenant;
+  actorUserId: string;
+  uploadedMediaId: string;
+  expectedMediaId: string | null;
+  operation: ContactMapSlotOperation;
+}) {
+  try {
+    return await db.$transaction(async (tx) => {
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${input.tenant.id}, 0))`;
+      const settings = await tx.contactSettings.findUnique({ where: { tenantId: input.tenant.id }, select: { id: true, contactMapMediaAssetId: true } });
+      if (!settings || settings.contactMapMediaAssetId !== input.expectedMediaId) {
+        throw new Error("Contact Map changed while this operation was in progress. Please retry.");
+      }
+      const uploaded = await tx.mediaAsset.findFirst({ where: { id: input.uploadedMediaId, tenantId: input.tenant.id, retiredAt: null, purpose: "contact-map" }, select: { id: true } });
+      if (!uploaded) throw new Error("Uploaded Contact Map media is unavailable.");
+      const updated = await tx.contactSettings.updateMany({
+        where: { id: settings.id, contactMapMediaAssetId: input.expectedMediaId },
+        data: { contactMapMediaAssetId: input.uploadedMediaId },
+      });
+      if (updated.count !== 1) throw new Error("Contact Map changed while this operation was in progress. Please retry.");
+      if (settings.contactMapMediaAssetId) {
+        await tx.mediaAsset.updateMany({
+          where: { id: settings.contactMapMediaAssetId, tenantId: input.tenant.id, retiredAt: null },
+          data: { retiredAt: new Date(), replacedById: input.uploadedMediaId },
+        });
+      }
+      await tx.auditLog.create({
+        data: {
+          tenantId: input.tenant.id,
+          actorUserId: input.actorUserId,
+          action: input.operation === "REPLACE" ? "CONTACT_MAP_REPLACE" : "CONTACT_MAP_UPLOAD",
+          targetType: "ContactSettings",
+          targetId: settings.id,
+          changeMetadata: { expectedMediaId: input.expectedMediaId, mediaAssetId: input.uploadedMediaId },
+        },
+      });
+      return uploaded;
+    });
+  } catch (error) {
+    await db.mediaAsset.updateMany({ where: { id: input.uploadedMediaId, tenantId: input.tenant.id, retiredAt: null }, data: { retiredAt: new Date() } });
+    throw error;
+  }
+}
+
+export async function removeContactMapGeneration(input: { tenant: ResolvedTenant; actorUserId: string; expectedMediaId: string }) {
+  return db.$transaction(async (tx) => {
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${input.tenant.id}, 0))`;
+    const settings = await tx.contactSettings.findUnique({ where: { tenantId: input.tenant.id }, select: { id: true, contactMapMediaAssetId: true } });
+    if (!settings || settings.contactMapMediaAssetId !== input.expectedMediaId) throw new Error("Contact Map changed while this operation was in progress. Please retry.");
+    const updated = await tx.contactSettings.updateMany({
+      where: { id: settings.id, contactMapMediaAssetId: settings.contactMapMediaAssetId },
+      data: { contactMapMediaAssetId: null },
+    });
+    if (updated.count !== 1) throw new Error("Contact Map changed while this operation was in progress. Please retry.");
+    if (settings.contactMapMediaAssetId) {
+      await tx.mediaAsset.updateMany({ where: { id: settings.contactMapMediaAssetId, tenantId: input.tenant.id, retiredAt: null }, data: { retiredAt: new Date() } });
+    }
+    await tx.auditLog.create({
+      data: {
+        tenantId: input.tenant.id,
+        actorUserId: input.actorUserId,
+        action: "CONTACT_MAP_REMOVE",
+        targetType: "ContactSettings",
+        targetId: settings.id,
+        changeMetadata: { mediaAssetId: settings.contactMapMediaAssetId },
+      },
+    });
+    return settings.contactMapMediaAssetId;
   });
 }

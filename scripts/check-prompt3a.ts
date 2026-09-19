@@ -171,10 +171,61 @@ async function main() {
     completeStaffPasswordReset({ membershipId: provisioned.id, token: concurrentResetToken, password: "Concurrent-Strong-Password-456" }).then(() => true).catch(() => false),
   ]);
   check(concurrentResults.filter(Boolean).length === 1, "Concurrent reset completion did not allow exactly one success.");
-  const assignedDraft = await createCmsDraft({ tenant: resolved, actorUserId: editor.id, kind: CmsDraftKind.NEWS, operation: CmsDraftOperation.CREATE, payload: { title: "Assigned", summary: "Assigned" } });
+  const editorMembership = await db.staffMembership.findUniqueOrThrow({ where: { tenantId_userId: { tenantId: tenant.id, userId: editor.id } } });
+  const lifecycleDraft = async (creatorUserId: string, title: string, status: "DRAFT" | "WAITING_FOR_APPROVAL" | "RETURNED_FOR_CHANGES") => {
+    const draft = await createCmsDraft({ tenant: resolved, actorUserId: creatorUserId, kind: CmsDraftKind.NEWS, operation: CmsDraftOperation.CREATE, payload: { title, summary: title } });
+    if (status !== "DRAFT") await submitCmsDraft({ tenant: resolved, actorUserId: creatorUserId, draftId: draft.id });
+    if (status === "RETURNED_FOR_CHANGES") await returnCmsDraft({ tenant: resolved, actorUserId: admin.id, draftId: draft.id, note: "Lifecycle safety review." });
+    return draft;
+  };
+  const rejectDrafts = await Promise.all([
+    lifecycleDraft(editor.id, "Reject draft", "DRAFT"),
+    lifecycleDraft(editor.id, "Reject waiting", "WAITING_FOR_APPROVAL"),
+    lifecycleDraft(editor.id, "Reject returned", "RETURNED_FOR_CHANGES"),
+  ]);
+  let rejectedWithoutDecision = false;
+  try { await setStaffAccountActive({ tenant: resolved, actorUserId: admin.id, membershipId: editorMembership.id, isActive: false }); } catch (error) {
+    rejectedWithoutDecision = error instanceof Error && error.message.includes("REASSIGN") && error.message.includes("ARCHIVE");
+  }
+  check(rejectedWithoutDecision, "Disabling an Editor with open drafts did not require an explicit REASSIGN or ARCHIVE decision.");
+  check((await db.staffMembership.findUniqueOrThrow({ where: { id: editorMembership.id } })).isActive, "Editor was disabled after a missing draft decision.");
+  check((await db.cmsDraft.findMany({ where: { id: { in: rejectDrafts.map((draft) => draft.id) } }, select: { status: true, assignedTo: true } })).every((draft) => draft.status !== CmsDraftStatus.ARCHIVED && draft.assignedTo === null), "Reject-without-decision changed open drafts.");
+  const reassignedLifecycle = await lifecycleDraft(provisioned.userId, "Assigned to disabled editor", "WAITING_FOR_APPROVAL");
+  await db.cmsDraft.update({ where: { id: reassignedLifecycle.id }, data: { assignedTo: editor.id } });
+  await setStaffAccountActive({ tenant: resolved, actorUserId: admin.id, membershipId: editorMembership.id, isActive: false, decision: "REASSIGN", assigneeUserId: provisioned.userId });
+  const reassignedLifecycleRows = await db.cmsDraft.findMany({ where: { id: { in: [...rejectDrafts.map((draft) => draft.id), reassignedLifecycle.id] } }, select: { status: true, assignedTo: true } });
+  check(reassignedLifecycleRows.every((draft) => draft.assignedTo === provisioned.userId), "REASSIGN did not transfer every createdBy/assignedTo open draft.");
+  check(reassignedLifecycleRows.some((draft) => draft.status === CmsDraftStatus.DRAFT) && reassignedLifecycleRows.some((draft) => draft.status === CmsDraftStatus.WAITING_FOR_APPROVAL) && reassignedLifecycleRows.some((draft) => draft.status === CmsDraftStatus.RETURNED_FOR_CHANGES), "REASSIGN lifecycle did not cover all three open statuses.");
+  check((await db.cmsDraft.count({ where: { tenantId: tenant.id, OR: [{ assignedTo: editor.id }, { createdBy: editor.id, assignedTo: null }], status: { in: [CmsDraftStatus.DRAFT, CmsDraftStatus.WAITING_FOR_APPROVAL, CmsDraftStatus.RETURNED_FOR_CHANGES] } } })) === 0, "Disabled Editor retained a persistent open or unassigned draft.");
+  const archiveEditor = await createStaffAccount({ tenant: resolved, actorUserId: admin.id, name: "Archive Editor", email: `archive-editor-${suffix}@example.invalid`, password: "Strong-Password-123", role: "EDITOR" });
+  qaUserIds.push(archiveEditor.userId);
+  const archiveDrafts = await Promise.all([
+    lifecycleDraft(archiveEditor.userId, "Archive draft", "DRAFT"),
+    lifecycleDraft(archiveEditor.userId, "Archive waiting", "WAITING_FOR_APPROVAL"),
+    lifecycleDraft(archiveEditor.userId, "Archive returned", "RETURNED_FOR_CHANGES"),
+  ]);
+  await db.session.create({ data: { id: crypto.randomUUID(), token: `qa-archive-session-${suffix}`, userId: archiveEditor.userId, expiresAt: new Date(Date.now() + 60 * 60 * 1000) } });
+  await setStaffAccountActive({ tenant: resolved, actorUserId: admin.id, membershipId: archiveEditor.id, isActive: false, decision: "ARCHIVE" });
+  check(await db.session.count({ where: { userId: archiveEditor.userId } }) === 0, "Draft-disposition disable did not revoke all sessions.");
+  const archivedLifecycleRows = await db.cmsDraft.findMany({ where: { id: { in: archiveDrafts.map((draft) => draft.id) } }, select: { status: true, archivedAt: true, assignedTo: true } });
+  check(archivedLifecycleRows.every((draft) => draft.status === CmsDraftStatus.ARCHIVED && draft.archivedAt), "ARCHIVE did not preserve all drafts as historical records.");
+  const emptyEditor = await createStaffAccount({ tenant: resolved, actorUserId: admin.id, name: "Empty Editor", email: `empty-editor-${suffix}@example.invalid`, password: "Strong-Password-123", role: "EDITOR" });
+  qaUserIds.push(emptyEditor.userId);
+  await setStaffAccountActive({ tenant: resolved, actorUserId: admin.id, membershipId: emptyEditor.id, isActive: false });
+  check(!(await db.staffMembership.findUniqueOrThrow({ where: { id: emptyEditor.id } })).isActive, "Editor with no open drafts could not be disabled normally.");
+  const handoffEditor = await createStaffAccount({ tenant: resolved, actorUserId: admin.id, name: "Handoff Editor", email: `handoff-editor-${suffix}@example.invalid`, password: "Strong-Password-123", role: "EDITOR" });
+  qaUserIds.push(handoffEditor.userId);
+  const assignedDraft = await createCmsDraft({ tenant: resolved, actorUserId: handoffEditor.userId, kind: CmsDraftKind.NEWS, operation: CmsDraftOperation.CREATE, payload: { title: "Assigned", summary: "Assigned" } });
   const assignedByOtherDraft = await createCmsDraft({ tenant: resolved, actorUserId: provisioned.userId, kind: CmsDraftKind.NEWS, operation: CmsDraftOperation.CREATE, payload: { title: "Assigned by another editor", summary: "Assigned by another editor" } });
-  await db.cmsDraft.update({ where: { id: assignedByOtherDraft.id }, data: { assignedTo: editor.id } });
-  await disableEditorWithReassignment({ tenant: resolved, actorUserId: admin.id, membershipId: (await db.staffMembership.findUniqueOrThrow({ where: { tenantId_userId: { tenantId: tenant.id, userId: editor.id } } })).id, assigneeUserId: provisioned.userId });
+  await db.cmsDraft.update({ where: { id: assignedByOtherDraft.id }, data: { assignedTo: handoffEditor.userId } });
+  let roleChangeRejected = false;
+  try { await changeStaffRole({ tenant: resolved, actorUserId: admin.id, membershipId: handoffEditor.id, role: "ADMINISTRATOR" }); } catch (error) {
+    roleChangeRejected = error instanceof Error && error.message.includes("REASSIGN") && error.message.includes("ARCHIVE");
+  }
+  check(roleChangeRejected, "Changing an Editor role with open drafts bypassed draft disposition.");
+  await db.session.create({ data: { id: crypto.randomUUID(), token: `qa-session-${suffix}`, userId: handoffEditor.userId, expiresAt: new Date(Date.now() + 60 * 60 * 1000) } });
+  await disableEditorWithReassignment({ tenant: resolved, actorUserId: admin.id, membershipId: handoffEditor.id, assigneeUserId: provisioned.userId });
+  check(await db.session.count({ where: { userId: handoffEditor.userId } }) === 0, "Disabling an Editor did not revoke all sessions.");
   const reassigned = await db.cmsDraft.findUniqueOrThrow({ where: { id: assignedDraft.id } });
   check(reassigned.assignedTo === provisioned.userId, "Disable/reassignment did not preserve assigned ownership.");
   const reassignedByOther = await db.cmsDraft.findUniqueOrThrow({ where: { id: assignedByOtherDraft.id } });
@@ -192,6 +243,10 @@ async function main() {
   for (const required of ["STAFF_ACCOUNT_CREATED", "STAFF_PASSWORD_RESET_INITIATED", "STAFF_DRAFTS_REASSIGNED", "STAFF_ACCESS_DISABLED", "STAFF_ROLE_CHANGED"]) {
     check(auditActions.some((entry) => entry.action === required && entry.actorUserId === admin.id), `Staff audit event missing: ${required}`);
   }
+  check(auditActions.some((entry) => entry.action === "STAFF_ACCESS_DISABLED" && entry.targetId === handoffEditor.id), "Editor access-disable audit event missing.");
+  check(auditActions.some((entry) => entry.action === "STAFF_ACCESS_DISABLED" && entry.targetId === archiveEditor.id), "Draft-disposition access-disable audit event missing.");
+  check(auditActions.some((entry) => entry.action === "STAFF_DRAFTS_ARCHIVED" && entry.actorUserId === admin.id), "Staff draft archive audit event missing.");
+  check(!auditActions.some((entry) => entry.action === "STAFF_DRAFTS_UNASSIGNED"), "Persistent unassigned draft audit behavior remains.");
   check(auditActions.filter((entry) => entry.action.startsWith("STAFF_")).every((entry) => !JSON.stringify(entry.changeMetadata).match(/password|resetLink|token/i)), "Staff audit metadata exposed secret material.");
   check((await db.cmsDraft.findMany({ where: { tenantId: tenant.id, status: { in: [CmsDraftStatus.DRAFT, CmsDraftStatus.WAITING_FOR_APPROVAL, CmsDraftStatus.RETURNED_FOR_CHANGES] } } })).every((draft) => draft.tenantId === tenant.id), "Pending count escaped tenant scope.");
   console.info(JSON.stringify({ assertions, script: "check-prompt3a" }));

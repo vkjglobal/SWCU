@@ -36,10 +36,13 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
         select: { id: true },
         take: 1,
       },
+      contactMapSettings: {
+        select: { id: true },
+      },
     },
   });
   if (!asset) return NextResponse.json({ error: "Media not found" }, { status: 404 });
-  const isPublished = asset.heroSlides.length > 0 || asset.formDocuments.length > 0 || asset.pageContent.length > 0 || asset.leadershipRecords.length > 0;
+  const isPublished = asset.heroSlides.length > 0 || asset.formDocuments.length > 0 || asset.pageContent.length > 0 || asset.leadershipRecords.length > 0 || Boolean(asset.contactMapSettings);
   if (!isPublished) {
     if (!request.headers.get("cookie")) return NextResponse.json({ error: "Media not found" }, { status: 404 });
     const { auth } = await import("@/lib/auth");

@@ -44,7 +44,7 @@ export async function getCalculatorSettings(tenant: ResolvedTenant) {
 export async function getPublicContactSettings(tenant: ResolvedTenant) {
   return db.contactSettings.findUnique({
     where: { tenantId: tenant.id },
-    select: { organisationName: true, streetAddress: true, postalAddress: true, telephone: true, publicEmail: true, officeHours: true, directionsUrl: true },
+    select: { organisationName: true, streetAddress: true, postalAddress: true, telephone: true, publicEmail: true, officeHours: true, contactMapMediaAsset: { select: { id: true, altText: true, mimeType: true } } },
   });
 }
 

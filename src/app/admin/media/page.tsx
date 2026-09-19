@@ -11,7 +11,7 @@ export default async function MediaAdminPage() {
   const tenant = await requireTenant((await headers()).get("host") ?? "");
   const { membership } = await requireStaffMembership(tenant);
   const editor = membership.role === "EDITOR";
-  const assets = await db.mediaAsset.findMany({ where: { tenantId: tenant.id, retiredAt: null }, orderBy: { createdAt: "desc" } });
+  const assets = await db.mediaAsset.findMany({ where: { tenantId: tenant.id, retiredAt: null, purpose: { not: "contact-map" } }, orderBy: { createdAt: "desc" } });
   const drafts = await db.cmsDraft.findMany({ where: { tenantId: tenant.id, kind: "MEDIA", status: { in: ["DRAFT", "RETURNED_FOR_CHANGES"] } }, select: { targetId: true, revision: true } });
   const revisionFor = (id: string) => drafts.find((draft) => draft.targetId === id)?.revision ?? "";
   return <main className="min-h-screen bg-soft-blue-grey"><div className="site-container py-12">

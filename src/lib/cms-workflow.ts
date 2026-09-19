@@ -218,6 +218,10 @@ export async function createCmsDraft(input: DraftInput) {
                 ? await tx.mediaAsset.findFirst({ where: { id: input.targetId, tenantId: input.tenant.id }, select: { id: true } })
                 : await tx.siteNotice.findFirst({ where: { id: input.targetId, tenantId: input.tenant.id }, select: { id: true } });
       if (!owned) throw new Error("Draft target does not belong to this tenant.");
+      if (input.kind === CmsDraftKind.MEDIA) {
+        const mediaTarget = await tx.mediaAsset.findFirst({ where: { id: input.targetId, tenantId: input.tenant.id }, select: { purpose: true } });
+        if (mediaTarget?.purpose === "contact-map") throw new Error("Contact Map assets require the dedicated Contact Map workflow.");
+      }
     }
     if (input.mediaAssetId) {
       const media = await tx.mediaAsset.findFirst({
@@ -627,6 +631,7 @@ export async function publishCmsDraft(input: {
         where: { id: mediaId, tenantId: input.tenant.id },
       });
       if (!existing) throw new Error("Media asset not found.");
+      if (existing.purpose === "contact-map") throw new Error("Contact Map assets require the dedicated Contact Map workflow.");
       Object.assign(before, existing);
       if (draft.operation === CmsDraftOperation.REPLACE && draft.mediaAssetId) {
         const replacement = await tx.mediaAsset.findFirst({

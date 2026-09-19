@@ -24,6 +24,8 @@
     "check:prompt3a": "NODE_OPTIONS=--conditions=react-server tsx scripts/check-prompt3a.ts",
     "check:prompt3b": "NODE_OPTIONS=--conditions=react-server tsx scripts/check-prompt3b.ts",
     "check:prompt3b:http": "NODE_OPTIONS=--conditions=react-server tsx scripts/check-prompt3b-http.ts",
+    "check:release-corrections": "NODE_OPTIONS=--conditions=react-server tsx scripts/check-release-corrections.ts",
+    "check:contact-map-generation": "NODE_OPTIONS=--conditions=react-server tsx scripts/check-contact-map-generation.ts",
     "check:seed-safety": "NODE_OPTIONS=--conditions=react-server tsx scripts/check-seed-safety.ts",
     "check:qa-residue": "NODE_OPTIONS=--conditions=react-server tsx scripts/check-qa-residue.ts",
     "check:migrations": "tsx scripts/check-migrations.ts",

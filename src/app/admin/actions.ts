@@ -6,7 +6,7 @@ import { z } from "zod";
 import { db } from "@/lib/db";
 import { requireStaffMembership } from "@/lib/authorise";
 import { requireTenant } from "@/lib/tenant";
-import { uploadMedia, uploadDocument, replaceMedia, retireMedia } from "@/lib/media-service";
+import { uploadMedia, uploadDocument, replaceMedia, retireMedia, attachContactMapGeneration, removeContactMapGeneration } from "@/lib/media-service";
 import {
   createCmsDraft as createCmsDraftWorkflow,
   archiveCmsDraft as archiveCmsDraftWorkflow,
@@ -483,6 +483,35 @@ export async function saveContactSettings(form: FormData) {
   revalidatePath("/", "layout");
 }
 
+export async function uploadContactMap(form: FormData) {
+  const { tenant, userId } = await staff(["ADMINISTRATOR"]);
+  const file = form.get("file");
+  if (!(file instanceof File)) throw new Error("Choose an image to upload.");
+  const expectedRaw = value(form, "expectedMediaId");
+  const expectedMediaId = expectedRaw ? idSchema.parse(expectedRaw) : null;
+  const media = await uploadMedia({ tenant, actorUserId: userId, file, purpose: "contact-map", altText: "Map showing the SWCU office at 300 Waimanu Road, Suva" });
+  await attachContactMapGeneration({ tenant, actorUserId: userId, uploadedMediaId: media.id, expectedMediaId, operation: expectedMediaId ? "REPLACE" : "UPLOAD" });
+  revalidatePath("/contact");
+}
+
+export async function replaceContactMap(form: FormData) {
+  const { tenant, userId } = await staff(["ADMINISTRATOR"]);
+  const file = form.get("file");
+  if (!(file instanceof File)) throw new Error("Choose an image to upload.");
+  const expectedRaw = value(form, "expectedMediaId");
+  const expectedMediaId = expectedRaw ? idSchema.parse(expectedRaw) : null;
+  const media = await uploadMedia({ tenant, actorUserId: userId, file, purpose: "contact-map", altText: "Map showing the SWCU office at 300 Waimanu Road, Suva" });
+  await attachContactMapGeneration({ tenant, actorUserId: userId, uploadedMediaId: media.id, expectedMediaId, operation: expectedMediaId ? "REPLACE" : "UPLOAD" });
+  revalidatePath("/contact");
+}
+
+export async function removeContactMap(form: FormData) {
+  const { tenant, userId } = await staff(["ADMINISTRATOR"]);
+  const expectedMediaId = idSchema.parse(value(form, "expectedMediaId"));
+  await removeContactMapGeneration({ tenant, actorUserId: userId, expectedMediaId });
+  revalidatePath("/contact");
+}
+
 export async function uploadImage(form: FormData) {
   const { tenant, userId, role } = await staff();
   const file = form.get("file");
@@ -601,7 +630,15 @@ export async function changeStaffRoleAction(form: FormData) {
 
 export async function setStaffActiveAction(form: FormData) {
   const { tenant, userId } = await staff(["ADMINISTRATOR"]);
-  await setStaffAccountActive({ tenant, actorUserId: userId, membershipId: value(form, "membershipId"), isActive: value(form, "isActive") === "true" });
+  const decision = value(form, "decision");
+  await setStaffAccountActive({
+    tenant,
+    actorUserId: userId,
+    membershipId: value(form, "membershipId"),
+    isActive: value(form, "isActive") === "true",
+    decision: decision === "REASSIGN" || decision === "ARCHIVE" ? decision : undefined,
+    assigneeUserId: value(form, "assigneeUserId") || undefined,
+  });
   revalidatePath("/admin/staff");
 }
 

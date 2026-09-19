@@ -42,6 +42,15 @@ export async function changeStaffRole(input: { tenant: ResolvedTenant; actorUser
       const count = await tx.staffMembership.count({ where: { tenantId: input.tenant.id, role: StaffRole.ADMINISTRATOR, isActive: true } });
       if (count <= 1) throw new Error("There must always be at least one active Administrator.");
     }
+    const openStatuses = [CmsDraftStatus.DRAFT, CmsDraftStatus.WAITING_FOR_APPROVAL, CmsDraftStatus.RETURNED_FOR_CHANGES];
+    if (membership.role === StaffRole.EDITOR && input.role !== StaffRole.EDITOR) {
+      const openDraftCount = await tx.cmsDraft.count({
+        where: { tenantId: input.tenant.id, OR: [{ createdBy: membership.userId }, { assignedTo: membership.userId }], status: { in: openStatuses } },
+      });
+      if (openDraftCount > 0) {
+        throw new Error("Choose REASSIGN or ARCHIVE for this Editor's open drafts before changing the role.");
+      }
+    }
     const updated = await tx.staffMembership.update({ where: { id: membership.id }, data: { role: input.role } });
     return { membership, updated };
   });
@@ -49,9 +58,16 @@ export async function changeStaffRole(input: { tenant: ResolvedTenant; actorUser
   return updated;
 }
 
-export async function setStaffAccountActive(input: { tenant: ResolvedTenant; actorUserId: string; membershipId: string; isActive: boolean }) {
+export async function setStaffAccountActive(input: {
+  tenant: ResolvedTenant;
+  actorUserId: string;
+  membershipId: string;
+  isActive: boolean;
+  decision?: "REASSIGN" | "ARCHIVE";
+  assigneeUserId?: string;
+}) {
   await assertAdministrator(input.tenant.id, input.actorUserId);
-  const { membership, updated } = await db.$transaction(async (tx) => {
+  const updated = await db.$transaction(async (tx) => {
     await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${input.tenant.id}, 0))`;
     const membership = await tx.staffMembership.findFirst({ where: { id: input.membershipId, tenantId: input.tenant.id } });
     if (!membership) throw new Error("Staff membership not found.");
@@ -59,35 +75,69 @@ export async function setStaffAccountActive(input: { tenant: ResolvedTenant; act
       const count = await tx.staffMembership.count({ where: { tenantId: input.tenant.id, role: StaffRole.ADMINISTRATOR, isActive: true } });
       if (count <= 1) throw new Error("There must always be at least one active Administrator.");
     }
+    const openStatuses = [CmsDraftStatus.DRAFT, CmsDraftStatus.WAITING_FOR_APPROVAL, CmsDraftStatus.RETURNED_FOR_CHANGES];
+    const openDrafts = !input.isActive && membership.role === StaffRole.EDITOR
+      ? await tx.cmsDraft.findMany({
+        where: { tenantId: input.tenant.id, OR: [{ createdBy: membership.userId }, { assignedTo: membership.userId }], status: { in: openStatuses } },
+        select: { id: true },
+      })
+      : [];
+    if (openDrafts.length > 0 && !input.decision) {
+      throw new Error("Choose REASSIGN to an active Editor or ARCHIVE the open drafts before disabling this Editor.");
+    }
+    if (openDrafts.length > 0 && input.decision === "REASSIGN") {
+      const replacement = input.assigneeUserId
+        ? await tx.staffMembership.findUnique({ where: { tenantId_userId: { tenantId: input.tenant.id, userId: input.assigneeUserId } } })
+        : null;
+      if (!replacement?.isActive || replacement.role !== StaffRole.EDITOR || replacement.userId === membership.userId) {
+        throw new Error("Choose another active Editor for reassignment.");
+      }
+      await tx.cmsDraft.updateMany({
+        where: { id: { in: openDrafts.map((draft) => draft.id) } },
+        data: { assignedTo: replacement.userId, revision: { increment: 1 } },
+      });
+      await tx.auditLog.create({
+        data: {
+          tenantId: input.tenant.id,
+          actorUserId: input.actorUserId,
+          action: "STAFF_DRAFTS_REASSIGNED",
+          targetType: "StaffMembership",
+          targetId: membership.id,
+          changeMetadata: { replacementUserId: replacement.userId, count: openDrafts.length },
+        },
+      });
+    }
+    if (openDrafts.length > 0 && input.decision === "ARCHIVE") {
+      await tx.cmsDraft.updateMany({
+        where: { id: { in: openDrafts.map((draft) => draft.id) } },
+        data: { status: CmsDraftStatus.ARCHIVED, archivedAt: new Date(), revision: { increment: 1 } },
+      });
+      await tx.auditLog.create({
+        data: {
+          tenantId: input.tenant.id,
+          actorUserId: input.actorUserId,
+          action: "STAFF_DRAFTS_ARCHIVED",
+          targetType: "StaffMembership",
+          targetId: membership.id,
+          changeMetadata: { count: openDrafts.length },
+        },
+      });
+    }
     const updated = await tx.staffMembership.update({ where: { id: membership.id }, data: { isActive: input.isActive } });
     if (!input.isActive) {
-      const drafts = await tx.cmsDraft.updateMany({
-        where: {
-          tenantId: input.tenant.id,
-          OR: [{ createdBy: membership.userId }, { assignedTo: membership.userId }],
-          status: { in: ["DRAFT", "WAITING_FOR_APPROVAL", "RETURNED_FOR_CHANGES"] },
-        },
-        data: { assignedTo: null },
-      });
-      if (drafts.count > 0) {
-        await tx.auditLog.create({
-          data: {
-            tenantId: input.tenant.id,
-            actorUserId: input.actorUserId,
-            action: "STAFF_DRAFTS_UNASSIGNED",
-            targetType: "StaffMembership",
-            targetId: membership.id,
-            changeMetadata: { count: drafts.count },
-          },
-        });
-      }
+      await tx.session.deleteMany({ where: { userId: membership.userId } });
     }
-    return { membership, updated };
+    await tx.auditLog.create({
+      data: {
+        tenantId: input.tenant.id,
+        actorUserId: input.actorUserId,
+        action: input.isActive ? "STAFF_ACCESS_RESTORED" : "STAFF_ACCESS_DISABLED",
+        targetType: "StaffMembership",
+        targetId: membership.id,
+      },
+    });
+    return updated;
   });
-  if (!input.isActive) {
-    await db.session.deleteMany({ where: { userId: membership.userId } });
-  }
-  await audit(input.tenant.id, input.actorUserId, input.isActive ? "STAFF_ACCESS_RESTORED" : "STAFF_ACCESS_DISABLED", membership.id);
   return updated;
 }
 
