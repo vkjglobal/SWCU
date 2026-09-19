@@ -23,6 +23,8 @@ export default async function HomepageAdminPage() {
     db.homeHighlight.findMany({ where: { tenantId: tenant.id }, orderBy: { sortOrder: "asc" } }),
     db.service.findMany({ where: { tenantId: tenant.id }, orderBy: { sortOrder: "asc" } }),
   ]);
+  const heroDrafts = await db.cmsDraft.findMany({ where: { tenantId: tenant.id, kind: "HERO", status: { in: ["DRAFT", "RETURNED_FOR_CHANGES"] } }, select: { targetId: true, revision: true } });
+  const heroRevision = (id: string) => heroDrafts.find((draft) => draft.targetId === id)?.revision ?? "";
   const editor = membership.role === "EDITOR";
   return (
     <main className="min-h-screen bg-soft-blue-grey">
@@ -44,10 +46,10 @@ export default async function HomepageAdminPage() {
               <div key={slide.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-soft-blue-grey p-4">
                 <span className="text-sm font-semibold">{slide.altText}</span>
                 <div className="flex flex-wrap items-center gap-3">
-                  <form action={reorderHeroSlide} className="flex items-center gap-2"><input type="hidden" name="id" value={slide.id} /><label className="sr-only" htmlFor={`order-${slide.id}`}>Order</label><input id={`order-${slide.id}`} name="sortOrder" defaultValue={slide.sortOrder} className="w-14 rounded border p-1 text-center" /><button className="text-xs font-semibold text-swcu-blue">{editor ? "Save Draft" : "Save order"}</button></form>
-                  <form action={toggleHeroSlide}><input type="hidden" name="id" value={slide.id} /><input type="hidden" name="isEnabled" value={String(!slide.isEnabled)} /><button className="text-xs font-semibold text-swcu-red">{editor ? `Propose ${slide.isEnabled ? "hide" : "show"}` : slide.isEnabled ? "Hide" : "Show"}</button></form>
-                  <form action={replaceHeroSlide} encType="multipart/form-data" className="flex items-center gap-2"><input type="hidden" name="slideId" value={slide.id} /><input name="file" type="file" accept="image/jpeg,image/png,image/webp" required className="max-w-36 text-xs" /><input name="altText" defaultValue={slide.altText} required className="w-36 rounded border p-1 text-xs" /><button className="text-xs font-semibold text-ocean-teal">{editor ? "Propose replacement" : "Replace"}</button></form>
-                  <form action={removeHeroSlide}><input type="hidden" name="id" value={slide.id} /><button className="text-xs font-semibold text-swcu-red">{editor ? "Propose removal" : "Remove"}</button></form>
+                  <form action={reorderHeroSlide} className="flex items-center gap-2"><input type="hidden" name="id" value={slide.id} /><input type="hidden" name="revision" value={heroRevision(slide.id)} /><label className="sr-only" htmlFor={`order-${slide.id}`}>Order</label><input id={`order-${slide.id}`} name="sortOrder" defaultValue={slide.sortOrder} className="w-14 rounded border p-1 text-center" /><button className="text-xs font-semibold text-swcu-blue">{editor ? "Save Draft" : "Save order"}</button></form>
+                  <form action={toggleHeroSlide}><input type="hidden" name="id" value={slide.id} /><input type="hidden" name="revision" value={heroRevision(slide.id)} /><input type="hidden" name="isEnabled" value={String(!slide.isEnabled)} /><button className="text-xs font-semibold text-swcu-red">{editor ? `Propose ${slide.isEnabled ? "hide" : "show"}` : slide.isEnabled ? "Hide" : "Show"}</button></form>
+                  <form action={replaceHeroSlide} encType="multipart/form-data" className="flex items-center gap-2"><input type="hidden" name="slideId" value={slide.id} /><input type="hidden" name="revision" value={heroRevision(slide.id)} /><input name="file" type="file" accept="image/jpeg,image/png,image/webp" required className="max-w-36 text-xs" /><input name="altText" defaultValue={slide.altText} required className="w-36 rounded border p-1 text-xs" /><button className="text-xs font-semibold text-ocean-teal">{editor ? "Propose replacement" : "Replace"}</button></form>
+                  <form action={removeHeroSlide}><input type="hidden" name="id" value={slide.id} /><input type="hidden" name="revision" value={heroRevision(slide.id)} /><button className="text-xs font-semibold text-swcu-red">{editor ? "Propose removal" : "Remove"}</button></form>
                 </div>
               </div>
             ))}

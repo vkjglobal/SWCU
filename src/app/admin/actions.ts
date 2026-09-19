@@ -8,13 +8,23 @@ import { requireStaffMembership } from "@/lib/authorise";
 import { requireTenant } from "@/lib/tenant";
 import { uploadMedia, uploadDocument, replaceMedia, retireMedia } from "@/lib/media-service";
 import {
-  createCmsDraft,
+  createCmsDraft as createCmsDraftWorkflow,
   archiveCmsDraft as archiveCmsDraftWorkflow,
   publishCmsDraft as publishCmsDraftWorkflow,
+  submitCmsDraft as submitCmsDraftWorkflow,
+  returnCmsDraft as returnCmsDraftWorkflow,
+  withdrawCmsDraft as withdrawCmsDraftWorkflow,
   retireIfUnreferenced,
   lockCmsTenant,
 } from "@/lib/cms-workflow";
 import { CmsDraftKind, CmsDraftOperation } from "@/generated/prisma/client";
+
+async function createCmsDraft(input: Parameters<typeof createCmsDraftWorkflow>[0]) {
+  const expectedRevision = input.expectedRevision;
+  return createCmsDraftWorkflow({ ...input, expectedRevision });
+}
+import { createStaffAccount, changeStaffRole, setStaffAccountActive, initiateStaffPasswordReset, disableEditorWithReassignment, completeStaffPasswordReset } from "@/lib/staff-accounts";
+import { reassignCmsDraft } from "@/lib/cms-workflow";
 
 const idSchema = z.string().cuid();
 const text = (max: number) => z.string().trim().min(1).max(max);
@@ -37,6 +47,7 @@ function value(form: FormData, key: string) {
 
 export async function saveSiteNotice(form: FormData) {
   const { tenant, userId, role } = await staff();
+  const expectedRevision = form.get("revision") ? Number(form.get("revision")) : undefined;
   const input = z.object({
     message: text(280), actionText: z.string().trim().max(80).optional(), actionUrl: safeActionUrl.optional(),
     isEnabled: z.boolean(), startsAt: dateOrNull, endsAt: dateOrNull,
@@ -46,7 +57,7 @@ export async function saveSiteNotice(form: FormData) {
   });
   if (input.startsAt && input.endsAt && input.endsAt <= input.startsAt) throw new Error("End date must be after start date.");
   if (role === "EDITOR") {
-    await createCmsDraft({ tenant, actorUserId: userId, kind: CmsDraftKind.SITE_NOTICE, operation: CmsDraftOperation.UPDATE, payload: {
+    await createCmsDraft({ tenant, actorUserId: userId, kind: CmsDraftKind.SITE_NOTICE, operation: CmsDraftOperation.UPDATE, expectedRevision, payload: {
       ...input,
       startsAt: input.startsAt?.toISOString() ?? null,
       endsAt: input.endsAt?.toISOString() ?? null,
@@ -61,6 +72,24 @@ export async function saveSiteNotice(form: FormData) {
     await tx.auditLog.create({ data: { tenantId: tenant.id, actorUserId: userId, action: "SITE_NOTICE_UPDATE", targetType: "SiteNotice", targetId: notice.id, changeMetadata: { before: before ? { message: before.message, isEnabled: before.isEnabled, startsAt: before.startsAt?.toISOString(), endsAt: before.endsAt?.toISOString() } : null, after: { message: notice.message, isEnabled: notice.isEnabled, startsAt: notice.startsAt?.toISOString(), endsAt: notice.endsAt?.toISOString() } } } });
   });
   revalidatePath("/", "layout");
+}
+
+export async function submitCmsDraft(form: FormData) {
+  const { tenant, userId } = await staff();
+  await submitCmsDraftWorkflow({ tenant, actorUserId: userId, draftId: idSchema.parse(value(form, "draftId")) });
+  revalidatePath("/admin");
+}
+
+export async function returnCmsDraft(form: FormData) {
+  const { tenant, userId } = await staff(["ADMINISTRATOR"]);
+  await returnCmsDraftWorkflow({ tenant, actorUserId: userId, draftId: idSchema.parse(value(form, "draftId")), note: value(form, "note") || undefined });
+  revalidatePath("/admin");
+}
+
+export async function withdrawCmsDraft(form: FormData) {
+  const { tenant, userId } = await staff();
+  await withdrawCmsDraftWorkflow({ tenant, actorUserId: userId, draftId: idSchema.parse(value(form, "draftId")) });
+  revalidatePath("/admin");
 }
 
 export async function saveHighlight(form: FormData) {
@@ -132,8 +161,9 @@ export async function toggleHeroSlide(form: FormData) {
   const current = await db.homeHeroSlide.findFirst({ where: { id, tenantId: tenant.id } });
   if (!current) throw new Error("Hero slide not found.");
   const enabled = form.get("isEnabled") === "true";
+  const expectedRevision = form.get("revision") ? Number(form.get("revision")) : undefined;
   if (role === "EDITOR") {
-    await createCmsDraft({ tenant, actorUserId: userId, kind: CmsDraftKind.HERO, operation: CmsDraftOperation.TOGGLE, targetId: id, payload: { isEnabled: enabled } });
+    await createCmsDraft({ tenant, actorUserId: userId, kind: CmsDraftKind.HERO, operation: CmsDraftOperation.TOGGLE, targetId: id, expectedRevision, payload: { isEnabled: enabled } });
     return;
   }
   await db.$transaction(async (tx) => {
@@ -190,7 +220,7 @@ export async function replaceHeroSlide(form: FormData) {
   const media = await uploadMedia({ tenant, actorUserId: userId, file, purpose: "hero", altText });
   if (role === "EDITOR") {
     try {
-      await createCmsDraft({ tenant, actorUserId: userId, kind: CmsDraftKind.HERO, operation: CmsDraftOperation.REPLACE, targetId: slideId, mediaAssetId: media.id, payload: { mediaAssetId: media.id, altText } });
+      await createCmsDraft({ tenant, actorUserId: userId, kind: CmsDraftKind.HERO, operation: CmsDraftOperation.REPLACE, targetId: slideId, expectedRevision: form.get("revision") ? Number(form.get("revision")) : undefined, mediaAssetId: media.id, payload: { mediaAssetId: media.id, altText } });
     } catch (error) {
       await db.mediaAsset.update({ where: { id: media.id }, data: { retiredAt: new Date() } });
       throw error;
@@ -217,7 +247,7 @@ export async function removeHeroSlide(form: FormData) {
   const slide = await db.homeHeroSlide.findFirst({ where: { id, tenantId: tenant.id }, include: { mediaAsset: true } });
   if (!slide) throw new Error("Hero slide not found.");
   if (role === "EDITOR") {
-    await createCmsDraft({ tenant, actorUserId: userId, kind: CmsDraftKind.HERO, operation: CmsDraftOperation.REMOVE, targetId: id, payload: {} });
+    await createCmsDraft({ tenant, actorUserId: userId, kind: CmsDraftKind.HERO, operation: CmsDraftOperation.REMOVE, targetId: id, expectedRevision: form.get("revision") ? Number(form.get("revision")) : undefined, payload: {} });
     return;
   }
   await db.$transaction(async (tx) => {
@@ -238,7 +268,7 @@ export async function reorderHeroSlide(form: FormData) {
   const current = await db.homeHeroSlide.findFirst({ where: { id, tenantId: tenant.id } });
   if (!current) throw new Error("Hero slide not found.");
   if (role === "EDITOR") {
-    await createCmsDraft({ tenant, actorUserId: userId, kind: CmsDraftKind.HERO, operation: CmsDraftOperation.REORDER, targetId: id, payload: { sortOrder } });
+    await createCmsDraft({ tenant, actorUserId: userId, kind: CmsDraftKind.HERO, operation: CmsDraftOperation.REORDER, targetId: id, expectedRevision: form.get("revision") ? Number(form.get("revision")) : undefined, payload: { sortOrder } });
     return;
   }
   await db.$transaction(async (tx) => {
@@ -253,8 +283,9 @@ export async function saveFaq(form: FormData) {
   const input = z.object({ id: idSchema.optional(), question: text(240), answer: text(1200), sortOrder: z.coerce.number().int().min(0).max(100), isEnabled: z.boolean() }).parse({
     id: value(form, "id") || undefined, question: value(form, "question"), answer: value(form, "answer"), sortOrder: value(form, "sortOrder") || "0", isEnabled: form.get("isEnabled") === "on",
   });
+  const expectedRevision = form.get("revision") ? Number(form.get("revision")) : undefined;
   if (role === "EDITOR") {
-    await createCmsDraft({ tenant, actorUserId: userId, kind: CmsDraftKind.FAQ, operation: input.id ? CmsDraftOperation.UPDATE : CmsDraftOperation.CREATE, targetId: input.id, payload: input });
+    await createCmsDraft({ tenant, actorUserId: userId, kind: CmsDraftKind.FAQ, operation: input.id ? CmsDraftOperation.UPDATE : CmsDraftOperation.CREATE, targetId: input.id, expectedRevision, payload: input });
     return;
   }
   await db.$transaction(async (tx) => {
@@ -277,8 +308,9 @@ export async function saveFormDocument(form: FormData) {
     mediaAssetId: value(form, "mediaAssetId") || undefined, sortOrder: value(form, "sortOrder") || "0", isEnabled: form.get("isEnabled") === "on",
   });
   if (input.mediaAssetId && !(await db.mediaAsset.findFirst({ where: { id: input.mediaAssetId, tenantId: tenant.id, retiredAt: null, mimeType: "application/pdf" } }))) throw new Error("A live PDF media asset is required.");
+  const expectedRevision = form.get("revision") ? Number(form.get("revision")) : undefined;
   if (role === "EDITOR") {
-    await createCmsDraft({ tenant, actorUserId: userId, kind: CmsDraftKind.FORM_DOCUMENT, operation: input.id ? CmsDraftOperation.UPDATE : CmsDraftOperation.CREATE, targetId: input.id, mediaAssetId: input.mediaAssetId, payload: input });
+    await createCmsDraft({ tenant, actorUserId: userId, kind: CmsDraftKind.FORM_DOCUMENT, operation: input.id ? CmsDraftOperation.UPDATE : CmsDraftOperation.CREATE, targetId: input.id, expectedRevision, mediaAssetId: input.mediaAssetId, payload: input });
     return;
   }
   await db.$transaction(async (tx) => {
@@ -337,7 +369,7 @@ export async function removeFormDocument(form: FormData) {
   const existing = await db.formDocument.findFirst({ where: { id, tenantId: tenant.id } });
   if (!existing) throw new Error("Document not found.");
   if (role === "EDITOR") {
-    await createCmsDraft({ tenant, actorUserId: userId, kind: CmsDraftKind.FORM_DOCUMENT, operation: CmsDraftOperation.REMOVE, targetId: id, payload: {} });
+    await createCmsDraft({ tenant, actorUserId: userId, kind: CmsDraftKind.FORM_DOCUMENT, operation: CmsDraftOperation.REMOVE, targetId: id, expectedRevision: form.get("revision") ? Number(form.get("revision")) : undefined, payload: {} });
     return;
   }
   await db.$transaction(async (tx) => {
@@ -353,8 +385,9 @@ export async function saveNewsNotice(form: FormData) {
     id: value(form, "id") || undefined, title: value(form, "title"), summary: value(form, "summary"),
     publishedAt: value(form, "publishedAt"), isPublished: form.get("isPublished") === "on",
   });
+  const expectedRevision = form.get("revision") ? Number(form.get("revision")) : undefined;
   if (role === "EDITOR") {
-    await createCmsDraft({ tenant, actorUserId: userId, kind: CmsDraftKind.NEWS, operation: input.id ? CmsDraftOperation.UPDATE : CmsDraftOperation.CREATE, targetId: input.id, payload: { ...input, publishedAt: input.publishedAt?.toISOString() ?? null, isPublished: true } });
+    await createCmsDraft({ tenant, actorUserId: userId, kind: CmsDraftKind.NEWS, operation: input.id ? CmsDraftOperation.UPDATE : CmsDraftOperation.CREATE, targetId: input.id, expectedRevision, payload: { ...input, publishedAt: input.publishedAt?.toISOString() ?? null, isPublished: true } });
     return;
   }
   await db.$transaction(async (tx) => {
@@ -376,7 +409,7 @@ export async function removeNewsNotice(form: FormData) {
   const existing = await db.newsNotice.findFirst({ where: { id, tenantId: tenant.id } });
   if (!existing) throw new Error("News notice not found.");
   if (role === "EDITOR") {
-    await createCmsDraft({ tenant, actorUserId: userId, kind: CmsDraftKind.NEWS, operation: CmsDraftOperation.REMOVE, targetId: id, payload: {} });
+    await createCmsDraft({ tenant, actorUserId: userId, kind: CmsDraftKind.NEWS, operation: CmsDraftOperation.REMOVE, targetId: id, expectedRevision: form.get("revision") ? Number(form.get("revision")) : undefined, payload: {} });
     return;
   }
   await db.$transaction(async (tx) => {
@@ -392,7 +425,7 @@ export async function removeFaq(form: FormData) {
   const existing = await db.fAQ.findFirst({ where: { id, tenantId: tenant.id } });
   if (!existing) throw new Error("FAQ not found.");
   if (role === "EDITOR") {
-    await createCmsDraft({ tenant, actorUserId: userId, kind: CmsDraftKind.FAQ, operation: CmsDraftOperation.REMOVE, targetId: id, payload: {} });
+    await createCmsDraft({ tenant, actorUserId: userId, kind: CmsDraftKind.FAQ, operation: CmsDraftOperation.REMOVE, targetId: id, expectedRevision: form.get("revision") ? Number(form.get("revision")) : undefined, payload: {} });
     return;
   }
   await db.$transaction(async (tx) => {
@@ -440,7 +473,7 @@ export async function replaceImage(form: FormData) {
   if (role === "EDITOR") {
     const media = await uploadMedia({ tenant, actorUserId: userId, file, purpose: "general", altText: value(form, "altText") || undefined });
     try {
-      await createCmsDraft({ tenant, actorUserId: userId, kind: CmsDraftKind.MEDIA, operation: CmsDraftOperation.REPLACE, targetId: mediaId, mediaAssetId: media.id, payload: { mediaAssetId: media.id } });
+      await createCmsDraft({ tenant, actorUserId: userId, kind: CmsDraftKind.MEDIA, operation: CmsDraftOperation.REPLACE, targetId: mediaId, expectedRevision: form.get("revision") ? Number(form.get("revision")) : undefined, mediaAssetId: media.id, payload: { mediaAssetId: media.id } });
     } catch (error) {
       await db.mediaAsset.update({ where: { id: media.id }, data: { retiredAt: new Date() } });
       throw error;
@@ -454,7 +487,7 @@ export async function retireImage(form: FormData) {
   const { tenant, userId, role } = await staff();
   const mediaId = idSchema.parse(value(form, "mediaId"));
   if (role === "EDITOR") {
-    await createCmsDraft({ tenant, actorUserId: userId, kind: CmsDraftKind.MEDIA, operation: CmsDraftOperation.RETIRE, targetId: mediaId, payload: {} });
+    await createCmsDraft({ tenant, actorUserId: userId, kind: CmsDraftKind.MEDIA, operation: CmsDraftOperation.RETIRE, targetId: mediaId, expectedRevision: form.get("revision") ? Number(form.get("revision")) : undefined, payload: {} });
     return;
   }
   await retireMedia(tenant, userId, mediaId);
@@ -473,7 +506,7 @@ export async function replaceFormDocument(form: FormData) {
     try {
       await createCmsDraft({
       tenant, actorUserId: userId, kind: CmsDraftKind.FORM_DOCUMENT,
-      operation: CmsDraftOperation.REPLACE, targetId: documentId,
+      operation: CmsDraftOperation.REPLACE, targetId: documentId, expectedRevision: form.get("revision") ? Number(form.get("revision")) : undefined,
       mediaAssetId: media.id,
       payload: {
         title: existing.title,
@@ -505,7 +538,7 @@ export async function replaceFormDocument(form: FormData) {
 
 export async function publishCmsDraft(form: FormData) {
   const { tenant, userId } = await staff(["ADMINISTRATOR"]);
-  await publishCmsDraftWorkflow({ tenant, actorUserId: userId, draftId: idSchema.parse(value(form, "draftId")) });
+  await publishCmsDraftWorkflow({ tenant, actorUserId: userId, draftId: idSchema.parse(value(form, "draftId")), confirmPublishedChange: value(form, "confirmPublishedChange") === "true" });
   revalidatePath("/", "layout");
 }
 
@@ -513,4 +546,71 @@ export async function archiveCmsDraft(form: FormData) {
   const { tenant, userId } = await staff(["ADMINISTRATOR"]);
   await archiveCmsDraftWorkflow({ tenant, actorUserId: userId, draftId: idSchema.parse(value(form, "draftId")) });
   revalidatePath("/admin");
+}
+
+export async function createStaffAccountAction(form: FormData) {
+  const { tenant, userId } = await staff(["ADMINISTRATOR"]);
+  const name = value(form, "name");
+  const email = value(form, "email");
+  const password = value(form, "password");
+  const role = value(form, "role") as "ADMINISTRATOR" | "EDITOR";
+  if (!name || !email || password.length < 8 || !["ADMINISTRATOR", "EDITOR"].includes(role)) throw new Error("Enter a name, a valid email, a supported setup password and a role.");
+  await createStaffAccount({ tenant, actorUserId: userId, name, email, password, role });
+  revalidatePath("/admin/staff");
+}
+
+export async function changeStaffRoleAction(form: FormData) {
+  const { tenant, userId } = await staff(["ADMINISTRATOR"]);
+  await changeStaffRole({ tenant, actorUserId: userId, membershipId: value(form, "membershipId"), role: value(form, "role") as "ADMINISTRATOR" | "EDITOR" });
+  revalidatePath("/admin/staff");
+}
+
+export async function setStaffActiveAction(form: FormData) {
+  const { tenant, userId } = await staff(["ADMINISTRATOR"]);
+  await setStaffAccountActive({ tenant, actorUserId: userId, membershipId: value(form, "membershipId"), isActive: value(form, "isActive") === "true" });
+  revalidatePath("/admin/staff");
+}
+
+export async function initiateStaffPasswordResetAction(form: FormData) {
+  const { tenant, userId } = await staff(["ADMINISTRATOR"]);
+  const requestHeaders = await headers();
+  const host = requestHeaders.get("x-forwarded-host")?.split(",")[0]?.trim() ?? requestHeaders.get("host");
+  if (!host || !/^[a-z0-9.-]+(?::\d+)?$/i.test(host)) throw new Error("A validated tenant origin is unavailable.");
+  const proto = requestHeaders.get("x-forwarded-proto")?.split(",")[0]?.trim().toLowerCase() === "https" ? "https" : "http";
+  const result = await initiateStaffPasswordReset({ tenant, actorUserId: userId, membershipId: idSchema.parse(value(form, "membershipId")), baseUrl: `${proto}://${host}` });
+  revalidatePath("/admin/staff");
+  return result;
+}
+
+export async function initiateStaffPasswordResetFormAction(form: FormData) {
+  await initiateStaffPasswordResetAction(form);
+}
+
+export async function completeStaffPasswordResetAction(form: FormData) {
+  const membershipId = idSchema.parse(value(form, "membershipId"));
+  const token = value(form, "token");
+  const password = value(form, "password");
+  if (password.length < 12 || !/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/\d/.test(password)) throw new Error("Use at least 12 characters with upper-case, lower-case and a number.");
+  try {
+    await completeStaffPasswordReset({ membershipId, token, password });
+  } catch {
+    throw new Error("This password reset link is invalid or expired.");
+  }
+}
+
+export async function disableEditorWithReassignmentAction(form: FormData) {
+  const { tenant, userId } = await staff(["ADMINISTRATOR"]);
+  const membershipId = value(form, "membershipId");
+  const assigneeUserId = value(form, "assigneeUserId");
+  if (!assigneeUserId) throw new Error("Choose an active Editor before disabling this account.");
+  await disableEditorWithReassignment({ tenant, actorUserId: userId, membershipId, assigneeUserId });
+  revalidatePath("/admin/staff");
+  revalidatePath("/admin/drafts");
+}
+
+export async function reassignDraftAction(form: FormData) {
+  const { tenant, userId } = await staff(["ADMINISTRATOR"]);
+  await reassignCmsDraft({ tenant, actorUserId: userId, draftId: value(form, "draftId"), assigneeUserId: value(form, "assigneeUserId") });
+  revalidatePath("/admin/staff");
+  revalidatePath("/admin/drafts");
 }

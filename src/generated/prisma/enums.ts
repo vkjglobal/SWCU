@@ -19,7 +19,10 @@ export type StaffRole = (typeof StaffRole)[keyof typeof StaffRole]
 
 export const CmsDraftStatus = {
   DRAFT: 'DRAFT',
+  WAITING_FOR_APPROVAL: 'WAITING_FOR_APPROVAL',
+  RETURNED_FOR_CHANGES: 'RETURNED_FOR_CHANGES',
   PUBLISHED: 'PUBLISHED',
+  WITHDRAWN: 'WITHDRAWN',
   ARCHIVED: 'ARCHIVED'
 } as const
 

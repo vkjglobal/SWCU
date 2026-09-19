@@ -19,7 +19,20 @@ type DraftInput = {
   targetId?: string;
   payload: DraftPayload;
   mediaAssetId?: string;
+  expectedRevision?: number;
 };
+
+const OPEN_DRAFT_STATUSES = [
+  CmsDraftStatus.DRAFT,
+  CmsDraftStatus.WAITING_FOR_APPROVAL,
+  CmsDraftStatus.RETURNED_FOR_CHANGES,
+] as const;
+const STALE_DRAFT_ERROR =
+  "This draft has changed since you opened it. Please reload it before saving.";
+const PUBLISHED_CHANGED_WARNING =
+  "The published version has changed since this draft was started. Please review the current version before publishing.";
+const RETIRED_TARGET_ERROR =
+  "This item has since been retired. This draft cannot be published.";
 
 function json(payload: DraftPayload): Prisma.InputJsonValue {
   return JSON.parse(JSON.stringify(payload)) as Prisma.InputJsonValue;
@@ -60,6 +73,47 @@ function numberValue(payload: DraftPayload, key: string) {
   return typeof value === "number" ? value : undefined;
 }
 
+async function targetRecord(
+  tx: Parameters<Parameters<typeof db.$transaction>[0]>[0],
+  tenantId: string,
+  kind: CmsDraftKind,
+  targetId?: string | null,
+) {
+  if (!targetId) return null;
+  if (kind === CmsDraftKind.NEWS) return tx.newsNotice.findFirst({ where: { id: targetId, tenantId, isPublished: true }, select: { id: true, updatedAt: true, isPublished: true } });
+  if (kind === CmsDraftKind.FAQ) return tx.fAQ.findFirst({ where: { id: targetId, tenantId, isEnabled: true }, select: { id: true, updatedAt: true, isEnabled: true } });
+  if (kind === CmsDraftKind.FORM_DOCUMENT) return tx.formDocument.findFirst({ where: { id: targetId, tenantId, isEnabled: true }, select: { id: true, updatedAt: true, isEnabled: true } });
+  if (kind === CmsDraftKind.HERO) return tx.homeHeroSlide.findFirst({ where: { id: targetId, tenantId, isEnabled: true }, select: { id: true, updatedAt: true, isEnabled: true } });
+  if (kind === CmsDraftKind.MEDIA) return tx.mediaAsset.findFirst({ where: { id: targetId, tenantId, retiredAt: null }, select: { id: true, updatedAt: true, retiredAt: true } });
+  return tx.siteNotice.findFirst({
+    where: targetId === `${tenantId}:site-notice` ? { tenantId } : { id: targetId, tenantId },
+    select: { id: true, updatedAt: true, isEnabled: true },
+  });
+}
+
+function fingerprint(record: { updatedAt: Date } | null) {
+  return record?.updatedAt.toISOString() ?? null;
+}
+
+export async function resolveCmsDraftTarget(tenant: ResolvedTenant, kind: CmsDraftKind, targetId?: string | null) {
+  if (!targetId) return null;
+  if (kind === CmsDraftKind.SITE_NOTICE && targetId === `${tenant.id}:site-notice`) {
+    return (await db.siteNotice.findUnique({ where: { tenantId: tenant.id } })) ?? {
+      id: `${tenant.id}:site-notice`,
+      tenantId: tenant.id,
+      updatedAt: new Date(0),
+      isEnabled: false,
+      message: "",
+    };
+  }
+  if (kind === CmsDraftKind.NEWS) return db.newsNotice.findFirst({ where: { id: targetId, tenantId: tenant.id } });
+  if (kind === CmsDraftKind.FAQ) return db.fAQ.findFirst({ where: { id: targetId, tenantId: tenant.id } });
+  if (kind === CmsDraftKind.FORM_DOCUMENT) return db.formDocument.findFirst({ where: { id: targetId, tenantId: tenant.id } });
+  if (kind === CmsDraftKind.HERO) return db.homeHeroSlide.findFirst({ where: { id: targetId, tenantId: tenant.id } });
+  if (kind === CmsDraftKind.MEDIA) return db.mediaAsset.findFirst({ where: { id: targetId, tenantId: tenant.id, retiredAt: null } });
+  return db.siteNotice.findFirst({ where: { id: targetId, tenantId: tenant.id } });
+}
+
 export async function retireIfUnreferenced(
   tx: Parameters<Parameters<typeof db.$transaction>[0]>[0],
   tenantId: string,
@@ -67,11 +121,12 @@ export async function retireIfUnreferenced(
   replacedById?: string,
 ) {
   await lockCmsTenant(tx, tenantId);
-  const [heroRefs, formRefs] = await Promise.all([
+  const [heroRefs, formRefs, draftRefs] = await Promise.all([
     tx.homeHeroSlide.count({ where: { tenantId, mediaAssetId } }),
     tx.formDocument.count({ where: { tenantId, mediaAssetId } }),
+    tx.cmsDraft.count({ where: { tenantId, mediaAssetId, status: { in: [...OPEN_DRAFT_STATUSES] } } }),
   ]);
-  if (heroRefs + formRefs === 0) {
+  if (heroRefs + formRefs + draftRefs === 0) {
     await tx.mediaAsset.update({
       where: { id: mediaAssetId },
       data: { retiredAt: new Date(), ...(replacedById ? { replacedById } : {}) },
@@ -91,6 +146,41 @@ export async function lockCmsTenant(
 export async function createCmsDraft(input: DraftInput) {
   const role = await roleFor(input.tenant.id, input.actorUserId);
   return db.$transaction(async (tx) => {
+    await lockCmsTenant(tx, input.tenant.id);
+    const effectiveTargetId = input.kind === CmsDraftKind.SITE_NOTICE
+      ? (input.targetId ?? `${input.tenant.id}:site-notice`)
+      : input.targetId;
+    if (effectiveTargetId) {
+      const existingDraft = await tx.cmsDraft.findFirst({
+        where: { tenantId: input.tenant.id, kind: input.kind, targetId: effectiveTargetId, status: { in: [...OPEN_DRAFT_STATUSES] } },
+        orderBy: { updatedAt: "desc" },
+      });
+      if (existingDraft) {
+        if (existingDraft.status === CmsDraftStatus.WAITING_FOR_APPROVAL) throw new Error("This draft is waiting for approval. Save changes only before submitting.");
+        if (existingDraft.createdBy !== input.actorUserId && existingDraft.assignedTo !== input.actorUserId && role === "EDITOR") throw new Error("An open draft already exists for this item.");
+        if (input.expectedRevision === undefined) throw new Error(STALE_DRAFT_ERROR);
+        const updated = await tx.cmsDraft.updateMany({
+          where: { id: existingDraft.id, revision: input.expectedRevision, status: { in: [CmsDraftStatus.DRAFT, CmsDraftStatus.RETURNED_FOR_CHANGES] } },
+          data: { payload: json(input.payload), operation: input.operation, mediaAssetId: input.mediaAssetId, revision: { increment: 1 }, updatedAt: new Date() },
+        });
+        if (!updated.count) throw new Error(STALE_DRAFT_ERROR);
+        if (existingDraft.mediaAssetId && existingDraft.mediaAssetId !== input.mediaAssetId) {
+          await retireIfUnreferenced(tx, input.tenant.id, existingDraft.mediaAssetId, input.mediaAssetId);
+        }
+        const revised = await tx.cmsDraft.findUniqueOrThrow({ where: { id: existingDraft.id } });
+        await tx.auditLog.create({
+          data: {
+            tenantId: input.tenant.id,
+            actorUserId: input.actorUserId,
+            action: "CMS_DRAFT_REVISED",
+            targetType: "CmsDraft",
+            targetId: revised.id,
+            changeMetadata: { revision: revised.revision, originalCreatorUserId: revised.createdBy },
+          },
+        });
+        return revised;
+      }
+    }
     if (input.targetId) {
       const owned = input.kind === CmsDraftKind.NEWS
         ? await tx.newsNotice.findFirst({ where: { id: input.targetId, tenantId: input.tenant.id }, select: { id: true } })
@@ -119,15 +209,17 @@ export async function createCmsDraft(input: DraftInput) {
         if (!target || target.mimeType !== media.mimeType) throw new Error("Replacement media type does not match the tenant asset.");
       }
     }
+    const target = await targetRecord(tx, input.tenant.id, input.kind, effectiveTargetId);
     const draft = await tx.cmsDraft.create({
       data: {
         tenantId: input.tenant.id,
         kind: input.kind,
         operation: input.operation,
-        targetId: input.targetId,
+        targetId: effectiveTargetId,
         payload: json(input.payload),
         mediaAssetId: input.mediaAssetId,
         createdBy: input.actorUserId,
+        publishedBaseFingerprint: fingerprint(target),
       },
     });
     await tx.auditLog.create({
@@ -147,6 +239,115 @@ export async function createCmsDraft(input: DraftInput) {
         }),
       },
     });
+    return draft;
+  });
+}
+
+export async function getCmsDraftRevision(input: {
+  tenant: ResolvedTenant; kind: CmsDraftKind; targetId?: string;
+}) {
+  const targetId = input.kind === CmsDraftKind.SITE_NOTICE
+    ? (input.targetId ?? `${input.tenant.id}:site-notice`)
+    : input.targetId;
+  if (!targetId) return undefined;
+  const draft = await db.cmsDraft.findFirst({
+    where: { tenantId: input.tenant.id, kind: input.kind, targetId, status: { in: [...OPEN_DRAFT_STATUSES] } },
+    select: { revision: true },
+  });
+  return draft?.revision;
+}
+
+export async function updateCmsDraft(input: {
+  tenant: ResolvedTenant; actorUserId: string; draftId: string; payload: DraftPayload;
+  revision: number; mediaAssetId?: string;
+}) {
+  await roleFor(input.tenant.id, input.actorUserId);
+  return db.$transaction(async (tx) => {
+    await lockCmsTenant(tx, input.tenant.id);
+    const existing = await tx.cmsDraft.findUnique({ where: { id: input.draftId }, select: { mediaAssetId: true } });
+    const result = await tx.cmsDraft.updateMany({
+      where: { id: input.draftId, tenantId: input.tenant.id, OR: [{ createdBy: input.actorUserId }, { assignedTo: input.actorUserId }],
+        status: { in: [CmsDraftStatus.DRAFT, CmsDraftStatus.RETURNED_FOR_CHANGES] }, revision: input.revision },
+      data: { payload: json(input.payload), mediaAssetId: input.mediaAssetId, revision: { increment: 1 }, administratorNote: null },
+    });
+    if (!result.count) throw new Error(STALE_DRAFT_ERROR);
+    if (existing?.mediaAssetId && existing.mediaAssetId !== input.mediaAssetId) {
+      await retireIfUnreferenced(tx, input.tenant.id, existing.mediaAssetId, input.mediaAssetId);
+    }
+    const draft = await tx.cmsDraft.findUniqueOrThrow({ where: { id: input.draftId } });
+    await tx.auditLog.create({ data: { tenantId: input.tenant.id, actorUserId: input.actorUserId, action: "CMS_DRAFT_REVISED", targetType: "CmsDraft", targetId: draft.id, changeMetadata: { revision: draft.revision } } });
+    return draft;
+  });
+}
+
+export async function submitCmsDraft(input: { tenant: ResolvedTenant; actorUserId: string; draftId: string }) {
+  await roleFor(input.tenant.id, input.actorUserId);
+  return db.$transaction(async (tx) => {
+    await lockCmsTenant(tx, input.tenant.id);
+    const draft = await tx.cmsDraft.findFirst({ where: { id: input.draftId, tenantId: input.tenant.id, OR: [{ createdBy: input.actorUserId }, { assignedTo: input.actorUserId }], status: { in: [CmsDraftStatus.DRAFT, CmsDraftStatus.RETURNED_FOR_CHANGES] } } });
+    if (!draft) throw new Error("Draft not found or cannot be submitted.");
+    const next = await tx.cmsDraft.update({ where: { id: draft.id }, data: { status: CmsDraftStatus.WAITING_FOR_APPROVAL, submittedAt: new Date(), administratorNote: null, revision: { increment: 1 } } });
+    await tx.auditLog.create({ data: { tenantId: input.tenant.id, actorUserId: input.actorUserId, action: draft.status === CmsDraftStatus.RETURNED_FOR_CHANGES ? "CMS_DRAFT_RESUBMITTED" : "CMS_DRAFT_SUBMITTED", targetType: "CmsDraft", targetId: draft.id, changeMetadata: { revision: next.revision } } });
+    return next;
+  });
+}
+
+export async function returnCmsDraft(input: { tenant: ResolvedTenant; actorUserId: string; draftId: string; note?: string }) {
+  if (await roleFor(input.tenant.id, input.actorUserId) !== "ADMINISTRATOR") throw new Error("Only Administrators may return drafts for changes.");
+  return db.$transaction(async (tx) => {
+    await lockCmsTenant(tx, input.tenant.id);
+    const updated = await tx.cmsDraft.updateMany({ where: { id: input.draftId, tenantId: input.tenant.id, status: CmsDraftStatus.WAITING_FOR_APPROVAL }, data: { status: CmsDraftStatus.RETURNED_FOR_CHANGES, administratorNote: input.note?.trim().slice(0, 500) || null, returnedAt: new Date(), revision: { increment: 1 } } });
+    if (!updated.count) throw new Error("Draft not found or is no longer awaiting approval.");
+    const draft = await tx.cmsDraft.findUniqueOrThrow({ where: { id: input.draftId } });
+    await tx.auditLog.create({ data: { tenantId: input.tenant.id, actorUserId: input.actorUserId, action: "CMS_DRAFT_RETURNED_FOR_CHANGES", targetType: "CmsDraft", targetId: draft.id, changeMetadata: { note: draft.administratorNote } } });
+    if (draft.administratorNote) {
+      await tx.auditLog.create({ data: { tenantId: input.tenant.id, actorUserId: input.actorUserId, action: "CMS_DRAFT_NOTE_ADDED", targetType: "CmsDraft", targetId: draft.id, changeMetadata: { note: draft.administratorNote } } });
+    }
+    return draft;
+  });
+}
+
+export async function withdrawCmsDraft(input: { tenant: ResolvedTenant; actorUserId: string; draftId: string }) {
+  await roleFor(input.tenant.id, input.actorUserId);
+  return db.$transaction(async (tx) => {
+    await lockCmsTenant(tx, input.tenant.id);
+    const updated = await tx.cmsDraft.updateMany({ where: { id: input.draftId, tenantId: input.tenant.id, OR: [{ createdBy: input.actorUserId }, { assignedTo: input.actorUserId }], status: { in: [CmsDraftStatus.DRAFT, CmsDraftStatus.WAITING_FOR_APPROVAL, CmsDraftStatus.RETURNED_FOR_CHANGES] } }, data: { status: CmsDraftStatus.WITHDRAWN, withdrawnAt: new Date(), revision: { increment: 1 } } });
+    if (!updated.count) throw new Error("Only your unpublished draft may be withdrawn.");
+    const draft = await tx.cmsDraft.findUniqueOrThrow({ where: { id: input.draftId } });
+    if (draft.mediaAssetId) await retireIfUnreferenced(tx, input.tenant.id, draft.mediaAssetId);
+    await tx.auditLog.create({ data: { tenantId: input.tenant.id, actorUserId: input.actorUserId, action: "CMS_DRAFT_WITHDRAWN", targetType: "CmsDraft", targetId: draft.id } });
+    return draft;
+  });
+}
+
+export async function listPendingCmsDrafts(tenant: ResolvedTenant) {
+  return db.cmsDraft.findMany({
+    where: { tenantId: tenant.id, status: CmsDraftStatus.WAITING_FOR_APPROVAL },
+    orderBy: { submittedAt: "asc" },
+  });
+}
+
+export async function listMyCmsDrafts(tenant: ResolvedTenant, actorUserId: string) {
+  return db.cmsDraft.findMany({
+    where: { tenantId: tenant.id, OR: [{ createdBy: actorUserId }, { assignedTo: actorUserId }], status: { in: [...OPEN_DRAFT_STATUSES] } },
+    orderBy: { updatedAt: "desc" },
+  });
+}
+
+export async function reassignCmsDraft(input: {
+  tenant: ResolvedTenant; actorUserId: string; draftId: string; assigneeUserId: string;
+}) {
+  if (await roleFor(input.tenant.id, input.actorUserId) !== "ADMINISTRATOR") throw new Error("Only Administrators may reassign drafts.");
+  return db.$transaction(async (tx) => {
+    const assignee = await tx.staffMembership.findUnique({ where: { tenantId_userId: { tenantId: input.tenant.id, userId: input.assigneeUserId } } });
+    if (!assignee?.isActive || assignee.role !== "EDITOR") throw new Error("Drafts may only be assigned to an active Editor.");
+    const updated = await tx.cmsDraft.updateMany({
+      where: { id: input.draftId, tenantId: input.tenant.id, status: { in: [...OPEN_DRAFT_STATUSES] } },
+      data: { assignedTo: input.assigneeUserId, revision: { increment: 1 } },
+    });
+    if (!updated.count) throw new Error("Draft not found or is no longer open.");
+    const draft = await tx.cmsDraft.findUniqueOrThrow({ where: { id: input.draftId } });
+    await tx.auditLog.create({ data: { tenantId: input.tenant.id, actorUserId: input.actorUserId, action: "CMS_DRAFT_REASSIGNED", targetType: "CmsDraft", targetId: draft.id, changeMetadata: { assignedTo: input.assigneeUserId } } });
     return draft;
   });
 }
@@ -186,6 +387,7 @@ export async function publishCmsDraft(input: {
   tenant: ResolvedTenant;
   actorUserId: string;
   draftId: string;
+  confirmPublishedChange?: boolean;
 }) {
   const role = await roleFor(input.tenant.id, input.actorUserId);
   if (role !== "ADMINISTRATOR") {
@@ -193,14 +395,20 @@ export async function publishCmsDraft(input: {
   }
 
   return db.$transaction(async (tx) => {
+    await lockCmsTenant(tx, input.tenant.id);
     const draft = await tx.cmsDraft.findFirst({
       where: {
         id: input.draftId,
         tenantId: input.tenant.id,
-        status: CmsDraftStatus.DRAFT,
+        status: { in: [CmsDraftStatus.DRAFT, CmsDraftStatus.WAITING_FOR_APPROVAL] },
       },
     });
     if (!draft) throw new Error("Draft not found or is no longer pending.");
+    const currentTarget = await targetRecord(tx, input.tenant.id, draft.kind, draft.targetId);
+    if (draft.targetId && !currentTarget && draft.kind !== CmsDraftKind.SITE_NOTICE && draft.operation !== CmsDraftOperation.REMOVE) throw new Error(RETIRED_TARGET_ERROR);
+    if (currentTarget && draft.publishedBaseFingerprint !== fingerprint(currentTarget) && !input.confirmPublishedChange) {
+      throw new Error(PUBLISHED_CHANGED_WARNING);
+    }
     const payload = asPayload(draft.payload);
     const before: DraftPayload = {};
     const targetId = draft.targetId;
@@ -403,14 +611,17 @@ export async function publishCmsDraft(input: {
       }
     }
 
-    const published = await tx.cmsDraft.update({
-      where: { id: draft.id },
+    const claimed = await tx.cmsDraft.updateMany({
+      where: { id: draft.id, tenantId: input.tenant.id, status: { in: [CmsDraftStatus.DRAFT, CmsDraftStatus.WAITING_FOR_APPROVAL] } },
       data: {
         status: CmsDraftStatus.PUBLISHED,
         publishedBy: input.actorUserId,
         publishedAt: new Date(),
+        revision: { increment: 1 },
       },
     });
+    if (!claimed.count) throw new Error("Draft was already processed by another Administrator.");
+    const published = await tx.cmsDraft.findUniqueOrThrow({ where: { id: draft.id } });
     await tx.auditLog.create({
       data: {
         tenantId: input.tenant.id,
@@ -422,11 +633,24 @@ export async function publishCmsDraft(input: {
           role,
           draftId: draft.id,
           operation: draft.operation,
+          publishedChangeConfirmation: input.confirmPublishedChange === true,
           before,
           after: payload,
         }),
       },
     });
+    if (input.confirmPublishedChange) {
+      await tx.auditLog.create({
+        data: {
+          tenantId: input.tenant.id,
+          actorUserId: input.actorUserId,
+          action: "CMS_DRAFT_STALE_VERSION_CONFIRMED",
+          targetType: "CmsDraft",
+          targetId: draft.id,
+          changeMetadata: { confirmation: true, draftId: draft.id },
+        },
+      });
+    }
     return published;
   });
 }
@@ -439,11 +663,15 @@ export async function archiveCmsDraft(input: {
   const role = await roleFor(input.tenant.id, input.actorUserId);
   if (role !== "ADMINISTRATOR") throw new Error("Only Administrators may archive drafts.");
   return db.$transaction(async (tx) => {
+    await lockCmsTenant(tx, input.tenant.id);
     const draft = await tx.cmsDraft.updateMany({
-      where: { id: input.draftId, tenantId: input.tenant.id, status: CmsDraftStatus.DRAFT },
+      where: { id: input.draftId, tenantId: input.tenant.id, status: { in: [CmsDraftStatus.DRAFT, CmsDraftStatus.WAITING_FOR_APPROVAL, CmsDraftStatus.RETURNED_FOR_CHANGES] } },
       data: { status: CmsDraftStatus.ARCHIVED },
     });
     if (!draft.count) throw new Error("Draft not found or is no longer pending.");
+    const archivedDraft = await tx.cmsDraft.findUniqueOrThrow({ where: { id: input.draftId } });
+    if (archivedDraft.mediaAssetId) await retireIfUnreferenced(tx, input.tenant.id, archivedDraft.mediaAssetId);
+    await tx.cmsDraft.update({ where: { id: input.draftId }, data: { archivedAt: new Date(), revision: { increment: 1 } } });
     await tx.auditLog.create({
       data: {
         tenantId: input.tenant.id,

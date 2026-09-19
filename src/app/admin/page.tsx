@@ -1,151 +1,33 @@
 import { headers } from "next/headers";
-import { requireStaffMembership } from "@/lib/authorise";
-import { requireTenant } from "@/lib/tenant";
+import Link from "next/link";
 import { db } from "@/lib/db";
 import { CmsDraftStatus } from "@/generated/prisma/client";
-import { AdminDraftQueue } from "@/components/admin-draft-queue";
-
-type DraftField = { label: string; value: string };
-type DraftPayload = Record<string, unknown>;
-
-function payloadValue(payload: DraftPayload, key: string) {
-  const value = payload[key];
-  if (value === null || value === undefined || value === "") return "—";
-  if (typeof value === "boolean") return value ? "Yes" : "No";
-  if (key.toLowerCase().includes("at")) {
-    const date = new Date(String(value));
-    if (!Number.isNaN(date.getTime())) return date.toLocaleString("en-FJ");
-  }
-  return String(value).slice(0, 240);
-}
-
-function fields(payload: DraftPayload, keys: [string, string][]): DraftField[] {
-  return keys.map(([key, label]) => ({ label, value: payloadValue(payload, key) }));
-}
-
-async function describeDraft(tenantId: string, draft: Awaited<ReturnType<typeof db.cmsDraft.findMany>>[number]) {
-  const payload = (draft.payload && typeof draft.payload === "object" && !Array.isArray(draft.payload) ? draft.payload : {}) as DraftPayload;
-  let current: DraftField[] = [];
-  let proposed: DraftField[] = [];
-  let media: { id: string; filename: string; mimeType: string } | undefined;
-
-  if (draft.kind === "SITE_NOTICE") {
-    const record = await db.siteNotice.findUnique({ where: { tenantId } });
-    current = record ? fields(record, [["message", "Message"], ["actionText", "Action text"], ["actionUrl", "Action URL"], ["isEnabled", "Enabled"], ["startsAt", "Starts"], ["endsAt", "Ends"]]) : [{ label: "Record", value: "None" }];
-    proposed = fields(payload, [["message", "Message"], ["actionText", "Action text"], ["actionUrl", "Action URL"], ["isEnabled", "Enabled"], ["startsAt", "Starts"], ["endsAt", "Ends"]]);
-  } else if (draft.kind === "NEWS") {
-    const record = draft.targetId ? await db.newsNotice.findFirst({ where: { id: draft.targetId, tenantId } }) : null;
-    current = record ? fields(record, [["title", "Title"], ["summary", "Summary"], ["publishedAt", "Published at"], ["isPublished", "Published"]]) : [{ label: "Record", value: "None" }];
-    proposed = fields(payload, [["title", "Title"], ["summary", "Summary"], ["publishedAt", "Published at"], ["isPublished", "Published"]]);
-  } else if (draft.kind === "FAQ") {
-    const record = draft.targetId ? await db.fAQ.findFirst({ where: { id: draft.targetId, tenantId } }) : null;
-    current = record ? fields(record, [["question", "Question"], ["answer", "Answer"], ["sortOrder", "Order"], ["isEnabled", "Enabled"]]) : [{ label: "Record", value: "None" }];
-    proposed = fields(payload, [["question", "Question"], ["answer", "Answer"], ["sortOrder", "Order"], ["isEnabled", "Enabled"]]);
-  } else if (draft.kind === "FORM_DOCUMENT") {
-    const record = draft.targetId ? await db.formDocument.findFirst({ where: { id: draft.targetId, tenantId }, include: { mediaAsset: { select: { id: true, originalFilename: true, mimeType: true } } } }) : null;
-    current = record ? fields(record, [["title", "Title"], ["description", "Description"], ["sortOrder", "Order"], ["isEnabled", "Enabled"]]) : [{ label: "Record", value: "None" }];
-    proposed = fields(payload, [["title", "Title"], ["description", "Description"], ["sortOrder", "Order"], ["isEnabled", "Enabled"]]);
-    const mediaId = String(payload.mediaAssetId ?? draft.mediaAssetId ?? "");
-    if (mediaId) {
-      const asset = await db.mediaAsset.findFirst({ where: { id: mediaId, tenantId }, select: { id: true, originalFilename: true, mimeType: true } });
-      if (asset) media = { id: asset.id, filename: asset.originalFilename, mimeType: asset.mimeType };
-    }
-    if (record?.mediaAsset) current.push({ label: "PDF", value: `${record.mediaAsset.originalFilename} (${record.mediaAsset.mimeType})` });
-  } else if (draft.kind === "HERO") {
-    const record = draft.targetId ? await db.homeHeroSlide.findFirst({ where: { id: draft.targetId, tenantId }, include: { mediaAsset: { select: { id: true, originalFilename: true, mimeType: true } } } }) : null;
-    current = record ? fields(record, [["altText", "Alt text"], ["sortOrder", "Order"], ["isEnabled", "Enabled"]]) : [{ label: "Record", value: "None" }];
-    proposed = fields(payload, [["altText", "Alt text"], ["sortOrder", "Order"], ["isEnabled", "Enabled"]]);
-    const mediaId = String(payload.mediaAssetId ?? draft.mediaAssetId ?? "");
-    if (mediaId) {
-      const asset = await db.mediaAsset.findFirst({ where: { id: mediaId, tenantId }, select: { id: true, originalFilename: true, mimeType: true } });
-      if (asset) media = { id: asset.id, filename: asset.originalFilename, mimeType: asset.mimeType };
-    }
-    if (record?.mediaAsset) current.push({ label: "Image", value: `${record.mediaAsset.originalFilename} (${record.mediaAsset.mimeType})` });
-  } else if (draft.kind === "MEDIA") {
-    const currentAsset = draft.targetId ? await db.mediaAsset.findFirst({ where: { id: draft.targetId, tenantId }, select: { id: true, originalFilename: true, mimeType: true } }) : null;
-    current = currentAsset ? [{ label: "File", value: `${currentAsset.originalFilename} (${currentAsset.mimeType})` }] : [{ label: "File", value: "None" }];
-    proposed = fields(payload, [["purpose", "Purpose"]]);
-    const mediaId = String(payload.mediaAssetId ?? draft.mediaAssetId ?? "");
-    if (mediaId) {
-      const asset = await db.mediaAsset.findFirst({ where: { id: mediaId, tenantId }, select: { id: true, originalFilename: true, mimeType: true } });
-      if (asset) media = { id: asset.id, filename: asset.originalFilename, mimeType: asset.mimeType };
-    }
-  }
-  return { current, proposed, media };
-}
+import { requireStaffMembership } from "@/lib/authorise";
+import { requireTenant } from "@/lib/tenant";
+import { AdminShell, StatusBadge } from "@/app/admin/admin-shell";
 
 const modules = [
-  ["Homepage", "/admin/homepage", "Hero, highlights and services"],
-  ["Site Notice", "/admin/site-notice", "Sitewide scheduled message"],
-  ["Forms & Documents", "/admin/forms", "Approved member downloads"],
-  ["News & Notices", "/admin/news", "Publish public updates"],
+  ["Homepage", "/admin/homepage", "Hero images, highlights and services"],
+  ["Site notice", "/admin/site-notice", "A scheduled message for members"],
+  ["Forms and documents", "/admin/forms", "Approved member downloads"],
+  ["News and notices", "/admin/news", "Public updates"],
   ["FAQs", "/admin/faqs", "Common member questions"],
-  ["Contact Details", "/admin/contact", "Central public contact source"],
-  ["Media Library", "/admin/media", "Upload, replace and retire images"],
+  ["Contact details", "/admin/contact", "The public contact source"],
+  ["Media library", "/admin/media", "Images and documents"],
 ];
 
 export default async function AdminDashboardPage() {
-  const hostname = (await headers()).get("host") ?? "";
-  const tenant = await requireTenant(hostname);
+  const tenant = await requireTenant((await headers()).get("host") ?? "");
   const { membership } = await requireStaffMembership(tenant);
-  const [heroCount, serviceCount, faqCount, drafts] = await Promise.all([
+  const [heroCount, faqCount, waiting, myDrafts] = await Promise.all([
     db.homeHeroSlide.count({ where: { tenantId: tenant.id } }),
-    db.service.count({ where: { tenantId: tenant.id } }),
     db.fAQ.count({ where: { tenantId: tenant.id } }),
-    membership.role === "ADMINISTRATOR"
-      ? db.cmsDraft.findMany({
-          where: { tenantId: tenant.id, status: CmsDraftStatus.DRAFT },
-          include: { creator: { select: { name: true, email: true } } },
-          orderBy: { createdAt: "asc" },
-        })
-      : Promise.resolve([]),
+    db.cmsDraft.count({ where: { tenantId: tenant.id, status: CmsDraftStatus.WAITING_FOR_APPROVAL } }),
+    db.cmsDraft.count({ where: { tenantId: tenant.id, createdBy: membership.userId, status: { in: [CmsDraftStatus.DRAFT, CmsDraftStatus.RETURNED_FOR_CHANGES] } } }),
   ]);
-  const draftSummaries = membership.role === "ADMINISTRATOR"
-    ? await Promise.all(drafts.map(async (draft) => ({
-        id: draft.id,
-        kind: draft.kind,
-        operation: draft.operation,
-        targetId: draft.targetId,
-        createdAt: draft.createdAt.toISOString(),
-        creator: draft.creator.name || draft.creator.email,
-        ...(await describeDraft(tenant.id, draft)),
-      })))
-    : [];
-
-  return (
-    <main className="min-h-screen bg-soft-blue-grey">
-      <header className="border-b border-deep-navy/10 bg-white">
-        <div className="site-container flex min-h-20 items-center justify-between">
-          <div>
-            <p className="font-heading text-xl font-bold text-deep-navy">SWCU CMS</p>
-          <p className="text-sm text-charcoal/65">Homepage content workspace</p>
-          </div>
-          <span className="rounded-full bg-swcu-blue/10 px-3 py-1 text-sm font-semibold text-swcu-blue">
-            {membership.role === "ADMINISTRATOR" ? "Administrator" : "Editor"}
-          </span>
-        </div>
-      </header>
-      <section className="site-container py-12">
-        <p className="eyebrow">Protected staff area</p>
-        <h1 className="mt-2 font-heading text-4xl font-bold text-deep-navy">
-          Keep SWCU content clear, useful and up to date.
-        </h1>
-        <div className="mt-9 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {modules.map(([module, href, description]) => (
-            <a key={module} href={href} className="rounded-card border border-deep-navy/10 bg-white p-5 shadow-card transition hover:-translate-y-0.5 hover:border-swcu-blue/30">
-              <p className="font-heading font-semibold text-deep-navy">{module}</p>
-              <p className="mt-2 text-sm text-charcoal/65">{description}</p>
-              <span className="mt-5 inline-block text-sm font-semibold text-swcu-blue">Open module →</span>
-            </a>
-          ))}
-        </div>
-        <div className="mt-8 flex flex-wrap gap-3 text-sm text-charcoal/65">
-          <span>{heroCount} hero slides</span><span>·</span><span>{serviceCount} services</span><span>·</span><span>{faqCount} FAQs</span>
-        </div>
-        {membership.role === "ADMINISTRATOR" && (
-          <AdminDraftQueue drafts={draftSummaries} />
-        )}
-      </section>
-    </main>
-  );
+  return <AdminShell role={membership.role} title="Publishing overview" intro="A calm place to prepare, review and publish SWCU website content.">
+    <div className="mt-8 grid gap-4 md:grid-cols-2">{membership.role === "ADMINISTRATOR" && <Link href="/admin/approvals" className="rounded-card border border-swcu-blue/20 bg-white p-6 shadow-card transition hover:-translate-y-0.5"><p className="text-sm font-semibold text-swcu-blue">Administrator</p><p className="mt-2 font-heading text-3xl font-bold text-deep-navy">{waiting}</p><p className="mt-1 text-charcoal/70">changes waiting for approval</p><span className="mt-5 inline-block font-semibold text-swcu-blue">Review submissions</span></Link>}<Link href="/admin/drafts" className="rounded-card border border-ocean-teal/20 bg-white p-6 shadow-card transition hover:-translate-y-0.5"><p className="text-sm font-semibold text-ocean-teal">{membership.role === "EDITOR" ? "Editor" : "Your work"}</p><p className="mt-2 font-heading text-3xl font-bold text-deep-navy">{myDrafts}</p><p className="mt-1 text-charcoal/70">drafts needing your attention</p><span className="mt-5 inline-block font-semibold text-swcu-blue">Open drafts</span></Link></div>
+    <section className="mt-10"><div className="flex items-end justify-between gap-4"><div><p className="eyebrow">Content areas</p><h2 className="mt-1 font-heading text-2xl font-bold text-deep-navy">Choose where to work</h2></div><div className="hidden text-right text-sm text-charcoal/60 sm:block"><p>{heroCount} homepage images</p><p>{faqCount} FAQs</p></div></div><div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{modules.filter(([, href]) => membership.role === "ADMINISTRATOR" || ["/admin/site-notice", "/admin/forms", "/admin/news", "/admin/faqs", "/admin/media"].includes(href)).map(([label, href, description]) => <Link key={href} href={href} className="rounded-xl border border-deep-navy/10 bg-white p-5 transition hover:-translate-y-0.5 hover:border-swcu-blue/30"><p className="font-heading font-semibold text-deep-navy">{label}</p><p className="mt-2 text-sm text-charcoal/65">{description}</p><span className="mt-5 inline-block text-sm font-semibold text-swcu-blue">Open area</span></Link>)}</div></section>
+    <div className="mt-8 flex items-center gap-3 text-sm text-charcoal/60"><StatusBadge status="PUBLISHED"/><span>Public content is reviewed before it goes live.</span></div>
+  </AdminShell>;
 }

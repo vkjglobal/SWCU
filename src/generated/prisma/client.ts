@@ -87,6 +87,11 @@ export type StaffMembership = Prisma.StaffMembershipModel
  */
 export type AuditLog = Prisma.AuditLogModel
 /**
+ * Model StaffLoginAttempt
+ * 
+ */
+export type StaffLoginAttempt = Prisma.StaffLoginAttemptModel
+/**
  * Model SiteNotice
  * 
  */

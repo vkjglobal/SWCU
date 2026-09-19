@@ -1,0 +1,21 @@
+ALTER TYPE "CmsDraftStatus" ADD VALUE IF NOT EXISTS 'WAITING_FOR_APPROVAL';
+ALTER TYPE "CmsDraftStatus" ADD VALUE IF NOT EXISTS 'RETURNED_FOR_CHANGES';
+ALTER TYPE "CmsDraftStatus" ADD VALUE IF NOT EXISTS 'WITHDRAWN';
+
+ALTER TABLE "cms_drafts"
+  ADD COLUMN IF NOT EXISTS "assignedTo" TEXT,
+  ADD COLUMN IF NOT EXISTS "administratorNote" VARCHAR(500),
+  ADD COLUMN IF NOT EXISTS "submittedAt" TIMESTAMP(3),
+  ADD COLUMN IF NOT EXISTS "returnedAt" TIMESTAMP(3),
+  ADD COLUMN IF NOT EXISTS "withdrawnAt" TIMESTAMP(3),
+  ADD COLUMN IF NOT EXISTS "archivedAt" TIMESTAMP(3),
+  ADD COLUMN IF NOT EXISTS "revision" INTEGER NOT NULL DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS "publishedBaseVersion" INTEGER,
+  ADD COLUMN IF NOT EXISTS "publishedBaseFingerprint" VARCHAR(128);
+
+ALTER TABLE "cms_drafts"
+  ADD CONSTRAINT "cms_drafts_assignedTo_fkey"
+  FOREIGN KEY ("assignedTo") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+CREATE INDEX IF NOT EXISTS "cms_drafts_tenantId_assignedTo_status_idx"
+  ON "cms_drafts"("tenantId", "assignedTo", "status");

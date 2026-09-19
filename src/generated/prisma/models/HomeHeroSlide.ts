@@ -471,14 +471,6 @@ export type HomeHeroSlideUncheckedUpdateManyWithoutTenantNestedInput = {
   deleteMany?: Prisma.HomeHeroSlideScalarWhereInput | Prisma.HomeHeroSlideScalarWhereInput[]
 }
 
-export type IntFieldUpdateOperationsInput = {
-  set?: number
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
-}
-
 export type HomeHeroSlideCreateNestedManyWithoutMediaAssetInput = {
   create?: Prisma.XOR<Prisma.HomeHeroSlideCreateWithoutMediaAssetInput, Prisma.HomeHeroSlideUncheckedCreateWithoutMediaAssetInput> | Prisma.HomeHeroSlideCreateWithoutMediaAssetInput[] | Prisma.HomeHeroSlideUncheckedCreateWithoutMediaAssetInput[]
   connectOrCreate?: Prisma.HomeHeroSlideCreateOrConnectWithoutMediaAssetInput | Prisma.HomeHeroSlideCreateOrConnectWithoutMediaAssetInput[]

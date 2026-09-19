@@ -20,8 +20,20 @@ export type CmsDraftModel = runtime.Types.Result.DefaultSelection<Prisma.$CmsDra
 
 export type AggregateCmsDraft = {
   _count: CmsDraftCountAggregateOutputType | null
+  _avg: CmsDraftAvgAggregateOutputType | null
+  _sum: CmsDraftSumAggregateOutputType | null
   _min: CmsDraftMinAggregateOutputType | null
   _max: CmsDraftMaxAggregateOutputType | null
+}
+
+export type CmsDraftAvgAggregateOutputType = {
+  revision: number | null
+  publishedBaseVersion: number | null
+}
+
+export type CmsDraftSumAggregateOutputType = {
+  revision: number | null
+  publishedBaseVersion: number | null
 }
 
 export type CmsDraftMinAggregateOutputType = {
@@ -33,6 +45,15 @@ export type CmsDraftMinAggregateOutputType = {
   targetId: string | null
   mediaAssetId: string | null
   createdBy: string | null
+  assignedTo: string | null
+  administratorNote: string | null
+  submittedAt: Date | null
+  returnedAt: Date | null
+  withdrawnAt: Date | null
+  archivedAt: Date | null
+  revision: number | null
+  publishedBaseVersion: number | null
+  publishedBaseFingerprint: string | null
   publishedBy: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -48,6 +69,15 @@ export type CmsDraftMaxAggregateOutputType = {
   targetId: string | null
   mediaAssetId: string | null
   createdBy: string | null
+  assignedTo: string | null
+  administratorNote: string | null
+  submittedAt: Date | null
+  returnedAt: Date | null
+  withdrawnAt: Date | null
+  archivedAt: Date | null
+  revision: number | null
+  publishedBaseVersion: number | null
+  publishedBaseFingerprint: string | null
   publishedBy: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -64,6 +94,15 @@ export type CmsDraftCountAggregateOutputType = {
   payload: number
   mediaAssetId: number
   createdBy: number
+  assignedTo: number
+  administratorNote: number
+  submittedAt: number
+  returnedAt: number
+  withdrawnAt: number
+  archivedAt: number
+  revision: number
+  publishedBaseVersion: number
+  publishedBaseFingerprint: number
   publishedBy: number
   createdAt: number
   updatedAt: number
@@ -71,6 +110,16 @@ export type CmsDraftCountAggregateOutputType = {
   _all: number
 }
 
+
+export type CmsDraftAvgAggregateInputType = {
+  revision?: true
+  publishedBaseVersion?: true
+}
+
+export type CmsDraftSumAggregateInputType = {
+  revision?: true
+  publishedBaseVersion?: true
+}
 
 export type CmsDraftMinAggregateInputType = {
   id?: true
@@ -81,6 +130,15 @@ export type CmsDraftMinAggregateInputType = {
   targetId?: true
   mediaAssetId?: true
   createdBy?: true
+  assignedTo?: true
+  administratorNote?: true
+  submittedAt?: true
+  returnedAt?: true
+  withdrawnAt?: true
+  archivedAt?: true
+  revision?: true
+  publishedBaseVersion?: true
+  publishedBaseFingerprint?: true
   publishedBy?: true
   createdAt?: true
   updatedAt?: true
@@ -96,6 +154,15 @@ export type CmsDraftMaxAggregateInputType = {
   targetId?: true
   mediaAssetId?: true
   createdBy?: true
+  assignedTo?: true
+  administratorNote?: true
+  submittedAt?: true
+  returnedAt?: true
+  withdrawnAt?: true
+  archivedAt?: true
+  revision?: true
+  publishedBaseVersion?: true
+  publishedBaseFingerprint?: true
   publishedBy?: true
   createdAt?: true
   updatedAt?: true
@@ -112,6 +179,15 @@ export type CmsDraftCountAggregateInputType = {
   payload?: true
   mediaAssetId?: true
   createdBy?: true
+  assignedTo?: true
+  administratorNote?: true
+  submittedAt?: true
+  returnedAt?: true
+  withdrawnAt?: true
+  archivedAt?: true
+  revision?: true
+  publishedBaseVersion?: true
+  publishedBaseFingerprint?: true
   publishedBy?: true
   createdAt?: true
   updatedAt?: true
@@ -157,6 +233,18 @@ export type CmsDraftAggregateArgs<ExtArgs extends runtime.Types.Extensions.Inter
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: CmsDraftAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: CmsDraftSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: CmsDraftMinAggregateInputType
@@ -187,6 +275,8 @@ export type CmsDraftGroupByArgs<ExtArgs extends runtime.Types.Extensions.Interna
   take?: number
   skip?: number
   _count?: CmsDraftCountAggregateInputType | true
+  _avg?: CmsDraftAvgAggregateInputType
+  _sum?: CmsDraftSumAggregateInputType
   _min?: CmsDraftMinAggregateInputType
   _max?: CmsDraftMaxAggregateInputType
 }
@@ -201,11 +291,22 @@ export type CmsDraftGroupByOutputType = {
   payload: runtime.JsonValue
   mediaAssetId: string | null
   createdBy: string
+  assignedTo: string | null
+  administratorNote: string | null
+  submittedAt: Date | null
+  returnedAt: Date | null
+  withdrawnAt: Date | null
+  archivedAt: Date | null
+  revision: number
+  publishedBaseVersion: number | null
+  publishedBaseFingerprint: string | null
   publishedBy: string | null
   createdAt: Date
   updatedAt: Date
   publishedAt: Date | null
   _count: CmsDraftCountAggregateOutputType | null
+  _avg: CmsDraftAvgAggregateOutputType | null
+  _sum: CmsDraftSumAggregateOutputType | null
   _min: CmsDraftMinAggregateOutputType | null
   _max: CmsDraftMaxAggregateOutputType | null
 }
@@ -238,12 +339,22 @@ export type CmsDraftWhereInput = {
   payload?: Prisma.JsonFilter<"CmsDraft">
   mediaAssetId?: Prisma.StringNullableFilter<"CmsDraft"> | string | null
   createdBy?: Prisma.StringFilter<"CmsDraft"> | string
+  assignedTo?: Prisma.StringNullableFilter<"CmsDraft"> | string | null
+  administratorNote?: Prisma.StringNullableFilter<"CmsDraft"> | string | null
+  submittedAt?: Prisma.DateTimeNullableFilter<"CmsDraft"> | Date | string | null
+  returnedAt?: Prisma.DateTimeNullableFilter<"CmsDraft"> | Date | string | null
+  withdrawnAt?: Prisma.DateTimeNullableFilter<"CmsDraft"> | Date | string | null
+  archivedAt?: Prisma.DateTimeNullableFilter<"CmsDraft"> | Date | string | null
+  revision?: Prisma.IntFilter<"CmsDraft"> | number
+  publishedBaseVersion?: Prisma.IntNullableFilter<"CmsDraft"> | number | null
+  publishedBaseFingerprint?: Prisma.StringNullableFilter<"CmsDraft"> | string | null
   publishedBy?: Prisma.StringNullableFilter<"CmsDraft"> | string | null
   createdAt?: Prisma.DateTimeFilter<"CmsDraft"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"CmsDraft"> | Date | string
   publishedAt?: Prisma.DateTimeNullableFilter<"CmsDraft"> | Date | string | null
   tenant?: Prisma.XOR<Prisma.TenantScalarRelationFilter, Prisma.TenantWhereInput>
   creator?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  assignee?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   publisher?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   mediaAsset?: Prisma.XOR<Prisma.MediaAssetNullableScalarRelationFilter, Prisma.MediaAssetWhereInput> | null
 }
@@ -258,12 +369,22 @@ export type CmsDraftOrderByWithRelationInput = {
   payload?: Prisma.SortOrder
   mediaAssetId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdBy?: Prisma.SortOrder
+  assignedTo?: Prisma.SortOrderInput | Prisma.SortOrder
+  administratorNote?: Prisma.SortOrderInput | Prisma.SortOrder
+  submittedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  returnedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  withdrawnAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  archivedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  revision?: Prisma.SortOrder
+  publishedBaseVersion?: Prisma.SortOrderInput | Prisma.SortOrder
+  publishedBaseFingerprint?: Prisma.SortOrderInput | Prisma.SortOrder
   publishedBy?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   publishedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   tenant?: Prisma.TenantOrderByWithRelationInput
   creator?: Prisma.UserOrderByWithRelationInput
+  assignee?: Prisma.UserOrderByWithRelationInput
   publisher?: Prisma.UserOrderByWithRelationInput
   mediaAsset?: Prisma.MediaAssetOrderByWithRelationInput
 }
@@ -281,12 +402,22 @@ export type CmsDraftWhereUniqueInput = Prisma.AtLeast<{
   payload?: Prisma.JsonFilter<"CmsDraft">
   mediaAssetId?: Prisma.StringNullableFilter<"CmsDraft"> | string | null
   createdBy?: Prisma.StringFilter<"CmsDraft"> | string
+  assignedTo?: Prisma.StringNullableFilter<"CmsDraft"> | string | null
+  administratorNote?: Prisma.StringNullableFilter<"CmsDraft"> | string | null
+  submittedAt?: Prisma.DateTimeNullableFilter<"CmsDraft"> | Date | string | null
+  returnedAt?: Prisma.DateTimeNullableFilter<"CmsDraft"> | Date | string | null
+  withdrawnAt?: Prisma.DateTimeNullableFilter<"CmsDraft"> | Date | string | null
+  archivedAt?: Prisma.DateTimeNullableFilter<"CmsDraft"> | Date | string | null
+  revision?: Prisma.IntFilter<"CmsDraft"> | number
+  publishedBaseVersion?: Prisma.IntNullableFilter<"CmsDraft"> | number | null
+  publishedBaseFingerprint?: Prisma.StringNullableFilter<"CmsDraft"> | string | null
   publishedBy?: Prisma.StringNullableFilter<"CmsDraft"> | string | null
   createdAt?: Prisma.DateTimeFilter<"CmsDraft"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"CmsDraft"> | Date | string
   publishedAt?: Prisma.DateTimeNullableFilter<"CmsDraft"> | Date | string | null
   tenant?: Prisma.XOR<Prisma.TenantScalarRelationFilter, Prisma.TenantWhereInput>
   creator?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  assignee?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   publisher?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   mediaAsset?: Prisma.XOR<Prisma.MediaAssetNullableScalarRelationFilter, Prisma.MediaAssetWhereInput> | null
 }, "id">
@@ -301,13 +432,24 @@ export type CmsDraftOrderByWithAggregationInput = {
   payload?: Prisma.SortOrder
   mediaAssetId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdBy?: Prisma.SortOrder
+  assignedTo?: Prisma.SortOrderInput | Prisma.SortOrder
+  administratorNote?: Prisma.SortOrderInput | Prisma.SortOrder
+  submittedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  returnedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  withdrawnAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  archivedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  revision?: Prisma.SortOrder
+  publishedBaseVersion?: Prisma.SortOrderInput | Prisma.SortOrder
+  publishedBaseFingerprint?: Prisma.SortOrderInput | Prisma.SortOrder
   publishedBy?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   publishedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.CmsDraftCountOrderByAggregateInput
+  _avg?: Prisma.CmsDraftAvgOrderByAggregateInput
   _max?: Prisma.CmsDraftMaxOrderByAggregateInput
   _min?: Prisma.CmsDraftMinOrderByAggregateInput
+  _sum?: Prisma.CmsDraftSumOrderByAggregateInput
 }
 
 export type CmsDraftScalarWhereWithAggregatesInput = {
@@ -323,6 +465,15 @@ export type CmsDraftScalarWhereWithAggregatesInput = {
   payload?: Prisma.JsonWithAggregatesFilter<"CmsDraft">
   mediaAssetId?: Prisma.StringNullableWithAggregatesFilter<"CmsDraft"> | string | null
   createdBy?: Prisma.StringWithAggregatesFilter<"CmsDraft"> | string
+  assignedTo?: Prisma.StringNullableWithAggregatesFilter<"CmsDraft"> | string | null
+  administratorNote?: Prisma.StringNullableWithAggregatesFilter<"CmsDraft"> | string | null
+  submittedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"CmsDraft"> | Date | string | null
+  returnedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"CmsDraft"> | Date | string | null
+  withdrawnAt?: Prisma.DateTimeNullableWithAggregatesFilter<"CmsDraft"> | Date | string | null
+  archivedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"CmsDraft"> | Date | string | null
+  revision?: Prisma.IntWithAggregatesFilter<"CmsDraft"> | number
+  publishedBaseVersion?: Prisma.IntNullableWithAggregatesFilter<"CmsDraft"> | number | null
+  publishedBaseFingerprint?: Prisma.StringNullableWithAggregatesFilter<"CmsDraft"> | string | null
   publishedBy?: Prisma.StringNullableWithAggregatesFilter<"CmsDraft"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"CmsDraft"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"CmsDraft"> | Date | string
@@ -336,11 +487,20 @@ export type CmsDraftCreateInput = {
   status?: $Enums.CmsDraftStatus
   targetId?: string | null
   payload: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  administratorNote?: string | null
+  submittedAt?: Date | string | null
+  returnedAt?: Date | string | null
+  withdrawnAt?: Date | string | null
+  archivedAt?: Date | string | null
+  revision?: number
+  publishedBaseVersion?: number | null
+  publishedBaseFingerprint?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   publishedAt?: Date | string | null
   tenant: Prisma.TenantCreateNestedOneWithoutCmsDraftsInput
   creator: Prisma.UserCreateNestedOneWithoutCreatedDraftsInput
+  assignee?: Prisma.UserCreateNestedOneWithoutAssignedDraftsInput
   publisher?: Prisma.UserCreateNestedOneWithoutPublishedDraftsInput
   mediaAsset?: Prisma.MediaAssetCreateNestedOneWithoutCmsDraftsInput
 }
@@ -355,6 +515,15 @@ export type CmsDraftUncheckedCreateInput = {
   payload: Prisma.JsonNullValueInput | runtime.InputJsonValue
   mediaAssetId?: string | null
   createdBy: string
+  assignedTo?: string | null
+  administratorNote?: string | null
+  submittedAt?: Date | string | null
+  returnedAt?: Date | string | null
+  withdrawnAt?: Date | string | null
+  archivedAt?: Date | string | null
+  revision?: number
+  publishedBaseVersion?: number | null
+  publishedBaseFingerprint?: string | null
   publishedBy?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -368,11 +537,20 @@ export type CmsDraftUpdateInput = {
   status?: Prisma.EnumCmsDraftStatusFieldUpdateOperationsInput | $Enums.CmsDraftStatus
   targetId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   payload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  administratorNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  returnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
+  publishedBaseVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  publishedBaseFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   tenant?: Prisma.TenantUpdateOneRequiredWithoutCmsDraftsNestedInput
   creator?: Prisma.UserUpdateOneRequiredWithoutCreatedDraftsNestedInput
+  assignee?: Prisma.UserUpdateOneWithoutAssignedDraftsNestedInput
   publisher?: Prisma.UserUpdateOneWithoutPublishedDraftsNestedInput
   mediaAsset?: Prisma.MediaAssetUpdateOneWithoutCmsDraftsNestedInput
 }
@@ -387,6 +565,15 @@ export type CmsDraftUncheckedUpdateInput = {
   payload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   mediaAssetId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdBy?: Prisma.StringFieldUpdateOperationsInput | string
+  assignedTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  administratorNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  returnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
+  publishedBaseVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  publishedBaseFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publishedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -403,6 +590,15 @@ export type CmsDraftCreateManyInput = {
   payload: Prisma.JsonNullValueInput | runtime.InputJsonValue
   mediaAssetId?: string | null
   createdBy: string
+  assignedTo?: string | null
+  administratorNote?: string | null
+  submittedAt?: Date | string | null
+  returnedAt?: Date | string | null
+  withdrawnAt?: Date | string | null
+  archivedAt?: Date | string | null
+  revision?: number
+  publishedBaseVersion?: number | null
+  publishedBaseFingerprint?: string | null
   publishedBy?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -416,6 +612,14 @@ export type CmsDraftUpdateManyMutationInput = {
   status?: Prisma.EnumCmsDraftStatusFieldUpdateOperationsInput | $Enums.CmsDraftStatus
   targetId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   payload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  administratorNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  returnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
+  publishedBaseVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  publishedBaseFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -431,6 +635,15 @@ export type CmsDraftUncheckedUpdateManyInput = {
   payload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   mediaAssetId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdBy?: Prisma.StringFieldUpdateOperationsInput | string
+  assignedTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  administratorNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  returnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
+  publishedBaseVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  publishedBaseFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publishedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -457,10 +670,24 @@ export type CmsDraftCountOrderByAggregateInput = {
   payload?: Prisma.SortOrder
   mediaAssetId?: Prisma.SortOrder
   createdBy?: Prisma.SortOrder
+  assignedTo?: Prisma.SortOrder
+  administratorNote?: Prisma.SortOrder
+  submittedAt?: Prisma.SortOrder
+  returnedAt?: Prisma.SortOrder
+  withdrawnAt?: Prisma.SortOrder
+  archivedAt?: Prisma.SortOrder
+  revision?: Prisma.SortOrder
+  publishedBaseVersion?: Prisma.SortOrder
+  publishedBaseFingerprint?: Prisma.SortOrder
   publishedBy?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   publishedAt?: Prisma.SortOrder
+}
+
+export type CmsDraftAvgOrderByAggregateInput = {
+  revision?: Prisma.SortOrder
+  publishedBaseVersion?: Prisma.SortOrder
 }
 
 export type CmsDraftMaxOrderByAggregateInput = {
@@ -472,6 +699,15 @@ export type CmsDraftMaxOrderByAggregateInput = {
   targetId?: Prisma.SortOrder
   mediaAssetId?: Prisma.SortOrder
   createdBy?: Prisma.SortOrder
+  assignedTo?: Prisma.SortOrder
+  administratorNote?: Prisma.SortOrder
+  submittedAt?: Prisma.SortOrder
+  returnedAt?: Prisma.SortOrder
+  withdrawnAt?: Prisma.SortOrder
+  archivedAt?: Prisma.SortOrder
+  revision?: Prisma.SortOrder
+  publishedBaseVersion?: Prisma.SortOrder
+  publishedBaseFingerprint?: Prisma.SortOrder
   publishedBy?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -487,10 +723,24 @@ export type CmsDraftMinOrderByAggregateInput = {
   targetId?: Prisma.SortOrder
   mediaAssetId?: Prisma.SortOrder
   createdBy?: Prisma.SortOrder
+  assignedTo?: Prisma.SortOrder
+  administratorNote?: Prisma.SortOrder
+  submittedAt?: Prisma.SortOrder
+  returnedAt?: Prisma.SortOrder
+  withdrawnAt?: Prisma.SortOrder
+  archivedAt?: Prisma.SortOrder
+  revision?: Prisma.SortOrder
+  publishedBaseVersion?: Prisma.SortOrder
+  publishedBaseFingerprint?: Prisma.SortOrder
   publishedBy?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   publishedAt?: Prisma.SortOrder
+}
+
+export type CmsDraftSumOrderByAggregateInput = {
+  revision?: Prisma.SortOrder
+  publishedBaseVersion?: Prisma.SortOrder
 }
 
 export type CmsDraftCreateNestedManyWithoutTenantInput = {
@@ -549,6 +799,13 @@ export type CmsDraftCreateNestedManyWithoutPublisherInput = {
   connect?: Prisma.CmsDraftWhereUniqueInput | Prisma.CmsDraftWhereUniqueInput[]
 }
 
+export type CmsDraftCreateNestedManyWithoutAssigneeInput = {
+  create?: Prisma.XOR<Prisma.CmsDraftCreateWithoutAssigneeInput, Prisma.CmsDraftUncheckedCreateWithoutAssigneeInput> | Prisma.CmsDraftCreateWithoutAssigneeInput[] | Prisma.CmsDraftUncheckedCreateWithoutAssigneeInput[]
+  connectOrCreate?: Prisma.CmsDraftCreateOrConnectWithoutAssigneeInput | Prisma.CmsDraftCreateOrConnectWithoutAssigneeInput[]
+  createMany?: Prisma.CmsDraftCreateManyAssigneeInputEnvelope
+  connect?: Prisma.CmsDraftWhereUniqueInput | Prisma.CmsDraftWhereUniqueInput[]
+}
+
 export type CmsDraftUncheckedCreateNestedManyWithoutCreatorInput = {
   create?: Prisma.XOR<Prisma.CmsDraftCreateWithoutCreatorInput, Prisma.CmsDraftUncheckedCreateWithoutCreatorInput> | Prisma.CmsDraftCreateWithoutCreatorInput[] | Prisma.CmsDraftUncheckedCreateWithoutCreatorInput[]
   connectOrCreate?: Prisma.CmsDraftCreateOrConnectWithoutCreatorInput | Prisma.CmsDraftCreateOrConnectWithoutCreatorInput[]
@@ -560,6 +817,13 @@ export type CmsDraftUncheckedCreateNestedManyWithoutPublisherInput = {
   create?: Prisma.XOR<Prisma.CmsDraftCreateWithoutPublisherInput, Prisma.CmsDraftUncheckedCreateWithoutPublisherInput> | Prisma.CmsDraftCreateWithoutPublisherInput[] | Prisma.CmsDraftUncheckedCreateWithoutPublisherInput[]
   connectOrCreate?: Prisma.CmsDraftCreateOrConnectWithoutPublisherInput | Prisma.CmsDraftCreateOrConnectWithoutPublisherInput[]
   createMany?: Prisma.CmsDraftCreateManyPublisherInputEnvelope
+  connect?: Prisma.CmsDraftWhereUniqueInput | Prisma.CmsDraftWhereUniqueInput[]
+}
+
+export type CmsDraftUncheckedCreateNestedManyWithoutAssigneeInput = {
+  create?: Prisma.XOR<Prisma.CmsDraftCreateWithoutAssigneeInput, Prisma.CmsDraftUncheckedCreateWithoutAssigneeInput> | Prisma.CmsDraftCreateWithoutAssigneeInput[] | Prisma.CmsDraftUncheckedCreateWithoutAssigneeInput[]
+  connectOrCreate?: Prisma.CmsDraftCreateOrConnectWithoutAssigneeInput | Prisma.CmsDraftCreateOrConnectWithoutAssigneeInput[]
+  createMany?: Prisma.CmsDraftCreateManyAssigneeInputEnvelope
   connect?: Prisma.CmsDraftWhereUniqueInput | Prisma.CmsDraftWhereUniqueInput[]
 }
 
@@ -591,6 +855,20 @@ export type CmsDraftUpdateManyWithoutPublisherNestedInput = {
   deleteMany?: Prisma.CmsDraftScalarWhereInput | Prisma.CmsDraftScalarWhereInput[]
 }
 
+export type CmsDraftUpdateManyWithoutAssigneeNestedInput = {
+  create?: Prisma.XOR<Prisma.CmsDraftCreateWithoutAssigneeInput, Prisma.CmsDraftUncheckedCreateWithoutAssigneeInput> | Prisma.CmsDraftCreateWithoutAssigneeInput[] | Prisma.CmsDraftUncheckedCreateWithoutAssigneeInput[]
+  connectOrCreate?: Prisma.CmsDraftCreateOrConnectWithoutAssigneeInput | Prisma.CmsDraftCreateOrConnectWithoutAssigneeInput[]
+  upsert?: Prisma.CmsDraftUpsertWithWhereUniqueWithoutAssigneeInput | Prisma.CmsDraftUpsertWithWhereUniqueWithoutAssigneeInput[]
+  createMany?: Prisma.CmsDraftCreateManyAssigneeInputEnvelope
+  set?: Prisma.CmsDraftWhereUniqueInput | Prisma.CmsDraftWhereUniqueInput[]
+  disconnect?: Prisma.CmsDraftWhereUniqueInput | Prisma.CmsDraftWhereUniqueInput[]
+  delete?: Prisma.CmsDraftWhereUniqueInput | Prisma.CmsDraftWhereUniqueInput[]
+  connect?: Prisma.CmsDraftWhereUniqueInput | Prisma.CmsDraftWhereUniqueInput[]
+  update?: Prisma.CmsDraftUpdateWithWhereUniqueWithoutAssigneeInput | Prisma.CmsDraftUpdateWithWhereUniqueWithoutAssigneeInput[]
+  updateMany?: Prisma.CmsDraftUpdateManyWithWhereWithoutAssigneeInput | Prisma.CmsDraftUpdateManyWithWhereWithoutAssigneeInput[]
+  deleteMany?: Prisma.CmsDraftScalarWhereInput | Prisma.CmsDraftScalarWhereInput[]
+}
+
 export type CmsDraftUncheckedUpdateManyWithoutCreatorNestedInput = {
   create?: Prisma.XOR<Prisma.CmsDraftCreateWithoutCreatorInput, Prisma.CmsDraftUncheckedCreateWithoutCreatorInput> | Prisma.CmsDraftCreateWithoutCreatorInput[] | Prisma.CmsDraftUncheckedCreateWithoutCreatorInput[]
   connectOrCreate?: Prisma.CmsDraftCreateOrConnectWithoutCreatorInput | Prisma.CmsDraftCreateOrConnectWithoutCreatorInput[]
@@ -616,6 +894,20 @@ export type CmsDraftUncheckedUpdateManyWithoutPublisherNestedInput = {
   connect?: Prisma.CmsDraftWhereUniqueInput | Prisma.CmsDraftWhereUniqueInput[]
   update?: Prisma.CmsDraftUpdateWithWhereUniqueWithoutPublisherInput | Prisma.CmsDraftUpdateWithWhereUniqueWithoutPublisherInput[]
   updateMany?: Prisma.CmsDraftUpdateManyWithWhereWithoutPublisherInput | Prisma.CmsDraftUpdateManyWithWhereWithoutPublisherInput[]
+  deleteMany?: Prisma.CmsDraftScalarWhereInput | Prisma.CmsDraftScalarWhereInput[]
+}
+
+export type CmsDraftUncheckedUpdateManyWithoutAssigneeNestedInput = {
+  create?: Prisma.XOR<Prisma.CmsDraftCreateWithoutAssigneeInput, Prisma.CmsDraftUncheckedCreateWithoutAssigneeInput> | Prisma.CmsDraftCreateWithoutAssigneeInput[] | Prisma.CmsDraftUncheckedCreateWithoutAssigneeInput[]
+  connectOrCreate?: Prisma.CmsDraftCreateOrConnectWithoutAssigneeInput | Prisma.CmsDraftCreateOrConnectWithoutAssigneeInput[]
+  upsert?: Prisma.CmsDraftUpsertWithWhereUniqueWithoutAssigneeInput | Prisma.CmsDraftUpsertWithWhereUniqueWithoutAssigneeInput[]
+  createMany?: Prisma.CmsDraftCreateManyAssigneeInputEnvelope
+  set?: Prisma.CmsDraftWhereUniqueInput | Prisma.CmsDraftWhereUniqueInput[]
+  disconnect?: Prisma.CmsDraftWhereUniqueInput | Prisma.CmsDraftWhereUniqueInput[]
+  delete?: Prisma.CmsDraftWhereUniqueInput | Prisma.CmsDraftWhereUniqueInput[]
+  connect?: Prisma.CmsDraftWhereUniqueInput | Prisma.CmsDraftWhereUniqueInput[]
+  update?: Prisma.CmsDraftUpdateWithWhereUniqueWithoutAssigneeInput | Prisma.CmsDraftUpdateWithWhereUniqueWithoutAssigneeInput[]
+  updateMany?: Prisma.CmsDraftUpdateManyWithWhereWithoutAssigneeInput | Prisma.CmsDraftUpdateManyWithWhereWithoutAssigneeInput[]
   deleteMany?: Prisma.CmsDraftScalarWhereInput | Prisma.CmsDraftScalarWhereInput[]
 }
 
@@ -673,6 +965,14 @@ export type EnumCmsDraftStatusFieldUpdateOperationsInput = {
   set?: $Enums.CmsDraftStatus
 }
 
+export type NullableIntFieldUpdateOperationsInput = {
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
 export type CmsDraftCreateWithoutTenantInput = {
   id?: string
   kind: $Enums.CmsDraftKind
@@ -680,10 +980,19 @@ export type CmsDraftCreateWithoutTenantInput = {
   status?: $Enums.CmsDraftStatus
   targetId?: string | null
   payload: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  administratorNote?: string | null
+  submittedAt?: Date | string | null
+  returnedAt?: Date | string | null
+  withdrawnAt?: Date | string | null
+  archivedAt?: Date | string | null
+  revision?: number
+  publishedBaseVersion?: number | null
+  publishedBaseFingerprint?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   publishedAt?: Date | string | null
   creator: Prisma.UserCreateNestedOneWithoutCreatedDraftsInput
+  assignee?: Prisma.UserCreateNestedOneWithoutAssignedDraftsInput
   publisher?: Prisma.UserCreateNestedOneWithoutPublishedDraftsInput
   mediaAsset?: Prisma.MediaAssetCreateNestedOneWithoutCmsDraftsInput
 }
@@ -697,6 +1006,15 @@ export type CmsDraftUncheckedCreateWithoutTenantInput = {
   payload: Prisma.JsonNullValueInput | runtime.InputJsonValue
   mediaAssetId?: string | null
   createdBy: string
+  assignedTo?: string | null
+  administratorNote?: string | null
+  submittedAt?: Date | string | null
+  returnedAt?: Date | string | null
+  withdrawnAt?: Date | string | null
+  archivedAt?: Date | string | null
+  revision?: number
+  publishedBaseVersion?: number | null
+  publishedBaseFingerprint?: string | null
   publishedBy?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -742,6 +1060,15 @@ export type CmsDraftScalarWhereInput = {
   payload?: Prisma.JsonFilter<"CmsDraft">
   mediaAssetId?: Prisma.StringNullableFilter<"CmsDraft"> | string | null
   createdBy?: Prisma.StringFilter<"CmsDraft"> | string
+  assignedTo?: Prisma.StringNullableFilter<"CmsDraft"> | string | null
+  administratorNote?: Prisma.StringNullableFilter<"CmsDraft"> | string | null
+  submittedAt?: Prisma.DateTimeNullableFilter<"CmsDraft"> | Date | string | null
+  returnedAt?: Prisma.DateTimeNullableFilter<"CmsDraft"> | Date | string | null
+  withdrawnAt?: Prisma.DateTimeNullableFilter<"CmsDraft"> | Date | string | null
+  archivedAt?: Prisma.DateTimeNullableFilter<"CmsDraft"> | Date | string | null
+  revision?: Prisma.IntFilter<"CmsDraft"> | number
+  publishedBaseVersion?: Prisma.IntNullableFilter<"CmsDraft"> | number | null
+  publishedBaseFingerprint?: Prisma.StringNullableFilter<"CmsDraft"> | string | null
   publishedBy?: Prisma.StringNullableFilter<"CmsDraft"> | string | null
   createdAt?: Prisma.DateTimeFilter<"CmsDraft"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"CmsDraft"> | Date | string
@@ -755,10 +1082,19 @@ export type CmsDraftCreateWithoutCreatorInput = {
   status?: $Enums.CmsDraftStatus
   targetId?: string | null
   payload: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  administratorNote?: string | null
+  submittedAt?: Date | string | null
+  returnedAt?: Date | string | null
+  withdrawnAt?: Date | string | null
+  archivedAt?: Date | string | null
+  revision?: number
+  publishedBaseVersion?: number | null
+  publishedBaseFingerprint?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   publishedAt?: Date | string | null
   tenant: Prisma.TenantCreateNestedOneWithoutCmsDraftsInput
+  assignee?: Prisma.UserCreateNestedOneWithoutAssignedDraftsInput
   publisher?: Prisma.UserCreateNestedOneWithoutPublishedDraftsInput
   mediaAsset?: Prisma.MediaAssetCreateNestedOneWithoutCmsDraftsInput
 }
@@ -772,6 +1108,15 @@ export type CmsDraftUncheckedCreateWithoutCreatorInput = {
   targetId?: string | null
   payload: Prisma.JsonNullValueInput | runtime.InputJsonValue
   mediaAssetId?: string | null
+  assignedTo?: string | null
+  administratorNote?: string | null
+  submittedAt?: Date | string | null
+  returnedAt?: Date | string | null
+  withdrawnAt?: Date | string | null
+  archivedAt?: Date | string | null
+  revision?: number
+  publishedBaseVersion?: number | null
+  publishedBaseFingerprint?: string | null
   publishedBy?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -795,11 +1140,20 @@ export type CmsDraftCreateWithoutPublisherInput = {
   status?: $Enums.CmsDraftStatus
   targetId?: string | null
   payload: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  administratorNote?: string | null
+  submittedAt?: Date | string | null
+  returnedAt?: Date | string | null
+  withdrawnAt?: Date | string | null
+  archivedAt?: Date | string | null
+  revision?: number
+  publishedBaseVersion?: number | null
+  publishedBaseFingerprint?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   publishedAt?: Date | string | null
   tenant: Prisma.TenantCreateNestedOneWithoutCmsDraftsInput
   creator: Prisma.UserCreateNestedOneWithoutCreatedDraftsInput
+  assignee?: Prisma.UserCreateNestedOneWithoutAssignedDraftsInput
   mediaAsset?: Prisma.MediaAssetCreateNestedOneWithoutCmsDraftsInput
 }
 
@@ -813,6 +1167,15 @@ export type CmsDraftUncheckedCreateWithoutPublisherInput = {
   payload: Prisma.JsonNullValueInput | runtime.InputJsonValue
   mediaAssetId?: string | null
   createdBy: string
+  assignedTo?: string | null
+  administratorNote?: string | null
+  submittedAt?: Date | string | null
+  returnedAt?: Date | string | null
+  withdrawnAt?: Date | string | null
+  archivedAt?: Date | string | null
+  revision?: number
+  publishedBaseVersion?: number | null
+  publishedBaseFingerprint?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   publishedAt?: Date | string | null
@@ -825,6 +1188,64 @@ export type CmsDraftCreateOrConnectWithoutPublisherInput = {
 
 export type CmsDraftCreateManyPublisherInputEnvelope = {
   data: Prisma.CmsDraftCreateManyPublisherInput | Prisma.CmsDraftCreateManyPublisherInput[]
+  skipDuplicates?: boolean
+}
+
+export type CmsDraftCreateWithoutAssigneeInput = {
+  id?: string
+  kind: $Enums.CmsDraftKind
+  operation: $Enums.CmsDraftOperation
+  status?: $Enums.CmsDraftStatus
+  targetId?: string | null
+  payload: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  administratorNote?: string | null
+  submittedAt?: Date | string | null
+  returnedAt?: Date | string | null
+  withdrawnAt?: Date | string | null
+  archivedAt?: Date | string | null
+  revision?: number
+  publishedBaseVersion?: number | null
+  publishedBaseFingerprint?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  publishedAt?: Date | string | null
+  tenant: Prisma.TenantCreateNestedOneWithoutCmsDraftsInput
+  creator: Prisma.UserCreateNestedOneWithoutCreatedDraftsInput
+  publisher?: Prisma.UserCreateNestedOneWithoutPublishedDraftsInput
+  mediaAsset?: Prisma.MediaAssetCreateNestedOneWithoutCmsDraftsInput
+}
+
+export type CmsDraftUncheckedCreateWithoutAssigneeInput = {
+  id?: string
+  tenantId: string
+  kind: $Enums.CmsDraftKind
+  operation: $Enums.CmsDraftOperation
+  status?: $Enums.CmsDraftStatus
+  targetId?: string | null
+  payload: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  mediaAssetId?: string | null
+  createdBy: string
+  administratorNote?: string | null
+  submittedAt?: Date | string | null
+  returnedAt?: Date | string | null
+  withdrawnAt?: Date | string | null
+  archivedAt?: Date | string | null
+  revision?: number
+  publishedBaseVersion?: number | null
+  publishedBaseFingerprint?: string | null
+  publishedBy?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  publishedAt?: Date | string | null
+}
+
+export type CmsDraftCreateOrConnectWithoutAssigneeInput = {
+  where: Prisma.CmsDraftWhereUniqueInput
+  create: Prisma.XOR<Prisma.CmsDraftCreateWithoutAssigneeInput, Prisma.CmsDraftUncheckedCreateWithoutAssigneeInput>
+}
+
+export type CmsDraftCreateManyAssigneeInputEnvelope = {
+  data: Prisma.CmsDraftCreateManyAssigneeInput | Prisma.CmsDraftCreateManyAssigneeInput[]
   skipDuplicates?: boolean
 }
 
@@ -860,6 +1281,22 @@ export type CmsDraftUpdateManyWithWhereWithoutPublisherInput = {
   data: Prisma.XOR<Prisma.CmsDraftUpdateManyMutationInput, Prisma.CmsDraftUncheckedUpdateManyWithoutPublisherInput>
 }
 
+export type CmsDraftUpsertWithWhereUniqueWithoutAssigneeInput = {
+  where: Prisma.CmsDraftWhereUniqueInput
+  update: Prisma.XOR<Prisma.CmsDraftUpdateWithoutAssigneeInput, Prisma.CmsDraftUncheckedUpdateWithoutAssigneeInput>
+  create: Prisma.XOR<Prisma.CmsDraftCreateWithoutAssigneeInput, Prisma.CmsDraftUncheckedCreateWithoutAssigneeInput>
+}
+
+export type CmsDraftUpdateWithWhereUniqueWithoutAssigneeInput = {
+  where: Prisma.CmsDraftWhereUniqueInput
+  data: Prisma.XOR<Prisma.CmsDraftUpdateWithoutAssigneeInput, Prisma.CmsDraftUncheckedUpdateWithoutAssigneeInput>
+}
+
+export type CmsDraftUpdateManyWithWhereWithoutAssigneeInput = {
+  where: Prisma.CmsDraftScalarWhereInput
+  data: Prisma.XOR<Prisma.CmsDraftUpdateManyMutationInput, Prisma.CmsDraftUncheckedUpdateManyWithoutAssigneeInput>
+}
+
 export type CmsDraftCreateWithoutMediaAssetInput = {
   id?: string
   kind: $Enums.CmsDraftKind
@@ -867,11 +1304,20 @@ export type CmsDraftCreateWithoutMediaAssetInput = {
   status?: $Enums.CmsDraftStatus
   targetId?: string | null
   payload: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  administratorNote?: string | null
+  submittedAt?: Date | string | null
+  returnedAt?: Date | string | null
+  withdrawnAt?: Date | string | null
+  archivedAt?: Date | string | null
+  revision?: number
+  publishedBaseVersion?: number | null
+  publishedBaseFingerprint?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   publishedAt?: Date | string | null
   tenant: Prisma.TenantCreateNestedOneWithoutCmsDraftsInput
   creator: Prisma.UserCreateNestedOneWithoutCreatedDraftsInput
+  assignee?: Prisma.UserCreateNestedOneWithoutAssignedDraftsInput
   publisher?: Prisma.UserCreateNestedOneWithoutPublishedDraftsInput
 }
 
@@ -884,6 +1330,15 @@ export type CmsDraftUncheckedCreateWithoutMediaAssetInput = {
   targetId?: string | null
   payload: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdBy: string
+  assignedTo?: string | null
+  administratorNote?: string | null
+  submittedAt?: Date | string | null
+  returnedAt?: Date | string | null
+  withdrawnAt?: Date | string | null
+  archivedAt?: Date | string | null
+  revision?: number
+  publishedBaseVersion?: number | null
+  publishedBaseFingerprint?: string | null
   publishedBy?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -925,6 +1380,15 @@ export type CmsDraftCreateManyTenantInput = {
   payload: Prisma.JsonNullValueInput | runtime.InputJsonValue
   mediaAssetId?: string | null
   createdBy: string
+  assignedTo?: string | null
+  administratorNote?: string | null
+  submittedAt?: Date | string | null
+  returnedAt?: Date | string | null
+  withdrawnAt?: Date | string | null
+  archivedAt?: Date | string | null
+  revision?: number
+  publishedBaseVersion?: number | null
+  publishedBaseFingerprint?: string | null
   publishedBy?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -938,10 +1402,19 @@ export type CmsDraftUpdateWithoutTenantInput = {
   status?: Prisma.EnumCmsDraftStatusFieldUpdateOperationsInput | $Enums.CmsDraftStatus
   targetId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   payload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  administratorNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  returnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
+  publishedBaseVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  publishedBaseFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   creator?: Prisma.UserUpdateOneRequiredWithoutCreatedDraftsNestedInput
+  assignee?: Prisma.UserUpdateOneWithoutAssignedDraftsNestedInput
   publisher?: Prisma.UserUpdateOneWithoutPublishedDraftsNestedInput
   mediaAsset?: Prisma.MediaAssetUpdateOneWithoutCmsDraftsNestedInput
 }
@@ -955,6 +1428,15 @@ export type CmsDraftUncheckedUpdateWithoutTenantInput = {
   payload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   mediaAssetId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdBy?: Prisma.StringFieldUpdateOperationsInput | string
+  assignedTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  administratorNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  returnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
+  publishedBaseVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  publishedBaseFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publishedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -970,6 +1452,15 @@ export type CmsDraftUncheckedUpdateManyWithoutTenantInput = {
   payload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   mediaAssetId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdBy?: Prisma.StringFieldUpdateOperationsInput | string
+  assignedTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  administratorNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  returnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
+  publishedBaseVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  publishedBaseFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publishedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -985,6 +1476,15 @@ export type CmsDraftCreateManyCreatorInput = {
   targetId?: string | null
   payload: Prisma.JsonNullValueInput | runtime.InputJsonValue
   mediaAssetId?: string | null
+  assignedTo?: string | null
+  administratorNote?: string | null
+  submittedAt?: Date | string | null
+  returnedAt?: Date | string | null
+  withdrawnAt?: Date | string | null
+  archivedAt?: Date | string | null
+  revision?: number
+  publishedBaseVersion?: number | null
+  publishedBaseFingerprint?: string | null
   publishedBy?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1001,6 +1501,39 @@ export type CmsDraftCreateManyPublisherInput = {
   payload: Prisma.JsonNullValueInput | runtime.InputJsonValue
   mediaAssetId?: string | null
   createdBy: string
+  assignedTo?: string | null
+  administratorNote?: string | null
+  submittedAt?: Date | string | null
+  returnedAt?: Date | string | null
+  withdrawnAt?: Date | string | null
+  archivedAt?: Date | string | null
+  revision?: number
+  publishedBaseVersion?: number | null
+  publishedBaseFingerprint?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  publishedAt?: Date | string | null
+}
+
+export type CmsDraftCreateManyAssigneeInput = {
+  id?: string
+  tenantId: string
+  kind: $Enums.CmsDraftKind
+  operation: $Enums.CmsDraftOperation
+  status?: $Enums.CmsDraftStatus
+  targetId?: string | null
+  payload: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  mediaAssetId?: string | null
+  createdBy: string
+  administratorNote?: string | null
+  submittedAt?: Date | string | null
+  returnedAt?: Date | string | null
+  withdrawnAt?: Date | string | null
+  archivedAt?: Date | string | null
+  revision?: number
+  publishedBaseVersion?: number | null
+  publishedBaseFingerprint?: string | null
+  publishedBy?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   publishedAt?: Date | string | null
@@ -1013,10 +1546,19 @@ export type CmsDraftUpdateWithoutCreatorInput = {
   status?: Prisma.EnumCmsDraftStatusFieldUpdateOperationsInput | $Enums.CmsDraftStatus
   targetId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   payload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  administratorNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  returnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
+  publishedBaseVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  publishedBaseFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   tenant?: Prisma.TenantUpdateOneRequiredWithoutCmsDraftsNestedInput
+  assignee?: Prisma.UserUpdateOneWithoutAssignedDraftsNestedInput
   publisher?: Prisma.UserUpdateOneWithoutPublishedDraftsNestedInput
   mediaAsset?: Prisma.MediaAssetUpdateOneWithoutCmsDraftsNestedInput
 }
@@ -1030,6 +1572,15 @@ export type CmsDraftUncheckedUpdateWithoutCreatorInput = {
   targetId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   payload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   mediaAssetId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  assignedTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  administratorNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  returnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
+  publishedBaseVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  publishedBaseFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publishedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1045,6 +1596,15 @@ export type CmsDraftUncheckedUpdateManyWithoutCreatorInput = {
   targetId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   payload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   mediaAssetId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  assignedTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  administratorNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  returnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
+  publishedBaseVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  publishedBaseFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publishedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1058,11 +1618,20 @@ export type CmsDraftUpdateWithoutPublisherInput = {
   status?: Prisma.EnumCmsDraftStatusFieldUpdateOperationsInput | $Enums.CmsDraftStatus
   targetId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   payload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  administratorNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  returnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
+  publishedBaseVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  publishedBaseFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   tenant?: Prisma.TenantUpdateOneRequiredWithoutCmsDraftsNestedInput
   creator?: Prisma.UserUpdateOneRequiredWithoutCreatedDraftsNestedInput
+  assignee?: Prisma.UserUpdateOneWithoutAssignedDraftsNestedInput
   mediaAsset?: Prisma.MediaAssetUpdateOneWithoutCmsDraftsNestedInput
 }
 
@@ -1076,6 +1645,15 @@ export type CmsDraftUncheckedUpdateWithoutPublisherInput = {
   payload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   mediaAssetId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdBy?: Prisma.StringFieldUpdateOperationsInput | string
+  assignedTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  administratorNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  returnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
+  publishedBaseVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  publishedBaseFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1091,6 +1669,87 @@ export type CmsDraftUncheckedUpdateManyWithoutPublisherInput = {
   payload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   mediaAssetId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdBy?: Prisma.StringFieldUpdateOperationsInput | string
+  assignedTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  administratorNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  returnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
+  publishedBaseVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  publishedBaseFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+}
+
+export type CmsDraftUpdateWithoutAssigneeInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumCmsDraftKindFieldUpdateOperationsInput | $Enums.CmsDraftKind
+  operation?: Prisma.EnumCmsDraftOperationFieldUpdateOperationsInput | $Enums.CmsDraftOperation
+  status?: Prisma.EnumCmsDraftStatusFieldUpdateOperationsInput | $Enums.CmsDraftStatus
+  targetId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  administratorNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  returnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
+  publishedBaseVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  publishedBaseFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tenant?: Prisma.TenantUpdateOneRequiredWithoutCmsDraftsNestedInput
+  creator?: Prisma.UserUpdateOneRequiredWithoutCreatedDraftsNestedInput
+  publisher?: Prisma.UserUpdateOneWithoutPublishedDraftsNestedInput
+  mediaAsset?: Prisma.MediaAssetUpdateOneWithoutCmsDraftsNestedInput
+}
+
+export type CmsDraftUncheckedUpdateWithoutAssigneeInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  tenantId?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumCmsDraftKindFieldUpdateOperationsInput | $Enums.CmsDraftKind
+  operation?: Prisma.EnumCmsDraftOperationFieldUpdateOperationsInput | $Enums.CmsDraftOperation
+  status?: Prisma.EnumCmsDraftStatusFieldUpdateOperationsInput | $Enums.CmsDraftStatus
+  targetId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  mediaAssetId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdBy?: Prisma.StringFieldUpdateOperationsInput | string
+  administratorNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  returnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
+  publishedBaseVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  publishedBaseFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publishedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+}
+
+export type CmsDraftUncheckedUpdateManyWithoutAssigneeInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  tenantId?: Prisma.StringFieldUpdateOperationsInput | string
+  kind?: Prisma.EnumCmsDraftKindFieldUpdateOperationsInput | $Enums.CmsDraftKind
+  operation?: Prisma.EnumCmsDraftOperationFieldUpdateOperationsInput | $Enums.CmsDraftOperation
+  status?: Prisma.EnumCmsDraftStatusFieldUpdateOperationsInput | $Enums.CmsDraftStatus
+  targetId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  payload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  mediaAssetId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdBy?: Prisma.StringFieldUpdateOperationsInput | string
+  administratorNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  returnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
+  publishedBaseVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  publishedBaseFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  publishedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1105,6 +1764,15 @@ export type CmsDraftCreateManyMediaAssetInput = {
   targetId?: string | null
   payload: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdBy: string
+  assignedTo?: string | null
+  administratorNote?: string | null
+  submittedAt?: Date | string | null
+  returnedAt?: Date | string | null
+  withdrawnAt?: Date | string | null
+  archivedAt?: Date | string | null
+  revision?: number
+  publishedBaseVersion?: number | null
+  publishedBaseFingerprint?: string | null
   publishedBy?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1118,11 +1786,20 @@ export type CmsDraftUpdateWithoutMediaAssetInput = {
   status?: Prisma.EnumCmsDraftStatusFieldUpdateOperationsInput | $Enums.CmsDraftStatus
   targetId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   payload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  administratorNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  returnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
+  publishedBaseVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  publishedBaseFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   tenant?: Prisma.TenantUpdateOneRequiredWithoutCmsDraftsNestedInput
   creator?: Prisma.UserUpdateOneRequiredWithoutCreatedDraftsNestedInput
+  assignee?: Prisma.UserUpdateOneWithoutAssignedDraftsNestedInput
   publisher?: Prisma.UserUpdateOneWithoutPublishedDraftsNestedInput
 }
 
@@ -1135,6 +1812,15 @@ export type CmsDraftUncheckedUpdateWithoutMediaAssetInput = {
   targetId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   payload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdBy?: Prisma.StringFieldUpdateOperationsInput | string
+  assignedTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  administratorNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  returnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
+  publishedBaseVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  publishedBaseFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publishedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1150,6 +1836,15 @@ export type CmsDraftUncheckedUpdateManyWithoutMediaAssetInput = {
   targetId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   payload?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdBy?: Prisma.StringFieldUpdateOperationsInput | string
+  assignedTo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  administratorNote?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  submittedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  returnedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  withdrawnAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  archivedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
+  publishedBaseVersion?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  publishedBaseFingerprint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   publishedBy?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1168,12 +1863,22 @@ export type CmsDraftSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   payload?: boolean
   mediaAssetId?: boolean
   createdBy?: boolean
+  assignedTo?: boolean
+  administratorNote?: boolean
+  submittedAt?: boolean
+  returnedAt?: boolean
+  withdrawnAt?: boolean
+  archivedAt?: boolean
+  revision?: boolean
+  publishedBaseVersion?: boolean
+  publishedBaseFingerprint?: boolean
   publishedBy?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   publishedAt?: boolean
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
   creator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  assignee?: boolean | Prisma.CmsDraft$assigneeArgs<ExtArgs>
   publisher?: boolean | Prisma.CmsDraft$publisherArgs<ExtArgs>
   mediaAsset?: boolean | Prisma.CmsDraft$mediaAssetArgs<ExtArgs>
 }, ExtArgs["result"]["cmsDraft"]>
@@ -1188,12 +1893,22 @@ export type CmsDraftSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   payload?: boolean
   mediaAssetId?: boolean
   createdBy?: boolean
+  assignedTo?: boolean
+  administratorNote?: boolean
+  submittedAt?: boolean
+  returnedAt?: boolean
+  withdrawnAt?: boolean
+  archivedAt?: boolean
+  revision?: boolean
+  publishedBaseVersion?: boolean
+  publishedBaseFingerprint?: boolean
   publishedBy?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   publishedAt?: boolean
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
   creator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  assignee?: boolean | Prisma.CmsDraft$assigneeArgs<ExtArgs>
   publisher?: boolean | Prisma.CmsDraft$publisherArgs<ExtArgs>
   mediaAsset?: boolean | Prisma.CmsDraft$mediaAssetArgs<ExtArgs>
 }, ExtArgs["result"]["cmsDraft"]>
@@ -1208,12 +1923,22 @@ export type CmsDraftSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   payload?: boolean
   mediaAssetId?: boolean
   createdBy?: boolean
+  assignedTo?: boolean
+  administratorNote?: boolean
+  submittedAt?: boolean
+  returnedAt?: boolean
+  withdrawnAt?: boolean
+  archivedAt?: boolean
+  revision?: boolean
+  publishedBaseVersion?: boolean
+  publishedBaseFingerprint?: boolean
   publishedBy?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   publishedAt?: boolean
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
   creator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  assignee?: boolean | Prisma.CmsDraft$assigneeArgs<ExtArgs>
   publisher?: boolean | Prisma.CmsDraft$publisherArgs<ExtArgs>
   mediaAsset?: boolean | Prisma.CmsDraft$mediaAssetArgs<ExtArgs>
 }, ExtArgs["result"]["cmsDraft"]>
@@ -1228,28 +1953,40 @@ export type CmsDraftSelectScalar = {
   payload?: boolean
   mediaAssetId?: boolean
   createdBy?: boolean
+  assignedTo?: boolean
+  administratorNote?: boolean
+  submittedAt?: boolean
+  returnedAt?: boolean
+  withdrawnAt?: boolean
+  archivedAt?: boolean
+  revision?: boolean
+  publishedBaseVersion?: boolean
+  publishedBaseFingerprint?: boolean
   publishedBy?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   publishedAt?: boolean
 }
 
-export type CmsDraftOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tenantId" | "kind" | "operation" | "status" | "targetId" | "payload" | "mediaAssetId" | "createdBy" | "publishedBy" | "createdAt" | "updatedAt" | "publishedAt", ExtArgs["result"]["cmsDraft"]>
+export type CmsDraftOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tenantId" | "kind" | "operation" | "status" | "targetId" | "payload" | "mediaAssetId" | "createdBy" | "assignedTo" | "administratorNote" | "submittedAt" | "returnedAt" | "withdrawnAt" | "archivedAt" | "revision" | "publishedBaseVersion" | "publishedBaseFingerprint" | "publishedBy" | "createdAt" | "updatedAt" | "publishedAt", ExtArgs["result"]["cmsDraft"]>
 export type CmsDraftInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
   creator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  assignee?: boolean | Prisma.CmsDraft$assigneeArgs<ExtArgs>
   publisher?: boolean | Prisma.CmsDraft$publisherArgs<ExtArgs>
   mediaAsset?: boolean | Prisma.CmsDraft$mediaAssetArgs<ExtArgs>
 }
 export type CmsDraftIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
   creator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  assignee?: boolean | Prisma.CmsDraft$assigneeArgs<ExtArgs>
   publisher?: boolean | Prisma.CmsDraft$publisherArgs<ExtArgs>
   mediaAsset?: boolean | Prisma.CmsDraft$mediaAssetArgs<ExtArgs>
 }
 export type CmsDraftIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
   creator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  assignee?: boolean | Prisma.CmsDraft$assigneeArgs<ExtArgs>
   publisher?: boolean | Prisma.CmsDraft$publisherArgs<ExtArgs>
   mediaAsset?: boolean | Prisma.CmsDraft$mediaAssetArgs<ExtArgs>
 }
@@ -1259,6 +1996,7 @@ export type $CmsDraftPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
   objects: {
     tenant: Prisma.$TenantPayload<ExtArgs>
     creator: Prisma.$UserPayload<ExtArgs>
+    assignee: Prisma.$UserPayload<ExtArgs> | null
     publisher: Prisma.$UserPayload<ExtArgs> | null
     mediaAsset: Prisma.$MediaAssetPayload<ExtArgs> | null
   }
@@ -1272,6 +2010,15 @@ export type $CmsDraftPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     payload: runtime.JsonValue
     mediaAssetId: string | null
     createdBy: string
+    assignedTo: string | null
+    administratorNote: string | null
+    submittedAt: Date | null
+    returnedAt: Date | null
+    withdrawnAt: Date | null
+    archivedAt: Date | null
+    revision: number
+    publishedBaseVersion: number | null
+    publishedBaseFingerprint: string | null
     publishedBy: string | null
     createdAt: Date
     updatedAt: Date
@@ -1672,6 +2419,7 @@ export interface Prisma__CmsDraftClient<T, Null = never, ExtArgs extends runtime
   readonly [Symbol.toStringTag]: "PrismaPromise"
   tenant<T extends Prisma.TenantDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TenantDefaultArgs<ExtArgs>>): Prisma.Prisma__TenantClient<runtime.Types.Result.GetResult<Prisma.$TenantPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   creator<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  assignee<T extends Prisma.CmsDraft$assigneeArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CmsDraft$assigneeArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   publisher<T extends Prisma.CmsDraft$publisherArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CmsDraft$publisherArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   mediaAsset<T extends Prisma.CmsDraft$mediaAssetArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CmsDraft$mediaAssetArgs<ExtArgs>>): Prisma.Prisma__MediaAssetClient<runtime.Types.Result.GetResult<Prisma.$MediaAssetPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
@@ -1712,6 +2460,15 @@ export interface CmsDraftFieldRefs {
   readonly payload: Prisma.FieldRef<"CmsDraft", 'Json'>
   readonly mediaAssetId: Prisma.FieldRef<"CmsDraft", 'String'>
   readonly createdBy: Prisma.FieldRef<"CmsDraft", 'String'>
+  readonly assignedTo: Prisma.FieldRef<"CmsDraft", 'String'>
+  readonly administratorNote: Prisma.FieldRef<"CmsDraft", 'String'>
+  readonly submittedAt: Prisma.FieldRef<"CmsDraft", 'DateTime'>
+  readonly returnedAt: Prisma.FieldRef<"CmsDraft", 'DateTime'>
+  readonly withdrawnAt: Prisma.FieldRef<"CmsDraft", 'DateTime'>
+  readonly archivedAt: Prisma.FieldRef<"CmsDraft", 'DateTime'>
+  readonly revision: Prisma.FieldRef<"CmsDraft", 'Int'>
+  readonly publishedBaseVersion: Prisma.FieldRef<"CmsDraft", 'Int'>
+  readonly publishedBaseFingerprint: Prisma.FieldRef<"CmsDraft", 'String'>
   readonly publishedBy: Prisma.FieldRef<"CmsDraft", 'String'>
   readonly createdAt: Prisma.FieldRef<"CmsDraft", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"CmsDraft", 'DateTime'>
@@ -2114,6 +2871,25 @@ export type CmsDraftDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Limit how many CmsDrafts to delete.
    */
   limit?: number
+}
+
+/**
+ * CmsDraft.assignee
+ */
+export type CmsDraft$assigneeArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the User
+   */
+  select?: Prisma.UserSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the User
+   */
+  omit?: Prisma.UserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  where?: Prisma.UserWhereInput
 }
 
 /**

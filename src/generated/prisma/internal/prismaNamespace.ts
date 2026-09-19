@@ -406,6 +406,7 @@ export const ModelName = {
   Verification: 'Verification',
   StaffMembership: 'StaffMembership',
   AuditLog: 'AuditLog',
+  StaffLoginAttempt: 'StaffLoginAttempt',
   SiteNotice: 'SiteNotice',
   HomeHeroSlide: 'HomeHeroSlide',
   HomeHighlight: 'HomeHighlight',
@@ -432,7 +433,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "tenant" | "tenantDomain" | "tenantSettings" | "user" | "session" | "account" | "verification" | "staffMembership" | "auditLog" | "siteNotice" | "homeHeroSlide" | "homeHighlight" | "homeSettings" | "service" | "formDocument" | "newsNotice" | "fAQ" | "contactSettings" | "mediaAsset" | "cmsDraft"
+    modelProps: "tenant" | "tenantDomain" | "tenantSettings" | "user" | "session" | "account" | "verification" | "staffMembership" | "auditLog" | "staffLoginAttempt" | "siteNotice" | "homeHeroSlide" | "homeHighlight" | "homeSettings" | "service" | "formDocument" | "newsNotice" | "fAQ" | "contactSettings" | "mediaAsset" | "cmsDraft"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1099,6 +1100,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.AuditLogCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.AuditLogCountAggregateOutputType> | number
+        }
+      }
+    }
+    StaffLoginAttempt: {
+      payload: Prisma.$StaffLoginAttemptPayload<ExtArgs>
+      fields: Prisma.StaffLoginAttemptFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.StaffLoginAttemptFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StaffLoginAttemptPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.StaffLoginAttemptFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StaffLoginAttemptPayload>
+        }
+        findFirst: {
+          args: Prisma.StaffLoginAttemptFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StaffLoginAttemptPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.StaffLoginAttemptFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StaffLoginAttemptPayload>
+        }
+        findMany: {
+          args: Prisma.StaffLoginAttemptFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StaffLoginAttemptPayload>[]
+        }
+        create: {
+          args: Prisma.StaffLoginAttemptCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StaffLoginAttemptPayload>
+        }
+        createMany: {
+          args: Prisma.StaffLoginAttemptCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.StaffLoginAttemptCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StaffLoginAttemptPayload>[]
+        }
+        delete: {
+          args: Prisma.StaffLoginAttemptDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StaffLoginAttemptPayload>
+        }
+        update: {
+          args: Prisma.StaffLoginAttemptUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StaffLoginAttemptPayload>
+        }
+        deleteMany: {
+          args: Prisma.StaffLoginAttemptDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.StaffLoginAttemptUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.StaffLoginAttemptUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StaffLoginAttemptPayload>[]
+        }
+        upsert: {
+          args: Prisma.StaffLoginAttemptUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StaffLoginAttemptPayload>
+        }
+        aggregate: {
+          args: Prisma.StaffLoginAttemptAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateStaffLoginAttempt>
+        }
+        groupBy: {
+          args: Prisma.StaffLoginAttemptGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.StaffLoginAttemptGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.StaffLoginAttemptCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.StaffLoginAttemptCountAggregateOutputType> | number
         }
       }
     }
@@ -2078,6 +2153,20 @@ export const AuditLogScalarFieldEnum = {
 export type AuditLogScalarFieldEnum = (typeof AuditLogScalarFieldEnum)[keyof typeof AuditLogScalarFieldEnum]
 
 
+export const StaffLoginAttemptScalarFieldEnum = {
+  id: 'id',
+  key: 'key',
+  email: 'email',
+  ipAddress: 'ipAddress',
+  failures: 'failures',
+  windowStart: 'windowStart',
+  blockedUntil: 'blockedUntil',
+  updatedAt: 'updatedAt'
+} as const
+
+export type StaffLoginAttemptScalarFieldEnum = (typeof StaffLoginAttemptScalarFieldEnum)[keyof typeof StaffLoginAttemptScalarFieldEnum]
+
+
 export const SiteNoticeScalarFieldEnum = {
   id: 'id',
   tenantId: 'tenantId',
@@ -2241,6 +2330,15 @@ export const CmsDraftScalarFieldEnum = {
   payload: 'payload',
   mediaAssetId: 'mediaAssetId',
   createdBy: 'createdBy',
+  assignedTo: 'assignedTo',
+  administratorNote: 'administratorNote',
+  submittedAt: 'submittedAt',
+  returnedAt: 'returnedAt',
+  withdrawnAt: 'withdrawnAt',
+  archivedAt: 'archivedAt',
+  revision: 'revision',
+  publishedBaseVersion: 'publishedBaseVersion',
+  publishedBaseFingerprint: 'publishedBaseFingerprint',
   publishedBy: 'publishedBy',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
@@ -2596,6 +2694,7 @@ export type GlobalOmitConfig = {
   verification?: Prisma.VerificationOmit
   staffMembership?: Prisma.StaffMembershipOmit
   auditLog?: Prisma.AuditLogOmit
+  staffLoginAttempt?: Prisma.StaffLoginAttemptOmit
   siteNotice?: Prisma.SiteNoticeOmit
   homeHeroSlide?: Prisma.HomeHeroSlideOmit
   homeHighlight?: Prisma.HomeHighlightOmit

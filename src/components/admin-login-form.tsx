@@ -2,7 +2,6 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { authClient } from "@/lib/auth-client";
 
 export function AdminLoginForm() {
   const router = useRouter();
@@ -15,15 +14,19 @@ export function AdminLoginForm() {
     setError("");
     const form = new FormData(event.currentTarget);
 
-    const result = await authClient.signIn.email({
-      email: String(form.get("email") ?? ""),
-      password: String(form.get("password") ?? ""),
-      rememberMe: false,
+    const response = await fetch("/api/admin/login", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      credentials: "same-origin",
+      body: JSON.stringify({
+        email: String(form.get("email") ?? ""),
+        password: String(form.get("password") ?? ""),
+      }),
     });
 
     setPending(false);
 
-    if (result.error) {
+    if (!response.ok) {
       setError("The email or password was not recognised.");
       return;
     }

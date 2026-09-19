@@ -10,6 +10,7 @@ export default async function SiteNoticeAdminPage() {
   const tenant = await requireTenant((await headers()).get("host") ?? "");
   const { membership } = await requireStaffMembership(tenant);
   const notice = await db.siteNotice.findUnique({ where: { tenantId: tenant.id } });
+  const draft = await db.cmsDraft.findFirst({ where: { tenantId: tenant.id, kind: "SITE_NOTICE", targetId: `${tenant.id}:site-notice`, status: { in: ["DRAFT", "RETURNED_FOR_CHANGES"] } }, select: { revision: true } });
   const editor = membership.role === "EDITOR";
   return (
     <main className="min-h-screen bg-soft-blue-grey"><div className="site-container py-12">
@@ -18,6 +19,7 @@ export default async function SiteNoticeAdminPage() {
       <p className="mt-2 text-sm text-charcoal/65">Times are entered and displayed in Fiji local time (UTC+12).</p>
       <AdminWorkflowNotice editor={editor} />
       <form action={saveSiteNotice} className="mt-8 max-w-2xl space-y-4 rounded-card border border-deep-navy/10 bg-white p-6 shadow-card">
+        <input type="hidden" name="revision" value={draft?.revision ?? ""} />
         <label className="block text-sm font-semibold">Message<textarea name="message" defaultValue={notice?.message} required maxLength={280} className="mt-2 min-h-28 w-full rounded border p-3" /></label>
         <div className="grid gap-4 sm:grid-cols-2"><label className="text-sm font-semibold">Action text<input name="actionText" defaultValue={notice?.actionText ?? ""} className="mt-2 w-full rounded border p-2" /></label><label className="text-sm font-semibold">Action URL<input name="actionUrl" defaultValue={notice?.actionUrl ?? ""} className="mt-2 w-full rounded border p-2" /></label><label className="text-sm font-semibold">Starts<input name="startsAt" defaultValue={formatFijiDateTime(notice?.startsAt)} type="datetime-local" className="mt-2 w-full rounded border p-2" /></label><label className="text-sm font-semibold">Ends<input name="endsAt" defaultValue={formatFijiDateTime(notice?.endsAt)} type="datetime-local" className="mt-2 w-full rounded border p-2" /></label></div>
         <label className="flex items-center gap-2 text-sm font-semibold"><input name="isEnabled" type="checkbox" defaultChecked={notice?.isEnabled} /> {editor ? "Prepare for approval" : "Show notice when scheduled"}</label>

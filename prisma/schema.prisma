@@ -14,7 +14,10 @@ enum StaffRole {
 
 enum CmsDraftStatus {
   DRAFT
+  WAITING_FOR_APPROVAL
+  RETURNED_FOR_CHANGES
   PUBLISHED
+  WITHDRAWN
   ARCHIVED
 }
 
@@ -106,6 +109,7 @@ model User {
   mediaUploads  MediaAsset[]      @relation("MediaCreator")
   createdDrafts CmsDraft[]       @relation("DraftCreator")
   publishedDrafts CmsDraft[]     @relation("DraftPublisher")
+  assignedDrafts CmsDraft[]      @relation("DraftAssignee")
 
   @@map("users")
 }
@@ -189,6 +193,19 @@ model AuditLog {
   @@index([tenantId, createdAt])
   @@index([actorUserId])
   @@map("audit_logs")
+}
+
+model StaffLoginAttempt {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  email       String   @db.VarChar(320)
+  ipAddress   String?  @db.VarChar(80)
+  failures    Int      @default(0)
+  windowStart DateTime @default(now())
+  blockedUntil DateTime?
+  updatedAt   DateTime @updatedAt
+  @@index([email, ipAddress])
+  @@map("staff_login_attempts")
 }
 
 model SiteNotice {
@@ -366,12 +383,22 @@ model CmsDraft {
   payload       Json
   mediaAssetId  String?
   createdBy     String
+  assignedTo    String?
+  administratorNote String?      @db.VarChar(500)
+  submittedAt   DateTime?
+  returnedAt    DateTime?
+  withdrawnAt   DateTime?
+  archivedAt    DateTime?
+  revision      Int              @default(0)
+  publishedBaseVersion Int?
+  publishedBaseFingerprint String? @db.VarChar(128)
   publishedBy   String?
   createdAt     DateTime         @default(now())
   updatedAt     DateTime         @updatedAt
   publishedAt   DateTime?
   tenant        Tenant           @relation("DraftTenant", fields: [tenantId], references: [id], onDelete: Restrict)
   creator       User             @relation("DraftCreator", fields: [createdBy], references: [id], onDelete: Restrict)
+  assignee      User?            @relation("DraftAssignee", fields: [assignedTo], references: [id], onDelete: SetNull)
   publisher     User?            @relation("DraftPublisher", fields: [publishedBy], references: [id], onDelete: SetNull)
   mediaAsset    MediaAsset?      @relation("DraftMedia", fields: [mediaAssetId], references: [id], onDelete: SetNull)
 
@@ -379,5 +406,6 @@ model CmsDraft {
   @@index([tenantId, kind, targetId, status])
   @@index([createdBy, status])
   @@index([mediaAssetId])
+  @@index([tenantId, assignedTo, status])
   @@map("cms_drafts")
 }

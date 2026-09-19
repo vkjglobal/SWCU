@@ -60,6 +60,7 @@ export const ModelName = {
   Verification: 'Verification',
   StaffMembership: 'StaffMembership',
   AuditLog: 'AuditLog',
+  StaffLoginAttempt: 'StaffLoginAttempt',
   SiteNotice: 'SiteNotice',
   HomeHeroSlide: 'HomeHeroSlide',
   HomeHighlight: 'HomeHighlight',
@@ -210,6 +211,20 @@ export const AuditLogScalarFieldEnum = {
 } as const
 
 export type AuditLogScalarFieldEnum = (typeof AuditLogScalarFieldEnum)[keyof typeof AuditLogScalarFieldEnum]
+
+
+export const StaffLoginAttemptScalarFieldEnum = {
+  id: 'id',
+  key: 'key',
+  email: 'email',
+  ipAddress: 'ipAddress',
+  failures: 'failures',
+  windowStart: 'windowStart',
+  blockedUntil: 'blockedUntil',
+  updatedAt: 'updatedAt'
+} as const
+
+export type StaffLoginAttemptScalarFieldEnum = (typeof StaffLoginAttemptScalarFieldEnum)[keyof typeof StaffLoginAttemptScalarFieldEnum]
 
 
 export const SiteNoticeScalarFieldEnum = {
@@ -375,6 +390,15 @@ export const CmsDraftScalarFieldEnum = {
   payload: 'payload',
   mediaAssetId: 'mediaAssetId',
   createdBy: 'createdBy',
+  assignedTo: 'assignedTo',
+  administratorNote: 'administratorNote',
+  submittedAt: 'submittedAt',
+  returnedAt: 'returnedAt',
+  withdrawnAt: 'withdrawnAt',
+  archivedAt: 'archivedAt',
+  revision: 'revision',
+  publishedBaseVersion: 'publishedBaseVersion',
+  publishedBaseFingerprint: 'publishedBaseFingerprint',
   publishedBy: 'publishedBy',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
