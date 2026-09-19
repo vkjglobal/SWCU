@@ -205,6 +205,12 @@ export type TenantWhereInput = {
   contactSettings?: Prisma.XOR<Prisma.ContactSettingsNullableScalarRelationFilter, Prisma.ContactSettingsWhereInput> | null
   mediaAssets?: Prisma.MediaAssetListRelationFilter
   cmsDrafts?: Prisma.CmsDraftListRelationFilter
+  pageContent?: Prisma.PageContentListRelationFilter
+  leaders?: Prisma.LeadershipRecordListRelationFilter
+  rateFees?: Prisma.RateFeeListRelationFilter
+  calculatorSettings?: Prisma.XOR<Prisma.CalculatorSettingsNullableScalarRelationFilter, Prisma.CalculatorSettingsWhereInput> | null
+  contactSubmissions?: Prisma.ContactSubmissionListRelationFilter
+  contactRateLimits?: Prisma.ContactRateLimitListRelationFilter
 }
 
 export type TenantOrderByWithRelationInput = {
@@ -229,6 +235,12 @@ export type TenantOrderByWithRelationInput = {
   contactSettings?: Prisma.ContactSettingsOrderByWithRelationInput
   mediaAssets?: Prisma.MediaAssetOrderByRelationAggregateInput
   cmsDrafts?: Prisma.CmsDraftOrderByRelationAggregateInput
+  pageContent?: Prisma.PageContentOrderByRelationAggregateInput
+  leaders?: Prisma.LeadershipRecordOrderByRelationAggregateInput
+  rateFees?: Prisma.RateFeeOrderByRelationAggregateInput
+  calculatorSettings?: Prisma.CalculatorSettingsOrderByWithRelationInput
+  contactSubmissions?: Prisma.ContactSubmissionOrderByRelationAggregateInput
+  contactRateLimits?: Prisma.ContactRateLimitOrderByRelationAggregateInput
 }
 
 export type TenantWhereUniqueInput = Prisma.AtLeast<{
@@ -256,6 +268,12 @@ export type TenantWhereUniqueInput = Prisma.AtLeast<{
   contactSettings?: Prisma.XOR<Prisma.ContactSettingsNullableScalarRelationFilter, Prisma.ContactSettingsWhereInput> | null
   mediaAssets?: Prisma.MediaAssetListRelationFilter
   cmsDrafts?: Prisma.CmsDraftListRelationFilter
+  pageContent?: Prisma.PageContentListRelationFilter
+  leaders?: Prisma.LeadershipRecordListRelationFilter
+  rateFees?: Prisma.RateFeeListRelationFilter
+  calculatorSettings?: Prisma.XOR<Prisma.CalculatorSettingsNullableScalarRelationFilter, Prisma.CalculatorSettingsWhereInput> | null
+  contactSubmissions?: Prisma.ContactSubmissionListRelationFilter
+  contactRateLimits?: Prisma.ContactRateLimitListRelationFilter
 }, "id" | "slug">
 
 export type TenantOrderByWithAggregationInput = {
@@ -304,6 +322,12 @@ export type TenantCreateInput = {
   contactSettings?: Prisma.ContactSettingsCreateNestedOneWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutTenantInput
   cmsDrafts?: Prisma.CmsDraftCreateNestedManyWithoutTenantInput
+  pageContent?: Prisma.PageContentCreateNestedManyWithoutTenantInput
+  leaders?: Prisma.LeadershipRecordCreateNestedManyWithoutTenantInput
+  rateFees?: Prisma.RateFeeCreateNestedManyWithoutTenantInput
+  calculatorSettings?: Prisma.CalculatorSettingsCreateNestedOneWithoutTenantInput
+  contactSubmissions?: Prisma.ContactSubmissionCreateNestedManyWithoutTenantInput
+  contactRateLimits?: Prisma.ContactRateLimitCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateInput = {
@@ -328,6 +352,12 @@ export type TenantUncheckedCreateInput = {
   contactSettings?: Prisma.ContactSettingsUncheckedCreateNestedOneWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutTenantInput
   cmsDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutTenantInput
+  pageContent?: Prisma.PageContentUncheckedCreateNestedManyWithoutTenantInput
+  leaders?: Prisma.LeadershipRecordUncheckedCreateNestedManyWithoutTenantInput
+  rateFees?: Prisma.RateFeeUncheckedCreateNestedManyWithoutTenantInput
+  calculatorSettings?: Prisma.CalculatorSettingsUncheckedCreateNestedOneWithoutTenantInput
+  contactSubmissions?: Prisma.ContactSubmissionUncheckedCreateNestedManyWithoutTenantInput
+  contactRateLimits?: Prisma.ContactRateLimitUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUpdateInput = {
@@ -352,6 +382,12 @@ export type TenantUpdateInput = {
   contactSettings?: Prisma.ContactSettingsUpdateOneWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUpdateManyWithoutTenantNestedInput
   cmsDrafts?: Prisma.CmsDraftUpdateManyWithoutTenantNestedInput
+  pageContent?: Prisma.PageContentUpdateManyWithoutTenantNestedInput
+  leaders?: Prisma.LeadershipRecordUpdateManyWithoutTenantNestedInput
+  rateFees?: Prisma.RateFeeUpdateManyWithoutTenantNestedInput
+  calculatorSettings?: Prisma.CalculatorSettingsUpdateOneWithoutTenantNestedInput
+  contactSubmissions?: Prisma.ContactSubmissionUpdateManyWithoutTenantNestedInput
+  contactRateLimits?: Prisma.ContactRateLimitUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateInput = {
@@ -376,6 +412,12 @@ export type TenantUncheckedUpdateInput = {
   contactSettings?: Prisma.ContactSettingsUncheckedUpdateOneWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutTenantNestedInput
   cmsDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutTenantNestedInput
+  pageContent?: Prisma.PageContentUncheckedUpdateManyWithoutTenantNestedInput
+  leaders?: Prisma.LeadershipRecordUncheckedUpdateManyWithoutTenantNestedInput
+  rateFees?: Prisma.RateFeeUncheckedUpdateManyWithoutTenantNestedInput
+  calculatorSettings?: Prisma.CalculatorSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  contactSubmissions?: Prisma.ContactSubmissionUncheckedUpdateManyWithoutTenantNestedInput
+  contactRateLimits?: Prisma.ContactRateLimitUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateManyInput = {
@@ -659,6 +701,90 @@ export type TenantUpdateOneRequiredWithoutCmsDraftsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutCmsDraftsInput, Prisma.TenantUpdateWithoutCmsDraftsInput>, Prisma.TenantUncheckedUpdateWithoutCmsDraftsInput>
 }
 
+export type TenantCreateNestedOneWithoutPageContentInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutPageContentInput, Prisma.TenantUncheckedCreateWithoutPageContentInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutPageContentInput
+  connect?: Prisma.TenantWhereUniqueInput
+}
+
+export type TenantUpdateOneRequiredWithoutPageContentNestedInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutPageContentInput, Prisma.TenantUncheckedCreateWithoutPageContentInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutPageContentInput
+  upsert?: Prisma.TenantUpsertWithoutPageContentInput
+  connect?: Prisma.TenantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutPageContentInput, Prisma.TenantUpdateWithoutPageContentInput>, Prisma.TenantUncheckedUpdateWithoutPageContentInput>
+}
+
+export type TenantCreateNestedOneWithoutLeadersInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutLeadersInput, Prisma.TenantUncheckedCreateWithoutLeadersInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutLeadersInput
+  connect?: Prisma.TenantWhereUniqueInput
+}
+
+export type TenantUpdateOneRequiredWithoutLeadersNestedInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutLeadersInput, Prisma.TenantUncheckedCreateWithoutLeadersInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutLeadersInput
+  upsert?: Prisma.TenantUpsertWithoutLeadersInput
+  connect?: Prisma.TenantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutLeadersInput, Prisma.TenantUpdateWithoutLeadersInput>, Prisma.TenantUncheckedUpdateWithoutLeadersInput>
+}
+
+export type TenantCreateNestedOneWithoutRateFeesInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutRateFeesInput, Prisma.TenantUncheckedCreateWithoutRateFeesInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutRateFeesInput
+  connect?: Prisma.TenantWhereUniqueInput
+}
+
+export type TenantUpdateOneRequiredWithoutRateFeesNestedInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutRateFeesInput, Prisma.TenantUncheckedCreateWithoutRateFeesInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutRateFeesInput
+  upsert?: Prisma.TenantUpsertWithoutRateFeesInput
+  connect?: Prisma.TenantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutRateFeesInput, Prisma.TenantUpdateWithoutRateFeesInput>, Prisma.TenantUncheckedUpdateWithoutRateFeesInput>
+}
+
+export type TenantCreateNestedOneWithoutCalculatorSettingsInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutCalculatorSettingsInput, Prisma.TenantUncheckedCreateWithoutCalculatorSettingsInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutCalculatorSettingsInput
+  connect?: Prisma.TenantWhereUniqueInput
+}
+
+export type TenantUpdateOneRequiredWithoutCalculatorSettingsNestedInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutCalculatorSettingsInput, Prisma.TenantUncheckedCreateWithoutCalculatorSettingsInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutCalculatorSettingsInput
+  upsert?: Prisma.TenantUpsertWithoutCalculatorSettingsInput
+  connect?: Prisma.TenantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutCalculatorSettingsInput, Prisma.TenantUpdateWithoutCalculatorSettingsInput>, Prisma.TenantUncheckedUpdateWithoutCalculatorSettingsInput>
+}
+
+export type TenantCreateNestedOneWithoutContactSubmissionsInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutContactSubmissionsInput, Prisma.TenantUncheckedCreateWithoutContactSubmissionsInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutContactSubmissionsInput
+  connect?: Prisma.TenantWhereUniqueInput
+}
+
+export type TenantUpdateOneRequiredWithoutContactSubmissionsNestedInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutContactSubmissionsInput, Prisma.TenantUncheckedCreateWithoutContactSubmissionsInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutContactSubmissionsInput
+  upsert?: Prisma.TenantUpsertWithoutContactSubmissionsInput
+  connect?: Prisma.TenantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutContactSubmissionsInput, Prisma.TenantUpdateWithoutContactSubmissionsInput>, Prisma.TenantUncheckedUpdateWithoutContactSubmissionsInput>
+}
+
+export type TenantCreateNestedOneWithoutContactRateLimitsInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutContactRateLimitsInput, Prisma.TenantUncheckedCreateWithoutContactRateLimitsInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutContactRateLimitsInput
+  connect?: Prisma.TenantWhereUniqueInput
+}
+
+export type TenantUpdateOneRequiredWithoutContactRateLimitsNestedInput = {
+  create?: Prisma.XOR<Prisma.TenantCreateWithoutContactRateLimitsInput, Prisma.TenantUncheckedCreateWithoutContactRateLimitsInput>
+  connectOrCreate?: Prisma.TenantCreateOrConnectWithoutContactRateLimitsInput
+  upsert?: Prisma.TenantUpsertWithoutContactRateLimitsInput
+  connect?: Prisma.TenantWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TenantUpdateToOneWithWhereWithoutContactRateLimitsInput, Prisma.TenantUpdateWithoutContactRateLimitsInput>, Prisma.TenantUncheckedUpdateWithoutContactRateLimitsInput>
+}
+
 export type TenantCreateWithoutDomainsInput = {
   id?: string
   slug: string
@@ -680,6 +806,12 @@ export type TenantCreateWithoutDomainsInput = {
   contactSettings?: Prisma.ContactSettingsCreateNestedOneWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutTenantInput
   cmsDrafts?: Prisma.CmsDraftCreateNestedManyWithoutTenantInput
+  pageContent?: Prisma.PageContentCreateNestedManyWithoutTenantInput
+  leaders?: Prisma.LeadershipRecordCreateNestedManyWithoutTenantInput
+  rateFees?: Prisma.RateFeeCreateNestedManyWithoutTenantInput
+  calculatorSettings?: Prisma.CalculatorSettingsCreateNestedOneWithoutTenantInput
+  contactSubmissions?: Prisma.ContactSubmissionCreateNestedManyWithoutTenantInput
+  contactRateLimits?: Prisma.ContactRateLimitCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutDomainsInput = {
@@ -703,6 +835,12 @@ export type TenantUncheckedCreateWithoutDomainsInput = {
   contactSettings?: Prisma.ContactSettingsUncheckedCreateNestedOneWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutTenantInput
   cmsDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutTenantInput
+  pageContent?: Prisma.PageContentUncheckedCreateNestedManyWithoutTenantInput
+  leaders?: Prisma.LeadershipRecordUncheckedCreateNestedManyWithoutTenantInput
+  rateFees?: Prisma.RateFeeUncheckedCreateNestedManyWithoutTenantInput
+  calculatorSettings?: Prisma.CalculatorSettingsUncheckedCreateNestedOneWithoutTenantInput
+  contactSubmissions?: Prisma.ContactSubmissionUncheckedCreateNestedManyWithoutTenantInput
+  contactRateLimits?: Prisma.ContactRateLimitUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutDomainsInput = {
@@ -742,6 +880,12 @@ export type TenantUpdateWithoutDomainsInput = {
   contactSettings?: Prisma.ContactSettingsUpdateOneWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUpdateManyWithoutTenantNestedInput
   cmsDrafts?: Prisma.CmsDraftUpdateManyWithoutTenantNestedInput
+  pageContent?: Prisma.PageContentUpdateManyWithoutTenantNestedInput
+  leaders?: Prisma.LeadershipRecordUpdateManyWithoutTenantNestedInput
+  rateFees?: Prisma.RateFeeUpdateManyWithoutTenantNestedInput
+  calculatorSettings?: Prisma.CalculatorSettingsUpdateOneWithoutTenantNestedInput
+  contactSubmissions?: Prisma.ContactSubmissionUpdateManyWithoutTenantNestedInput
+  contactRateLimits?: Prisma.ContactRateLimitUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutDomainsInput = {
@@ -765,6 +909,12 @@ export type TenantUncheckedUpdateWithoutDomainsInput = {
   contactSettings?: Prisma.ContactSettingsUncheckedUpdateOneWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutTenantNestedInput
   cmsDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutTenantNestedInput
+  pageContent?: Prisma.PageContentUncheckedUpdateManyWithoutTenantNestedInput
+  leaders?: Prisma.LeadershipRecordUncheckedUpdateManyWithoutTenantNestedInput
+  rateFees?: Prisma.RateFeeUncheckedUpdateManyWithoutTenantNestedInput
+  calculatorSettings?: Prisma.CalculatorSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  contactSubmissions?: Prisma.ContactSubmissionUncheckedUpdateManyWithoutTenantNestedInput
+  contactRateLimits?: Prisma.ContactRateLimitUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutSettingsInput = {
@@ -788,6 +938,12 @@ export type TenantCreateWithoutSettingsInput = {
   contactSettings?: Prisma.ContactSettingsCreateNestedOneWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutTenantInput
   cmsDrafts?: Prisma.CmsDraftCreateNestedManyWithoutTenantInput
+  pageContent?: Prisma.PageContentCreateNestedManyWithoutTenantInput
+  leaders?: Prisma.LeadershipRecordCreateNestedManyWithoutTenantInput
+  rateFees?: Prisma.RateFeeCreateNestedManyWithoutTenantInput
+  calculatorSettings?: Prisma.CalculatorSettingsCreateNestedOneWithoutTenantInput
+  contactSubmissions?: Prisma.ContactSubmissionCreateNestedManyWithoutTenantInput
+  contactRateLimits?: Prisma.ContactRateLimitCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutSettingsInput = {
@@ -811,6 +967,12 @@ export type TenantUncheckedCreateWithoutSettingsInput = {
   contactSettings?: Prisma.ContactSettingsUncheckedCreateNestedOneWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutTenantInput
   cmsDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutTenantInput
+  pageContent?: Prisma.PageContentUncheckedCreateNestedManyWithoutTenantInput
+  leaders?: Prisma.LeadershipRecordUncheckedCreateNestedManyWithoutTenantInput
+  rateFees?: Prisma.RateFeeUncheckedCreateNestedManyWithoutTenantInput
+  calculatorSettings?: Prisma.CalculatorSettingsUncheckedCreateNestedOneWithoutTenantInput
+  contactSubmissions?: Prisma.ContactSubmissionUncheckedCreateNestedManyWithoutTenantInput
+  contactRateLimits?: Prisma.ContactRateLimitUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutSettingsInput = {
@@ -850,6 +1012,12 @@ export type TenantUpdateWithoutSettingsInput = {
   contactSettings?: Prisma.ContactSettingsUpdateOneWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUpdateManyWithoutTenantNestedInput
   cmsDrafts?: Prisma.CmsDraftUpdateManyWithoutTenantNestedInput
+  pageContent?: Prisma.PageContentUpdateManyWithoutTenantNestedInput
+  leaders?: Prisma.LeadershipRecordUpdateManyWithoutTenantNestedInput
+  rateFees?: Prisma.RateFeeUpdateManyWithoutTenantNestedInput
+  calculatorSettings?: Prisma.CalculatorSettingsUpdateOneWithoutTenantNestedInput
+  contactSubmissions?: Prisma.ContactSubmissionUpdateManyWithoutTenantNestedInput
+  contactRateLimits?: Prisma.ContactRateLimitUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutSettingsInput = {
@@ -873,6 +1041,12 @@ export type TenantUncheckedUpdateWithoutSettingsInput = {
   contactSettings?: Prisma.ContactSettingsUncheckedUpdateOneWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutTenantNestedInput
   cmsDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutTenantNestedInput
+  pageContent?: Prisma.PageContentUncheckedUpdateManyWithoutTenantNestedInput
+  leaders?: Prisma.LeadershipRecordUncheckedUpdateManyWithoutTenantNestedInput
+  rateFees?: Prisma.RateFeeUncheckedUpdateManyWithoutTenantNestedInput
+  calculatorSettings?: Prisma.CalculatorSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  contactSubmissions?: Prisma.ContactSubmissionUncheckedUpdateManyWithoutTenantNestedInput
+  contactRateLimits?: Prisma.ContactRateLimitUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutStaffInput = {
@@ -896,6 +1070,12 @@ export type TenantCreateWithoutStaffInput = {
   contactSettings?: Prisma.ContactSettingsCreateNestedOneWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutTenantInput
   cmsDrafts?: Prisma.CmsDraftCreateNestedManyWithoutTenantInput
+  pageContent?: Prisma.PageContentCreateNestedManyWithoutTenantInput
+  leaders?: Prisma.LeadershipRecordCreateNestedManyWithoutTenantInput
+  rateFees?: Prisma.RateFeeCreateNestedManyWithoutTenantInput
+  calculatorSettings?: Prisma.CalculatorSettingsCreateNestedOneWithoutTenantInput
+  contactSubmissions?: Prisma.ContactSubmissionCreateNestedManyWithoutTenantInput
+  contactRateLimits?: Prisma.ContactRateLimitCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutStaffInput = {
@@ -919,6 +1099,12 @@ export type TenantUncheckedCreateWithoutStaffInput = {
   contactSettings?: Prisma.ContactSettingsUncheckedCreateNestedOneWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutTenantInput
   cmsDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutTenantInput
+  pageContent?: Prisma.PageContentUncheckedCreateNestedManyWithoutTenantInput
+  leaders?: Prisma.LeadershipRecordUncheckedCreateNestedManyWithoutTenantInput
+  rateFees?: Prisma.RateFeeUncheckedCreateNestedManyWithoutTenantInput
+  calculatorSettings?: Prisma.CalculatorSettingsUncheckedCreateNestedOneWithoutTenantInput
+  contactSubmissions?: Prisma.ContactSubmissionUncheckedCreateNestedManyWithoutTenantInput
+  contactRateLimits?: Prisma.ContactRateLimitUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutStaffInput = {
@@ -958,6 +1144,12 @@ export type TenantUpdateWithoutStaffInput = {
   contactSettings?: Prisma.ContactSettingsUpdateOneWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUpdateManyWithoutTenantNestedInput
   cmsDrafts?: Prisma.CmsDraftUpdateManyWithoutTenantNestedInput
+  pageContent?: Prisma.PageContentUpdateManyWithoutTenantNestedInput
+  leaders?: Prisma.LeadershipRecordUpdateManyWithoutTenantNestedInput
+  rateFees?: Prisma.RateFeeUpdateManyWithoutTenantNestedInput
+  calculatorSettings?: Prisma.CalculatorSettingsUpdateOneWithoutTenantNestedInput
+  contactSubmissions?: Prisma.ContactSubmissionUpdateManyWithoutTenantNestedInput
+  contactRateLimits?: Prisma.ContactRateLimitUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutStaffInput = {
@@ -981,6 +1173,12 @@ export type TenantUncheckedUpdateWithoutStaffInput = {
   contactSettings?: Prisma.ContactSettingsUncheckedUpdateOneWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutTenantNestedInput
   cmsDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutTenantNestedInput
+  pageContent?: Prisma.PageContentUncheckedUpdateManyWithoutTenantNestedInput
+  leaders?: Prisma.LeadershipRecordUncheckedUpdateManyWithoutTenantNestedInput
+  rateFees?: Prisma.RateFeeUncheckedUpdateManyWithoutTenantNestedInput
+  calculatorSettings?: Prisma.CalculatorSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  contactSubmissions?: Prisma.ContactSubmissionUncheckedUpdateManyWithoutTenantNestedInput
+  contactRateLimits?: Prisma.ContactRateLimitUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutAuditLogsInput = {
@@ -1004,6 +1202,12 @@ export type TenantCreateWithoutAuditLogsInput = {
   contactSettings?: Prisma.ContactSettingsCreateNestedOneWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutTenantInput
   cmsDrafts?: Prisma.CmsDraftCreateNestedManyWithoutTenantInput
+  pageContent?: Prisma.PageContentCreateNestedManyWithoutTenantInput
+  leaders?: Prisma.LeadershipRecordCreateNestedManyWithoutTenantInput
+  rateFees?: Prisma.RateFeeCreateNestedManyWithoutTenantInput
+  calculatorSettings?: Prisma.CalculatorSettingsCreateNestedOneWithoutTenantInput
+  contactSubmissions?: Prisma.ContactSubmissionCreateNestedManyWithoutTenantInput
+  contactRateLimits?: Prisma.ContactRateLimitCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutAuditLogsInput = {
@@ -1027,6 +1231,12 @@ export type TenantUncheckedCreateWithoutAuditLogsInput = {
   contactSettings?: Prisma.ContactSettingsUncheckedCreateNestedOneWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutTenantInput
   cmsDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutTenantInput
+  pageContent?: Prisma.PageContentUncheckedCreateNestedManyWithoutTenantInput
+  leaders?: Prisma.LeadershipRecordUncheckedCreateNestedManyWithoutTenantInput
+  rateFees?: Prisma.RateFeeUncheckedCreateNestedManyWithoutTenantInput
+  calculatorSettings?: Prisma.CalculatorSettingsUncheckedCreateNestedOneWithoutTenantInput
+  contactSubmissions?: Prisma.ContactSubmissionUncheckedCreateNestedManyWithoutTenantInput
+  contactRateLimits?: Prisma.ContactRateLimitUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutAuditLogsInput = {
@@ -1066,6 +1276,12 @@ export type TenantUpdateWithoutAuditLogsInput = {
   contactSettings?: Prisma.ContactSettingsUpdateOneWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUpdateManyWithoutTenantNestedInput
   cmsDrafts?: Prisma.CmsDraftUpdateManyWithoutTenantNestedInput
+  pageContent?: Prisma.PageContentUpdateManyWithoutTenantNestedInput
+  leaders?: Prisma.LeadershipRecordUpdateManyWithoutTenantNestedInput
+  rateFees?: Prisma.RateFeeUpdateManyWithoutTenantNestedInput
+  calculatorSettings?: Prisma.CalculatorSettingsUpdateOneWithoutTenantNestedInput
+  contactSubmissions?: Prisma.ContactSubmissionUpdateManyWithoutTenantNestedInput
+  contactRateLimits?: Prisma.ContactRateLimitUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutAuditLogsInput = {
@@ -1089,6 +1305,12 @@ export type TenantUncheckedUpdateWithoutAuditLogsInput = {
   contactSettings?: Prisma.ContactSettingsUncheckedUpdateOneWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutTenantNestedInput
   cmsDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutTenantNestedInput
+  pageContent?: Prisma.PageContentUncheckedUpdateManyWithoutTenantNestedInput
+  leaders?: Prisma.LeadershipRecordUncheckedUpdateManyWithoutTenantNestedInput
+  rateFees?: Prisma.RateFeeUncheckedUpdateManyWithoutTenantNestedInput
+  calculatorSettings?: Prisma.CalculatorSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  contactSubmissions?: Prisma.ContactSubmissionUncheckedUpdateManyWithoutTenantNestedInput
+  contactRateLimits?: Prisma.ContactRateLimitUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutSiteNoticesInput = {
@@ -1112,6 +1334,12 @@ export type TenantCreateWithoutSiteNoticesInput = {
   contactSettings?: Prisma.ContactSettingsCreateNestedOneWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutTenantInput
   cmsDrafts?: Prisma.CmsDraftCreateNestedManyWithoutTenantInput
+  pageContent?: Prisma.PageContentCreateNestedManyWithoutTenantInput
+  leaders?: Prisma.LeadershipRecordCreateNestedManyWithoutTenantInput
+  rateFees?: Prisma.RateFeeCreateNestedManyWithoutTenantInput
+  calculatorSettings?: Prisma.CalculatorSettingsCreateNestedOneWithoutTenantInput
+  contactSubmissions?: Prisma.ContactSubmissionCreateNestedManyWithoutTenantInput
+  contactRateLimits?: Prisma.ContactRateLimitCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutSiteNoticesInput = {
@@ -1135,6 +1363,12 @@ export type TenantUncheckedCreateWithoutSiteNoticesInput = {
   contactSettings?: Prisma.ContactSettingsUncheckedCreateNestedOneWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutTenantInput
   cmsDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutTenantInput
+  pageContent?: Prisma.PageContentUncheckedCreateNestedManyWithoutTenantInput
+  leaders?: Prisma.LeadershipRecordUncheckedCreateNestedManyWithoutTenantInput
+  rateFees?: Prisma.RateFeeUncheckedCreateNestedManyWithoutTenantInput
+  calculatorSettings?: Prisma.CalculatorSettingsUncheckedCreateNestedOneWithoutTenantInput
+  contactSubmissions?: Prisma.ContactSubmissionUncheckedCreateNestedManyWithoutTenantInput
+  contactRateLimits?: Prisma.ContactRateLimitUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutSiteNoticesInput = {
@@ -1174,6 +1408,12 @@ export type TenantUpdateWithoutSiteNoticesInput = {
   contactSettings?: Prisma.ContactSettingsUpdateOneWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUpdateManyWithoutTenantNestedInput
   cmsDrafts?: Prisma.CmsDraftUpdateManyWithoutTenantNestedInput
+  pageContent?: Prisma.PageContentUpdateManyWithoutTenantNestedInput
+  leaders?: Prisma.LeadershipRecordUpdateManyWithoutTenantNestedInput
+  rateFees?: Prisma.RateFeeUpdateManyWithoutTenantNestedInput
+  calculatorSettings?: Prisma.CalculatorSettingsUpdateOneWithoutTenantNestedInput
+  contactSubmissions?: Prisma.ContactSubmissionUpdateManyWithoutTenantNestedInput
+  contactRateLimits?: Prisma.ContactRateLimitUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutSiteNoticesInput = {
@@ -1197,6 +1437,12 @@ export type TenantUncheckedUpdateWithoutSiteNoticesInput = {
   contactSettings?: Prisma.ContactSettingsUncheckedUpdateOneWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutTenantNestedInput
   cmsDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutTenantNestedInput
+  pageContent?: Prisma.PageContentUncheckedUpdateManyWithoutTenantNestedInput
+  leaders?: Prisma.LeadershipRecordUncheckedUpdateManyWithoutTenantNestedInput
+  rateFees?: Prisma.RateFeeUncheckedUpdateManyWithoutTenantNestedInput
+  calculatorSettings?: Prisma.CalculatorSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  contactSubmissions?: Prisma.ContactSubmissionUncheckedUpdateManyWithoutTenantNestedInput
+  contactRateLimits?: Prisma.ContactRateLimitUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutHeroSlidesInput = {
@@ -1220,6 +1466,12 @@ export type TenantCreateWithoutHeroSlidesInput = {
   contactSettings?: Prisma.ContactSettingsCreateNestedOneWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutTenantInput
   cmsDrafts?: Prisma.CmsDraftCreateNestedManyWithoutTenantInput
+  pageContent?: Prisma.PageContentCreateNestedManyWithoutTenantInput
+  leaders?: Prisma.LeadershipRecordCreateNestedManyWithoutTenantInput
+  rateFees?: Prisma.RateFeeCreateNestedManyWithoutTenantInput
+  calculatorSettings?: Prisma.CalculatorSettingsCreateNestedOneWithoutTenantInput
+  contactSubmissions?: Prisma.ContactSubmissionCreateNestedManyWithoutTenantInput
+  contactRateLimits?: Prisma.ContactRateLimitCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutHeroSlidesInput = {
@@ -1243,6 +1495,12 @@ export type TenantUncheckedCreateWithoutHeroSlidesInput = {
   contactSettings?: Prisma.ContactSettingsUncheckedCreateNestedOneWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutTenantInput
   cmsDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutTenantInput
+  pageContent?: Prisma.PageContentUncheckedCreateNestedManyWithoutTenantInput
+  leaders?: Prisma.LeadershipRecordUncheckedCreateNestedManyWithoutTenantInput
+  rateFees?: Prisma.RateFeeUncheckedCreateNestedManyWithoutTenantInput
+  calculatorSettings?: Prisma.CalculatorSettingsUncheckedCreateNestedOneWithoutTenantInput
+  contactSubmissions?: Prisma.ContactSubmissionUncheckedCreateNestedManyWithoutTenantInput
+  contactRateLimits?: Prisma.ContactRateLimitUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutHeroSlidesInput = {
@@ -1282,6 +1540,12 @@ export type TenantUpdateWithoutHeroSlidesInput = {
   contactSettings?: Prisma.ContactSettingsUpdateOneWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUpdateManyWithoutTenantNestedInput
   cmsDrafts?: Prisma.CmsDraftUpdateManyWithoutTenantNestedInput
+  pageContent?: Prisma.PageContentUpdateManyWithoutTenantNestedInput
+  leaders?: Prisma.LeadershipRecordUpdateManyWithoutTenantNestedInput
+  rateFees?: Prisma.RateFeeUpdateManyWithoutTenantNestedInput
+  calculatorSettings?: Prisma.CalculatorSettingsUpdateOneWithoutTenantNestedInput
+  contactSubmissions?: Prisma.ContactSubmissionUpdateManyWithoutTenantNestedInput
+  contactRateLimits?: Prisma.ContactRateLimitUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutHeroSlidesInput = {
@@ -1305,6 +1569,12 @@ export type TenantUncheckedUpdateWithoutHeroSlidesInput = {
   contactSettings?: Prisma.ContactSettingsUncheckedUpdateOneWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutTenantNestedInput
   cmsDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutTenantNestedInput
+  pageContent?: Prisma.PageContentUncheckedUpdateManyWithoutTenantNestedInput
+  leaders?: Prisma.LeadershipRecordUncheckedUpdateManyWithoutTenantNestedInput
+  rateFees?: Prisma.RateFeeUncheckedUpdateManyWithoutTenantNestedInput
+  calculatorSettings?: Prisma.CalculatorSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  contactSubmissions?: Prisma.ContactSubmissionUncheckedUpdateManyWithoutTenantNestedInput
+  contactRateLimits?: Prisma.ContactRateLimitUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutHighlightsInput = {
@@ -1328,6 +1598,12 @@ export type TenantCreateWithoutHighlightsInput = {
   contactSettings?: Prisma.ContactSettingsCreateNestedOneWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutTenantInput
   cmsDrafts?: Prisma.CmsDraftCreateNestedManyWithoutTenantInput
+  pageContent?: Prisma.PageContentCreateNestedManyWithoutTenantInput
+  leaders?: Prisma.LeadershipRecordCreateNestedManyWithoutTenantInput
+  rateFees?: Prisma.RateFeeCreateNestedManyWithoutTenantInput
+  calculatorSettings?: Prisma.CalculatorSettingsCreateNestedOneWithoutTenantInput
+  contactSubmissions?: Prisma.ContactSubmissionCreateNestedManyWithoutTenantInput
+  contactRateLimits?: Prisma.ContactRateLimitCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutHighlightsInput = {
@@ -1351,6 +1627,12 @@ export type TenantUncheckedCreateWithoutHighlightsInput = {
   contactSettings?: Prisma.ContactSettingsUncheckedCreateNestedOneWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutTenantInput
   cmsDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutTenantInput
+  pageContent?: Prisma.PageContentUncheckedCreateNestedManyWithoutTenantInput
+  leaders?: Prisma.LeadershipRecordUncheckedCreateNestedManyWithoutTenantInput
+  rateFees?: Prisma.RateFeeUncheckedCreateNestedManyWithoutTenantInput
+  calculatorSettings?: Prisma.CalculatorSettingsUncheckedCreateNestedOneWithoutTenantInput
+  contactSubmissions?: Prisma.ContactSubmissionUncheckedCreateNestedManyWithoutTenantInput
+  contactRateLimits?: Prisma.ContactRateLimitUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutHighlightsInput = {
@@ -1390,6 +1672,12 @@ export type TenantUpdateWithoutHighlightsInput = {
   contactSettings?: Prisma.ContactSettingsUpdateOneWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUpdateManyWithoutTenantNestedInput
   cmsDrafts?: Prisma.CmsDraftUpdateManyWithoutTenantNestedInput
+  pageContent?: Prisma.PageContentUpdateManyWithoutTenantNestedInput
+  leaders?: Prisma.LeadershipRecordUpdateManyWithoutTenantNestedInput
+  rateFees?: Prisma.RateFeeUpdateManyWithoutTenantNestedInput
+  calculatorSettings?: Prisma.CalculatorSettingsUpdateOneWithoutTenantNestedInput
+  contactSubmissions?: Prisma.ContactSubmissionUpdateManyWithoutTenantNestedInput
+  contactRateLimits?: Prisma.ContactRateLimitUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutHighlightsInput = {
@@ -1413,6 +1701,12 @@ export type TenantUncheckedUpdateWithoutHighlightsInput = {
   contactSettings?: Prisma.ContactSettingsUncheckedUpdateOneWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutTenantNestedInput
   cmsDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutTenantNestedInput
+  pageContent?: Prisma.PageContentUncheckedUpdateManyWithoutTenantNestedInput
+  leaders?: Prisma.LeadershipRecordUncheckedUpdateManyWithoutTenantNestedInput
+  rateFees?: Prisma.RateFeeUncheckedUpdateManyWithoutTenantNestedInput
+  calculatorSettings?: Prisma.CalculatorSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  contactSubmissions?: Prisma.ContactSubmissionUncheckedUpdateManyWithoutTenantNestedInput
+  contactRateLimits?: Prisma.ContactRateLimitUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutHomeSettingsInput = {
@@ -1436,6 +1730,12 @@ export type TenantCreateWithoutHomeSettingsInput = {
   contactSettings?: Prisma.ContactSettingsCreateNestedOneWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutTenantInput
   cmsDrafts?: Prisma.CmsDraftCreateNestedManyWithoutTenantInput
+  pageContent?: Prisma.PageContentCreateNestedManyWithoutTenantInput
+  leaders?: Prisma.LeadershipRecordCreateNestedManyWithoutTenantInput
+  rateFees?: Prisma.RateFeeCreateNestedManyWithoutTenantInput
+  calculatorSettings?: Prisma.CalculatorSettingsCreateNestedOneWithoutTenantInput
+  contactSubmissions?: Prisma.ContactSubmissionCreateNestedManyWithoutTenantInput
+  contactRateLimits?: Prisma.ContactRateLimitCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutHomeSettingsInput = {
@@ -1459,6 +1759,12 @@ export type TenantUncheckedCreateWithoutHomeSettingsInput = {
   contactSettings?: Prisma.ContactSettingsUncheckedCreateNestedOneWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutTenantInput
   cmsDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutTenantInput
+  pageContent?: Prisma.PageContentUncheckedCreateNestedManyWithoutTenantInput
+  leaders?: Prisma.LeadershipRecordUncheckedCreateNestedManyWithoutTenantInput
+  rateFees?: Prisma.RateFeeUncheckedCreateNestedManyWithoutTenantInput
+  calculatorSettings?: Prisma.CalculatorSettingsUncheckedCreateNestedOneWithoutTenantInput
+  contactSubmissions?: Prisma.ContactSubmissionUncheckedCreateNestedManyWithoutTenantInput
+  contactRateLimits?: Prisma.ContactRateLimitUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutHomeSettingsInput = {
@@ -1498,6 +1804,12 @@ export type TenantUpdateWithoutHomeSettingsInput = {
   contactSettings?: Prisma.ContactSettingsUpdateOneWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUpdateManyWithoutTenantNestedInput
   cmsDrafts?: Prisma.CmsDraftUpdateManyWithoutTenantNestedInput
+  pageContent?: Prisma.PageContentUpdateManyWithoutTenantNestedInput
+  leaders?: Prisma.LeadershipRecordUpdateManyWithoutTenantNestedInput
+  rateFees?: Prisma.RateFeeUpdateManyWithoutTenantNestedInput
+  calculatorSettings?: Prisma.CalculatorSettingsUpdateOneWithoutTenantNestedInput
+  contactSubmissions?: Prisma.ContactSubmissionUpdateManyWithoutTenantNestedInput
+  contactRateLimits?: Prisma.ContactRateLimitUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutHomeSettingsInput = {
@@ -1521,6 +1833,12 @@ export type TenantUncheckedUpdateWithoutHomeSettingsInput = {
   contactSettings?: Prisma.ContactSettingsUncheckedUpdateOneWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutTenantNestedInput
   cmsDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutTenantNestedInput
+  pageContent?: Prisma.PageContentUncheckedUpdateManyWithoutTenantNestedInput
+  leaders?: Prisma.LeadershipRecordUncheckedUpdateManyWithoutTenantNestedInput
+  rateFees?: Prisma.RateFeeUncheckedUpdateManyWithoutTenantNestedInput
+  calculatorSettings?: Prisma.CalculatorSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  contactSubmissions?: Prisma.ContactSubmissionUncheckedUpdateManyWithoutTenantNestedInput
+  contactRateLimits?: Prisma.ContactRateLimitUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutServicesInput = {
@@ -1544,6 +1862,12 @@ export type TenantCreateWithoutServicesInput = {
   contactSettings?: Prisma.ContactSettingsCreateNestedOneWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutTenantInput
   cmsDrafts?: Prisma.CmsDraftCreateNestedManyWithoutTenantInput
+  pageContent?: Prisma.PageContentCreateNestedManyWithoutTenantInput
+  leaders?: Prisma.LeadershipRecordCreateNestedManyWithoutTenantInput
+  rateFees?: Prisma.RateFeeCreateNestedManyWithoutTenantInput
+  calculatorSettings?: Prisma.CalculatorSettingsCreateNestedOneWithoutTenantInput
+  contactSubmissions?: Prisma.ContactSubmissionCreateNestedManyWithoutTenantInput
+  contactRateLimits?: Prisma.ContactRateLimitCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutServicesInput = {
@@ -1567,6 +1891,12 @@ export type TenantUncheckedCreateWithoutServicesInput = {
   contactSettings?: Prisma.ContactSettingsUncheckedCreateNestedOneWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutTenantInput
   cmsDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutTenantInput
+  pageContent?: Prisma.PageContentUncheckedCreateNestedManyWithoutTenantInput
+  leaders?: Prisma.LeadershipRecordUncheckedCreateNestedManyWithoutTenantInput
+  rateFees?: Prisma.RateFeeUncheckedCreateNestedManyWithoutTenantInput
+  calculatorSettings?: Prisma.CalculatorSettingsUncheckedCreateNestedOneWithoutTenantInput
+  contactSubmissions?: Prisma.ContactSubmissionUncheckedCreateNestedManyWithoutTenantInput
+  contactRateLimits?: Prisma.ContactRateLimitUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutServicesInput = {
@@ -1606,6 +1936,12 @@ export type TenantUpdateWithoutServicesInput = {
   contactSettings?: Prisma.ContactSettingsUpdateOneWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUpdateManyWithoutTenantNestedInput
   cmsDrafts?: Prisma.CmsDraftUpdateManyWithoutTenantNestedInput
+  pageContent?: Prisma.PageContentUpdateManyWithoutTenantNestedInput
+  leaders?: Prisma.LeadershipRecordUpdateManyWithoutTenantNestedInput
+  rateFees?: Prisma.RateFeeUpdateManyWithoutTenantNestedInput
+  calculatorSettings?: Prisma.CalculatorSettingsUpdateOneWithoutTenantNestedInput
+  contactSubmissions?: Prisma.ContactSubmissionUpdateManyWithoutTenantNestedInput
+  contactRateLimits?: Prisma.ContactRateLimitUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutServicesInput = {
@@ -1629,6 +1965,12 @@ export type TenantUncheckedUpdateWithoutServicesInput = {
   contactSettings?: Prisma.ContactSettingsUncheckedUpdateOneWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutTenantNestedInput
   cmsDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutTenantNestedInput
+  pageContent?: Prisma.PageContentUncheckedUpdateManyWithoutTenantNestedInput
+  leaders?: Prisma.LeadershipRecordUncheckedUpdateManyWithoutTenantNestedInput
+  rateFees?: Prisma.RateFeeUncheckedUpdateManyWithoutTenantNestedInput
+  calculatorSettings?: Prisma.CalculatorSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  contactSubmissions?: Prisma.ContactSubmissionUncheckedUpdateManyWithoutTenantNestedInput
+  contactRateLimits?: Prisma.ContactRateLimitUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutFormsInput = {
@@ -1652,6 +1994,12 @@ export type TenantCreateWithoutFormsInput = {
   contactSettings?: Prisma.ContactSettingsCreateNestedOneWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutTenantInput
   cmsDrafts?: Prisma.CmsDraftCreateNestedManyWithoutTenantInput
+  pageContent?: Prisma.PageContentCreateNestedManyWithoutTenantInput
+  leaders?: Prisma.LeadershipRecordCreateNestedManyWithoutTenantInput
+  rateFees?: Prisma.RateFeeCreateNestedManyWithoutTenantInput
+  calculatorSettings?: Prisma.CalculatorSettingsCreateNestedOneWithoutTenantInput
+  contactSubmissions?: Prisma.ContactSubmissionCreateNestedManyWithoutTenantInput
+  contactRateLimits?: Prisma.ContactRateLimitCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutFormsInput = {
@@ -1675,6 +2023,12 @@ export type TenantUncheckedCreateWithoutFormsInput = {
   contactSettings?: Prisma.ContactSettingsUncheckedCreateNestedOneWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutTenantInput
   cmsDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutTenantInput
+  pageContent?: Prisma.PageContentUncheckedCreateNestedManyWithoutTenantInput
+  leaders?: Prisma.LeadershipRecordUncheckedCreateNestedManyWithoutTenantInput
+  rateFees?: Prisma.RateFeeUncheckedCreateNestedManyWithoutTenantInput
+  calculatorSettings?: Prisma.CalculatorSettingsUncheckedCreateNestedOneWithoutTenantInput
+  contactSubmissions?: Prisma.ContactSubmissionUncheckedCreateNestedManyWithoutTenantInput
+  contactRateLimits?: Prisma.ContactRateLimitUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutFormsInput = {
@@ -1714,6 +2068,12 @@ export type TenantUpdateWithoutFormsInput = {
   contactSettings?: Prisma.ContactSettingsUpdateOneWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUpdateManyWithoutTenantNestedInput
   cmsDrafts?: Prisma.CmsDraftUpdateManyWithoutTenantNestedInput
+  pageContent?: Prisma.PageContentUpdateManyWithoutTenantNestedInput
+  leaders?: Prisma.LeadershipRecordUpdateManyWithoutTenantNestedInput
+  rateFees?: Prisma.RateFeeUpdateManyWithoutTenantNestedInput
+  calculatorSettings?: Prisma.CalculatorSettingsUpdateOneWithoutTenantNestedInput
+  contactSubmissions?: Prisma.ContactSubmissionUpdateManyWithoutTenantNestedInput
+  contactRateLimits?: Prisma.ContactRateLimitUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutFormsInput = {
@@ -1737,6 +2097,12 @@ export type TenantUncheckedUpdateWithoutFormsInput = {
   contactSettings?: Prisma.ContactSettingsUncheckedUpdateOneWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutTenantNestedInput
   cmsDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutTenantNestedInput
+  pageContent?: Prisma.PageContentUncheckedUpdateManyWithoutTenantNestedInput
+  leaders?: Prisma.LeadershipRecordUncheckedUpdateManyWithoutTenantNestedInput
+  rateFees?: Prisma.RateFeeUncheckedUpdateManyWithoutTenantNestedInput
+  calculatorSettings?: Prisma.CalculatorSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  contactSubmissions?: Prisma.ContactSubmissionUncheckedUpdateManyWithoutTenantNestedInput
+  contactRateLimits?: Prisma.ContactRateLimitUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutNewsNoticesInput = {
@@ -1760,6 +2126,12 @@ export type TenantCreateWithoutNewsNoticesInput = {
   contactSettings?: Prisma.ContactSettingsCreateNestedOneWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutTenantInput
   cmsDrafts?: Prisma.CmsDraftCreateNestedManyWithoutTenantInput
+  pageContent?: Prisma.PageContentCreateNestedManyWithoutTenantInput
+  leaders?: Prisma.LeadershipRecordCreateNestedManyWithoutTenantInput
+  rateFees?: Prisma.RateFeeCreateNestedManyWithoutTenantInput
+  calculatorSettings?: Prisma.CalculatorSettingsCreateNestedOneWithoutTenantInput
+  contactSubmissions?: Prisma.ContactSubmissionCreateNestedManyWithoutTenantInput
+  contactRateLimits?: Prisma.ContactRateLimitCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutNewsNoticesInput = {
@@ -1783,6 +2155,12 @@ export type TenantUncheckedCreateWithoutNewsNoticesInput = {
   contactSettings?: Prisma.ContactSettingsUncheckedCreateNestedOneWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutTenantInput
   cmsDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutTenantInput
+  pageContent?: Prisma.PageContentUncheckedCreateNestedManyWithoutTenantInput
+  leaders?: Prisma.LeadershipRecordUncheckedCreateNestedManyWithoutTenantInput
+  rateFees?: Prisma.RateFeeUncheckedCreateNestedManyWithoutTenantInput
+  calculatorSettings?: Prisma.CalculatorSettingsUncheckedCreateNestedOneWithoutTenantInput
+  contactSubmissions?: Prisma.ContactSubmissionUncheckedCreateNestedManyWithoutTenantInput
+  contactRateLimits?: Prisma.ContactRateLimitUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutNewsNoticesInput = {
@@ -1822,6 +2200,12 @@ export type TenantUpdateWithoutNewsNoticesInput = {
   contactSettings?: Prisma.ContactSettingsUpdateOneWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUpdateManyWithoutTenantNestedInput
   cmsDrafts?: Prisma.CmsDraftUpdateManyWithoutTenantNestedInput
+  pageContent?: Prisma.PageContentUpdateManyWithoutTenantNestedInput
+  leaders?: Prisma.LeadershipRecordUpdateManyWithoutTenantNestedInput
+  rateFees?: Prisma.RateFeeUpdateManyWithoutTenantNestedInput
+  calculatorSettings?: Prisma.CalculatorSettingsUpdateOneWithoutTenantNestedInput
+  contactSubmissions?: Prisma.ContactSubmissionUpdateManyWithoutTenantNestedInput
+  contactRateLimits?: Prisma.ContactRateLimitUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutNewsNoticesInput = {
@@ -1845,6 +2229,12 @@ export type TenantUncheckedUpdateWithoutNewsNoticesInput = {
   contactSettings?: Prisma.ContactSettingsUncheckedUpdateOneWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutTenantNestedInput
   cmsDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutTenantNestedInput
+  pageContent?: Prisma.PageContentUncheckedUpdateManyWithoutTenantNestedInput
+  leaders?: Prisma.LeadershipRecordUncheckedUpdateManyWithoutTenantNestedInput
+  rateFees?: Prisma.RateFeeUncheckedUpdateManyWithoutTenantNestedInput
+  calculatorSettings?: Prisma.CalculatorSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  contactSubmissions?: Prisma.ContactSubmissionUncheckedUpdateManyWithoutTenantNestedInput
+  contactRateLimits?: Prisma.ContactRateLimitUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutFaqsInput = {
@@ -1868,6 +2258,12 @@ export type TenantCreateWithoutFaqsInput = {
   contactSettings?: Prisma.ContactSettingsCreateNestedOneWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutTenantInput
   cmsDrafts?: Prisma.CmsDraftCreateNestedManyWithoutTenantInput
+  pageContent?: Prisma.PageContentCreateNestedManyWithoutTenantInput
+  leaders?: Prisma.LeadershipRecordCreateNestedManyWithoutTenantInput
+  rateFees?: Prisma.RateFeeCreateNestedManyWithoutTenantInput
+  calculatorSettings?: Prisma.CalculatorSettingsCreateNestedOneWithoutTenantInput
+  contactSubmissions?: Prisma.ContactSubmissionCreateNestedManyWithoutTenantInput
+  contactRateLimits?: Prisma.ContactRateLimitCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutFaqsInput = {
@@ -1891,6 +2287,12 @@ export type TenantUncheckedCreateWithoutFaqsInput = {
   contactSettings?: Prisma.ContactSettingsUncheckedCreateNestedOneWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutTenantInput
   cmsDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutTenantInput
+  pageContent?: Prisma.PageContentUncheckedCreateNestedManyWithoutTenantInput
+  leaders?: Prisma.LeadershipRecordUncheckedCreateNestedManyWithoutTenantInput
+  rateFees?: Prisma.RateFeeUncheckedCreateNestedManyWithoutTenantInput
+  calculatorSettings?: Prisma.CalculatorSettingsUncheckedCreateNestedOneWithoutTenantInput
+  contactSubmissions?: Prisma.ContactSubmissionUncheckedCreateNestedManyWithoutTenantInput
+  contactRateLimits?: Prisma.ContactRateLimitUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutFaqsInput = {
@@ -1930,6 +2332,12 @@ export type TenantUpdateWithoutFaqsInput = {
   contactSettings?: Prisma.ContactSettingsUpdateOneWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUpdateManyWithoutTenantNestedInput
   cmsDrafts?: Prisma.CmsDraftUpdateManyWithoutTenantNestedInput
+  pageContent?: Prisma.PageContentUpdateManyWithoutTenantNestedInput
+  leaders?: Prisma.LeadershipRecordUpdateManyWithoutTenantNestedInput
+  rateFees?: Prisma.RateFeeUpdateManyWithoutTenantNestedInput
+  calculatorSettings?: Prisma.CalculatorSettingsUpdateOneWithoutTenantNestedInput
+  contactSubmissions?: Prisma.ContactSubmissionUpdateManyWithoutTenantNestedInput
+  contactRateLimits?: Prisma.ContactRateLimitUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutFaqsInput = {
@@ -1953,6 +2361,12 @@ export type TenantUncheckedUpdateWithoutFaqsInput = {
   contactSettings?: Prisma.ContactSettingsUncheckedUpdateOneWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutTenantNestedInput
   cmsDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutTenantNestedInput
+  pageContent?: Prisma.PageContentUncheckedUpdateManyWithoutTenantNestedInput
+  leaders?: Prisma.LeadershipRecordUncheckedUpdateManyWithoutTenantNestedInput
+  rateFees?: Prisma.RateFeeUncheckedUpdateManyWithoutTenantNestedInput
+  calculatorSettings?: Prisma.CalculatorSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  contactSubmissions?: Prisma.ContactSubmissionUncheckedUpdateManyWithoutTenantNestedInput
+  contactRateLimits?: Prisma.ContactRateLimitUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutContactSettingsInput = {
@@ -1976,6 +2390,12 @@ export type TenantCreateWithoutContactSettingsInput = {
   faqs?: Prisma.FAQCreateNestedManyWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutTenantInput
   cmsDrafts?: Prisma.CmsDraftCreateNestedManyWithoutTenantInput
+  pageContent?: Prisma.PageContentCreateNestedManyWithoutTenantInput
+  leaders?: Prisma.LeadershipRecordCreateNestedManyWithoutTenantInput
+  rateFees?: Prisma.RateFeeCreateNestedManyWithoutTenantInput
+  calculatorSettings?: Prisma.CalculatorSettingsCreateNestedOneWithoutTenantInput
+  contactSubmissions?: Prisma.ContactSubmissionCreateNestedManyWithoutTenantInput
+  contactRateLimits?: Prisma.ContactRateLimitCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutContactSettingsInput = {
@@ -1999,6 +2419,12 @@ export type TenantUncheckedCreateWithoutContactSettingsInput = {
   faqs?: Prisma.FAQUncheckedCreateNestedManyWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutTenantInput
   cmsDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutTenantInput
+  pageContent?: Prisma.PageContentUncheckedCreateNestedManyWithoutTenantInput
+  leaders?: Prisma.LeadershipRecordUncheckedCreateNestedManyWithoutTenantInput
+  rateFees?: Prisma.RateFeeUncheckedCreateNestedManyWithoutTenantInput
+  calculatorSettings?: Prisma.CalculatorSettingsUncheckedCreateNestedOneWithoutTenantInput
+  contactSubmissions?: Prisma.ContactSubmissionUncheckedCreateNestedManyWithoutTenantInput
+  contactRateLimits?: Prisma.ContactRateLimitUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutContactSettingsInput = {
@@ -2038,6 +2464,12 @@ export type TenantUpdateWithoutContactSettingsInput = {
   faqs?: Prisma.FAQUpdateManyWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUpdateManyWithoutTenantNestedInput
   cmsDrafts?: Prisma.CmsDraftUpdateManyWithoutTenantNestedInput
+  pageContent?: Prisma.PageContentUpdateManyWithoutTenantNestedInput
+  leaders?: Prisma.LeadershipRecordUpdateManyWithoutTenantNestedInput
+  rateFees?: Prisma.RateFeeUpdateManyWithoutTenantNestedInput
+  calculatorSettings?: Prisma.CalculatorSettingsUpdateOneWithoutTenantNestedInput
+  contactSubmissions?: Prisma.ContactSubmissionUpdateManyWithoutTenantNestedInput
+  contactRateLimits?: Prisma.ContactRateLimitUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutContactSettingsInput = {
@@ -2061,6 +2493,12 @@ export type TenantUncheckedUpdateWithoutContactSettingsInput = {
   faqs?: Prisma.FAQUncheckedUpdateManyWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutTenantNestedInput
   cmsDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutTenantNestedInput
+  pageContent?: Prisma.PageContentUncheckedUpdateManyWithoutTenantNestedInput
+  leaders?: Prisma.LeadershipRecordUncheckedUpdateManyWithoutTenantNestedInput
+  rateFees?: Prisma.RateFeeUncheckedUpdateManyWithoutTenantNestedInput
+  calculatorSettings?: Prisma.CalculatorSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  contactSubmissions?: Prisma.ContactSubmissionUncheckedUpdateManyWithoutTenantNestedInput
+  contactRateLimits?: Prisma.ContactRateLimitUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutMediaAssetsInput = {
@@ -2084,6 +2522,12 @@ export type TenantCreateWithoutMediaAssetsInput = {
   faqs?: Prisma.FAQCreateNestedManyWithoutTenantInput
   contactSettings?: Prisma.ContactSettingsCreateNestedOneWithoutTenantInput
   cmsDrafts?: Prisma.CmsDraftCreateNestedManyWithoutTenantInput
+  pageContent?: Prisma.PageContentCreateNestedManyWithoutTenantInput
+  leaders?: Prisma.LeadershipRecordCreateNestedManyWithoutTenantInput
+  rateFees?: Prisma.RateFeeCreateNestedManyWithoutTenantInput
+  calculatorSettings?: Prisma.CalculatorSettingsCreateNestedOneWithoutTenantInput
+  contactSubmissions?: Prisma.ContactSubmissionCreateNestedManyWithoutTenantInput
+  contactRateLimits?: Prisma.ContactRateLimitCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutMediaAssetsInput = {
@@ -2107,6 +2551,12 @@ export type TenantUncheckedCreateWithoutMediaAssetsInput = {
   faqs?: Prisma.FAQUncheckedCreateNestedManyWithoutTenantInput
   contactSettings?: Prisma.ContactSettingsUncheckedCreateNestedOneWithoutTenantInput
   cmsDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutTenantInput
+  pageContent?: Prisma.PageContentUncheckedCreateNestedManyWithoutTenantInput
+  leaders?: Prisma.LeadershipRecordUncheckedCreateNestedManyWithoutTenantInput
+  rateFees?: Prisma.RateFeeUncheckedCreateNestedManyWithoutTenantInput
+  calculatorSettings?: Prisma.CalculatorSettingsUncheckedCreateNestedOneWithoutTenantInput
+  contactSubmissions?: Prisma.ContactSubmissionUncheckedCreateNestedManyWithoutTenantInput
+  contactRateLimits?: Prisma.ContactRateLimitUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutMediaAssetsInput = {
@@ -2146,6 +2596,12 @@ export type TenantUpdateWithoutMediaAssetsInput = {
   faqs?: Prisma.FAQUpdateManyWithoutTenantNestedInput
   contactSettings?: Prisma.ContactSettingsUpdateOneWithoutTenantNestedInput
   cmsDrafts?: Prisma.CmsDraftUpdateManyWithoutTenantNestedInput
+  pageContent?: Prisma.PageContentUpdateManyWithoutTenantNestedInput
+  leaders?: Prisma.LeadershipRecordUpdateManyWithoutTenantNestedInput
+  rateFees?: Prisma.RateFeeUpdateManyWithoutTenantNestedInput
+  calculatorSettings?: Prisma.CalculatorSettingsUpdateOneWithoutTenantNestedInput
+  contactSubmissions?: Prisma.ContactSubmissionUpdateManyWithoutTenantNestedInput
+  contactRateLimits?: Prisma.ContactRateLimitUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutMediaAssetsInput = {
@@ -2169,6 +2625,12 @@ export type TenantUncheckedUpdateWithoutMediaAssetsInput = {
   faqs?: Prisma.FAQUncheckedUpdateManyWithoutTenantNestedInput
   contactSettings?: Prisma.ContactSettingsUncheckedUpdateOneWithoutTenantNestedInput
   cmsDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutTenantNestedInput
+  pageContent?: Prisma.PageContentUncheckedUpdateManyWithoutTenantNestedInput
+  leaders?: Prisma.LeadershipRecordUncheckedUpdateManyWithoutTenantNestedInput
+  rateFees?: Prisma.RateFeeUncheckedUpdateManyWithoutTenantNestedInput
+  calculatorSettings?: Prisma.CalculatorSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  contactSubmissions?: Prisma.ContactSubmissionUncheckedUpdateManyWithoutTenantNestedInput
+  contactRateLimits?: Prisma.ContactRateLimitUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantCreateWithoutCmsDraftsInput = {
@@ -2192,6 +2654,12 @@ export type TenantCreateWithoutCmsDraftsInput = {
   faqs?: Prisma.FAQCreateNestedManyWithoutTenantInput
   contactSettings?: Prisma.ContactSettingsCreateNestedOneWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutTenantInput
+  pageContent?: Prisma.PageContentCreateNestedManyWithoutTenantInput
+  leaders?: Prisma.LeadershipRecordCreateNestedManyWithoutTenantInput
+  rateFees?: Prisma.RateFeeCreateNestedManyWithoutTenantInput
+  calculatorSettings?: Prisma.CalculatorSettingsCreateNestedOneWithoutTenantInput
+  contactSubmissions?: Prisma.ContactSubmissionCreateNestedManyWithoutTenantInput
+  contactRateLimits?: Prisma.ContactRateLimitCreateNestedManyWithoutTenantInput
 }
 
 export type TenantUncheckedCreateWithoutCmsDraftsInput = {
@@ -2215,6 +2683,12 @@ export type TenantUncheckedCreateWithoutCmsDraftsInput = {
   faqs?: Prisma.FAQUncheckedCreateNestedManyWithoutTenantInput
   contactSettings?: Prisma.ContactSettingsUncheckedCreateNestedOneWithoutTenantInput
   mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutTenantInput
+  pageContent?: Prisma.PageContentUncheckedCreateNestedManyWithoutTenantInput
+  leaders?: Prisma.LeadershipRecordUncheckedCreateNestedManyWithoutTenantInput
+  rateFees?: Prisma.RateFeeUncheckedCreateNestedManyWithoutTenantInput
+  calculatorSettings?: Prisma.CalculatorSettingsUncheckedCreateNestedOneWithoutTenantInput
+  contactSubmissions?: Prisma.ContactSubmissionUncheckedCreateNestedManyWithoutTenantInput
+  contactRateLimits?: Prisma.ContactRateLimitUncheckedCreateNestedManyWithoutTenantInput
 }
 
 export type TenantCreateOrConnectWithoutCmsDraftsInput = {
@@ -2254,6 +2728,12 @@ export type TenantUpdateWithoutCmsDraftsInput = {
   faqs?: Prisma.FAQUpdateManyWithoutTenantNestedInput
   contactSettings?: Prisma.ContactSettingsUpdateOneWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUpdateManyWithoutTenantNestedInput
+  pageContent?: Prisma.PageContentUpdateManyWithoutTenantNestedInput
+  leaders?: Prisma.LeadershipRecordUpdateManyWithoutTenantNestedInput
+  rateFees?: Prisma.RateFeeUpdateManyWithoutTenantNestedInput
+  calculatorSettings?: Prisma.CalculatorSettingsUpdateOneWithoutTenantNestedInput
+  contactSubmissions?: Prisma.ContactSubmissionUpdateManyWithoutTenantNestedInput
+  contactRateLimits?: Prisma.ContactRateLimitUpdateManyWithoutTenantNestedInput
 }
 
 export type TenantUncheckedUpdateWithoutCmsDraftsInput = {
@@ -2277,6 +2757,804 @@ export type TenantUncheckedUpdateWithoutCmsDraftsInput = {
   faqs?: Prisma.FAQUncheckedUpdateManyWithoutTenantNestedInput
   contactSettings?: Prisma.ContactSettingsUncheckedUpdateOneWithoutTenantNestedInput
   mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutTenantNestedInput
+  pageContent?: Prisma.PageContentUncheckedUpdateManyWithoutTenantNestedInput
+  leaders?: Prisma.LeadershipRecordUncheckedUpdateManyWithoutTenantNestedInput
+  rateFees?: Prisma.RateFeeUncheckedUpdateManyWithoutTenantNestedInput
+  calculatorSettings?: Prisma.CalculatorSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  contactSubmissions?: Prisma.ContactSubmissionUncheckedUpdateManyWithoutTenantNestedInput
+  contactRateLimits?: Prisma.ContactRateLimitUncheckedUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantCreateWithoutPageContentInput = {
+  id?: string
+  slug: string
+  displayName: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  domains?: Prisma.TenantDomainCreateNestedManyWithoutTenantInput
+  settings?: Prisma.TenantSettingsCreateNestedOneWithoutTenantInput
+  staff?: Prisma.StaffMembershipCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  siteNotices?: Prisma.SiteNoticeCreateNestedManyWithoutTenantInput
+  heroSlides?: Prisma.HomeHeroSlideCreateNestedManyWithoutTenantInput
+  highlights?: Prisma.HomeHighlightCreateNestedManyWithoutTenantInput
+  homeSettings?: Prisma.HomeSettingsCreateNestedOneWithoutTenantInput
+  services?: Prisma.ServiceCreateNestedManyWithoutTenantInput
+  forms?: Prisma.FormDocumentCreateNestedManyWithoutTenantInput
+  newsNotices?: Prisma.NewsNoticeCreateNestedManyWithoutTenantInput
+  faqs?: Prisma.FAQCreateNestedManyWithoutTenantInput
+  contactSettings?: Prisma.ContactSettingsCreateNestedOneWithoutTenantInput
+  mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutTenantInput
+  cmsDrafts?: Prisma.CmsDraftCreateNestedManyWithoutTenantInput
+  leaders?: Prisma.LeadershipRecordCreateNestedManyWithoutTenantInput
+  rateFees?: Prisma.RateFeeCreateNestedManyWithoutTenantInput
+  calculatorSettings?: Prisma.CalculatorSettingsCreateNestedOneWithoutTenantInput
+  contactSubmissions?: Prisma.ContactSubmissionCreateNestedManyWithoutTenantInput
+  contactRateLimits?: Prisma.ContactRateLimitCreateNestedManyWithoutTenantInput
+}
+
+export type TenantUncheckedCreateWithoutPageContentInput = {
+  id?: string
+  slug: string
+  displayName: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  domains?: Prisma.TenantDomainUncheckedCreateNestedManyWithoutTenantInput
+  settings?: Prisma.TenantSettingsUncheckedCreateNestedOneWithoutTenantInput
+  staff?: Prisma.StaffMembershipUncheckedCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  siteNotices?: Prisma.SiteNoticeUncheckedCreateNestedManyWithoutTenantInput
+  heroSlides?: Prisma.HomeHeroSlideUncheckedCreateNestedManyWithoutTenantInput
+  highlights?: Prisma.HomeHighlightUncheckedCreateNestedManyWithoutTenantInput
+  homeSettings?: Prisma.HomeSettingsUncheckedCreateNestedOneWithoutTenantInput
+  services?: Prisma.ServiceUncheckedCreateNestedManyWithoutTenantInput
+  forms?: Prisma.FormDocumentUncheckedCreateNestedManyWithoutTenantInput
+  newsNotices?: Prisma.NewsNoticeUncheckedCreateNestedManyWithoutTenantInput
+  faqs?: Prisma.FAQUncheckedCreateNestedManyWithoutTenantInput
+  contactSettings?: Prisma.ContactSettingsUncheckedCreateNestedOneWithoutTenantInput
+  mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutTenantInput
+  cmsDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutTenantInput
+  leaders?: Prisma.LeadershipRecordUncheckedCreateNestedManyWithoutTenantInput
+  rateFees?: Prisma.RateFeeUncheckedCreateNestedManyWithoutTenantInput
+  calculatorSettings?: Prisma.CalculatorSettingsUncheckedCreateNestedOneWithoutTenantInput
+  contactSubmissions?: Prisma.ContactSubmissionUncheckedCreateNestedManyWithoutTenantInput
+  contactRateLimits?: Prisma.ContactRateLimitUncheckedCreateNestedManyWithoutTenantInput
+}
+
+export type TenantCreateOrConnectWithoutPageContentInput = {
+  where: Prisma.TenantWhereUniqueInput
+  create: Prisma.XOR<Prisma.TenantCreateWithoutPageContentInput, Prisma.TenantUncheckedCreateWithoutPageContentInput>
+}
+
+export type TenantUpsertWithoutPageContentInput = {
+  update: Prisma.XOR<Prisma.TenantUpdateWithoutPageContentInput, Prisma.TenantUncheckedUpdateWithoutPageContentInput>
+  create: Prisma.XOR<Prisma.TenantCreateWithoutPageContentInput, Prisma.TenantUncheckedCreateWithoutPageContentInput>
+  where?: Prisma.TenantWhereInput
+}
+
+export type TenantUpdateToOneWithWhereWithoutPageContentInput = {
+  where?: Prisma.TenantWhereInput
+  data: Prisma.XOR<Prisma.TenantUpdateWithoutPageContentInput, Prisma.TenantUncheckedUpdateWithoutPageContentInput>
+}
+
+export type TenantUpdateWithoutPageContentInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  domains?: Prisma.TenantDomainUpdateManyWithoutTenantNestedInput
+  settings?: Prisma.TenantSettingsUpdateOneWithoutTenantNestedInput
+  staff?: Prisma.StaffMembershipUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  siteNotices?: Prisma.SiteNoticeUpdateManyWithoutTenantNestedInput
+  heroSlides?: Prisma.HomeHeroSlideUpdateManyWithoutTenantNestedInput
+  highlights?: Prisma.HomeHighlightUpdateManyWithoutTenantNestedInput
+  homeSettings?: Prisma.HomeSettingsUpdateOneWithoutTenantNestedInput
+  services?: Prisma.ServiceUpdateManyWithoutTenantNestedInput
+  forms?: Prisma.FormDocumentUpdateManyWithoutTenantNestedInput
+  newsNotices?: Prisma.NewsNoticeUpdateManyWithoutTenantNestedInput
+  faqs?: Prisma.FAQUpdateManyWithoutTenantNestedInput
+  contactSettings?: Prisma.ContactSettingsUpdateOneWithoutTenantNestedInput
+  mediaAssets?: Prisma.MediaAssetUpdateManyWithoutTenantNestedInput
+  cmsDrafts?: Prisma.CmsDraftUpdateManyWithoutTenantNestedInput
+  leaders?: Prisma.LeadershipRecordUpdateManyWithoutTenantNestedInput
+  rateFees?: Prisma.RateFeeUpdateManyWithoutTenantNestedInput
+  calculatorSettings?: Prisma.CalculatorSettingsUpdateOneWithoutTenantNestedInput
+  contactSubmissions?: Prisma.ContactSubmissionUpdateManyWithoutTenantNestedInput
+  contactRateLimits?: Prisma.ContactRateLimitUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantUncheckedUpdateWithoutPageContentInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  domains?: Prisma.TenantDomainUncheckedUpdateManyWithoutTenantNestedInput
+  settings?: Prisma.TenantSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  staff?: Prisma.StaffMembershipUncheckedUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  siteNotices?: Prisma.SiteNoticeUncheckedUpdateManyWithoutTenantNestedInput
+  heroSlides?: Prisma.HomeHeroSlideUncheckedUpdateManyWithoutTenantNestedInput
+  highlights?: Prisma.HomeHighlightUncheckedUpdateManyWithoutTenantNestedInput
+  homeSettings?: Prisma.HomeSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  services?: Prisma.ServiceUncheckedUpdateManyWithoutTenantNestedInput
+  forms?: Prisma.FormDocumentUncheckedUpdateManyWithoutTenantNestedInput
+  newsNotices?: Prisma.NewsNoticeUncheckedUpdateManyWithoutTenantNestedInput
+  faqs?: Prisma.FAQUncheckedUpdateManyWithoutTenantNestedInput
+  contactSettings?: Prisma.ContactSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutTenantNestedInput
+  cmsDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutTenantNestedInput
+  leaders?: Prisma.LeadershipRecordUncheckedUpdateManyWithoutTenantNestedInput
+  rateFees?: Prisma.RateFeeUncheckedUpdateManyWithoutTenantNestedInput
+  calculatorSettings?: Prisma.CalculatorSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  contactSubmissions?: Prisma.ContactSubmissionUncheckedUpdateManyWithoutTenantNestedInput
+  contactRateLimits?: Prisma.ContactRateLimitUncheckedUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantCreateWithoutLeadersInput = {
+  id?: string
+  slug: string
+  displayName: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  domains?: Prisma.TenantDomainCreateNestedManyWithoutTenantInput
+  settings?: Prisma.TenantSettingsCreateNestedOneWithoutTenantInput
+  staff?: Prisma.StaffMembershipCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  siteNotices?: Prisma.SiteNoticeCreateNestedManyWithoutTenantInput
+  heroSlides?: Prisma.HomeHeroSlideCreateNestedManyWithoutTenantInput
+  highlights?: Prisma.HomeHighlightCreateNestedManyWithoutTenantInput
+  homeSettings?: Prisma.HomeSettingsCreateNestedOneWithoutTenantInput
+  services?: Prisma.ServiceCreateNestedManyWithoutTenantInput
+  forms?: Prisma.FormDocumentCreateNestedManyWithoutTenantInput
+  newsNotices?: Prisma.NewsNoticeCreateNestedManyWithoutTenantInput
+  faqs?: Prisma.FAQCreateNestedManyWithoutTenantInput
+  contactSettings?: Prisma.ContactSettingsCreateNestedOneWithoutTenantInput
+  mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutTenantInput
+  cmsDrafts?: Prisma.CmsDraftCreateNestedManyWithoutTenantInput
+  pageContent?: Prisma.PageContentCreateNestedManyWithoutTenantInput
+  rateFees?: Prisma.RateFeeCreateNestedManyWithoutTenantInput
+  calculatorSettings?: Prisma.CalculatorSettingsCreateNestedOneWithoutTenantInput
+  contactSubmissions?: Prisma.ContactSubmissionCreateNestedManyWithoutTenantInput
+  contactRateLimits?: Prisma.ContactRateLimitCreateNestedManyWithoutTenantInput
+}
+
+export type TenantUncheckedCreateWithoutLeadersInput = {
+  id?: string
+  slug: string
+  displayName: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  domains?: Prisma.TenantDomainUncheckedCreateNestedManyWithoutTenantInput
+  settings?: Prisma.TenantSettingsUncheckedCreateNestedOneWithoutTenantInput
+  staff?: Prisma.StaffMembershipUncheckedCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  siteNotices?: Prisma.SiteNoticeUncheckedCreateNestedManyWithoutTenantInput
+  heroSlides?: Prisma.HomeHeroSlideUncheckedCreateNestedManyWithoutTenantInput
+  highlights?: Prisma.HomeHighlightUncheckedCreateNestedManyWithoutTenantInput
+  homeSettings?: Prisma.HomeSettingsUncheckedCreateNestedOneWithoutTenantInput
+  services?: Prisma.ServiceUncheckedCreateNestedManyWithoutTenantInput
+  forms?: Prisma.FormDocumentUncheckedCreateNestedManyWithoutTenantInput
+  newsNotices?: Prisma.NewsNoticeUncheckedCreateNestedManyWithoutTenantInput
+  faqs?: Prisma.FAQUncheckedCreateNestedManyWithoutTenantInput
+  contactSettings?: Prisma.ContactSettingsUncheckedCreateNestedOneWithoutTenantInput
+  mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutTenantInput
+  cmsDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutTenantInput
+  pageContent?: Prisma.PageContentUncheckedCreateNestedManyWithoutTenantInput
+  rateFees?: Prisma.RateFeeUncheckedCreateNestedManyWithoutTenantInput
+  calculatorSettings?: Prisma.CalculatorSettingsUncheckedCreateNestedOneWithoutTenantInput
+  contactSubmissions?: Prisma.ContactSubmissionUncheckedCreateNestedManyWithoutTenantInput
+  contactRateLimits?: Prisma.ContactRateLimitUncheckedCreateNestedManyWithoutTenantInput
+}
+
+export type TenantCreateOrConnectWithoutLeadersInput = {
+  where: Prisma.TenantWhereUniqueInput
+  create: Prisma.XOR<Prisma.TenantCreateWithoutLeadersInput, Prisma.TenantUncheckedCreateWithoutLeadersInput>
+}
+
+export type TenantUpsertWithoutLeadersInput = {
+  update: Prisma.XOR<Prisma.TenantUpdateWithoutLeadersInput, Prisma.TenantUncheckedUpdateWithoutLeadersInput>
+  create: Prisma.XOR<Prisma.TenantCreateWithoutLeadersInput, Prisma.TenantUncheckedCreateWithoutLeadersInput>
+  where?: Prisma.TenantWhereInput
+}
+
+export type TenantUpdateToOneWithWhereWithoutLeadersInput = {
+  where?: Prisma.TenantWhereInput
+  data: Prisma.XOR<Prisma.TenantUpdateWithoutLeadersInput, Prisma.TenantUncheckedUpdateWithoutLeadersInput>
+}
+
+export type TenantUpdateWithoutLeadersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  domains?: Prisma.TenantDomainUpdateManyWithoutTenantNestedInput
+  settings?: Prisma.TenantSettingsUpdateOneWithoutTenantNestedInput
+  staff?: Prisma.StaffMembershipUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  siteNotices?: Prisma.SiteNoticeUpdateManyWithoutTenantNestedInput
+  heroSlides?: Prisma.HomeHeroSlideUpdateManyWithoutTenantNestedInput
+  highlights?: Prisma.HomeHighlightUpdateManyWithoutTenantNestedInput
+  homeSettings?: Prisma.HomeSettingsUpdateOneWithoutTenantNestedInput
+  services?: Prisma.ServiceUpdateManyWithoutTenantNestedInput
+  forms?: Prisma.FormDocumentUpdateManyWithoutTenantNestedInput
+  newsNotices?: Prisma.NewsNoticeUpdateManyWithoutTenantNestedInput
+  faqs?: Prisma.FAQUpdateManyWithoutTenantNestedInput
+  contactSettings?: Prisma.ContactSettingsUpdateOneWithoutTenantNestedInput
+  mediaAssets?: Prisma.MediaAssetUpdateManyWithoutTenantNestedInput
+  cmsDrafts?: Prisma.CmsDraftUpdateManyWithoutTenantNestedInput
+  pageContent?: Prisma.PageContentUpdateManyWithoutTenantNestedInput
+  rateFees?: Prisma.RateFeeUpdateManyWithoutTenantNestedInput
+  calculatorSettings?: Prisma.CalculatorSettingsUpdateOneWithoutTenantNestedInput
+  contactSubmissions?: Prisma.ContactSubmissionUpdateManyWithoutTenantNestedInput
+  contactRateLimits?: Prisma.ContactRateLimitUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantUncheckedUpdateWithoutLeadersInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  domains?: Prisma.TenantDomainUncheckedUpdateManyWithoutTenantNestedInput
+  settings?: Prisma.TenantSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  staff?: Prisma.StaffMembershipUncheckedUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  siteNotices?: Prisma.SiteNoticeUncheckedUpdateManyWithoutTenantNestedInput
+  heroSlides?: Prisma.HomeHeroSlideUncheckedUpdateManyWithoutTenantNestedInput
+  highlights?: Prisma.HomeHighlightUncheckedUpdateManyWithoutTenantNestedInput
+  homeSettings?: Prisma.HomeSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  services?: Prisma.ServiceUncheckedUpdateManyWithoutTenantNestedInput
+  forms?: Prisma.FormDocumentUncheckedUpdateManyWithoutTenantNestedInput
+  newsNotices?: Prisma.NewsNoticeUncheckedUpdateManyWithoutTenantNestedInput
+  faqs?: Prisma.FAQUncheckedUpdateManyWithoutTenantNestedInput
+  contactSettings?: Prisma.ContactSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutTenantNestedInput
+  cmsDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutTenantNestedInput
+  pageContent?: Prisma.PageContentUncheckedUpdateManyWithoutTenantNestedInput
+  rateFees?: Prisma.RateFeeUncheckedUpdateManyWithoutTenantNestedInput
+  calculatorSettings?: Prisma.CalculatorSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  contactSubmissions?: Prisma.ContactSubmissionUncheckedUpdateManyWithoutTenantNestedInput
+  contactRateLimits?: Prisma.ContactRateLimitUncheckedUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantCreateWithoutRateFeesInput = {
+  id?: string
+  slug: string
+  displayName: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  domains?: Prisma.TenantDomainCreateNestedManyWithoutTenantInput
+  settings?: Prisma.TenantSettingsCreateNestedOneWithoutTenantInput
+  staff?: Prisma.StaffMembershipCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  siteNotices?: Prisma.SiteNoticeCreateNestedManyWithoutTenantInput
+  heroSlides?: Prisma.HomeHeroSlideCreateNestedManyWithoutTenantInput
+  highlights?: Prisma.HomeHighlightCreateNestedManyWithoutTenantInput
+  homeSettings?: Prisma.HomeSettingsCreateNestedOneWithoutTenantInput
+  services?: Prisma.ServiceCreateNestedManyWithoutTenantInput
+  forms?: Prisma.FormDocumentCreateNestedManyWithoutTenantInput
+  newsNotices?: Prisma.NewsNoticeCreateNestedManyWithoutTenantInput
+  faqs?: Prisma.FAQCreateNestedManyWithoutTenantInput
+  contactSettings?: Prisma.ContactSettingsCreateNestedOneWithoutTenantInput
+  mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutTenantInput
+  cmsDrafts?: Prisma.CmsDraftCreateNestedManyWithoutTenantInput
+  pageContent?: Prisma.PageContentCreateNestedManyWithoutTenantInput
+  leaders?: Prisma.LeadershipRecordCreateNestedManyWithoutTenantInput
+  calculatorSettings?: Prisma.CalculatorSettingsCreateNestedOneWithoutTenantInput
+  contactSubmissions?: Prisma.ContactSubmissionCreateNestedManyWithoutTenantInput
+  contactRateLimits?: Prisma.ContactRateLimitCreateNestedManyWithoutTenantInput
+}
+
+export type TenantUncheckedCreateWithoutRateFeesInput = {
+  id?: string
+  slug: string
+  displayName: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  domains?: Prisma.TenantDomainUncheckedCreateNestedManyWithoutTenantInput
+  settings?: Prisma.TenantSettingsUncheckedCreateNestedOneWithoutTenantInput
+  staff?: Prisma.StaffMembershipUncheckedCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  siteNotices?: Prisma.SiteNoticeUncheckedCreateNestedManyWithoutTenantInput
+  heroSlides?: Prisma.HomeHeroSlideUncheckedCreateNestedManyWithoutTenantInput
+  highlights?: Prisma.HomeHighlightUncheckedCreateNestedManyWithoutTenantInput
+  homeSettings?: Prisma.HomeSettingsUncheckedCreateNestedOneWithoutTenantInput
+  services?: Prisma.ServiceUncheckedCreateNestedManyWithoutTenantInput
+  forms?: Prisma.FormDocumentUncheckedCreateNestedManyWithoutTenantInput
+  newsNotices?: Prisma.NewsNoticeUncheckedCreateNestedManyWithoutTenantInput
+  faqs?: Prisma.FAQUncheckedCreateNestedManyWithoutTenantInput
+  contactSettings?: Prisma.ContactSettingsUncheckedCreateNestedOneWithoutTenantInput
+  mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutTenantInput
+  cmsDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutTenantInput
+  pageContent?: Prisma.PageContentUncheckedCreateNestedManyWithoutTenantInput
+  leaders?: Prisma.LeadershipRecordUncheckedCreateNestedManyWithoutTenantInput
+  calculatorSettings?: Prisma.CalculatorSettingsUncheckedCreateNestedOneWithoutTenantInput
+  contactSubmissions?: Prisma.ContactSubmissionUncheckedCreateNestedManyWithoutTenantInput
+  contactRateLimits?: Prisma.ContactRateLimitUncheckedCreateNestedManyWithoutTenantInput
+}
+
+export type TenantCreateOrConnectWithoutRateFeesInput = {
+  where: Prisma.TenantWhereUniqueInput
+  create: Prisma.XOR<Prisma.TenantCreateWithoutRateFeesInput, Prisma.TenantUncheckedCreateWithoutRateFeesInput>
+}
+
+export type TenantUpsertWithoutRateFeesInput = {
+  update: Prisma.XOR<Prisma.TenantUpdateWithoutRateFeesInput, Prisma.TenantUncheckedUpdateWithoutRateFeesInput>
+  create: Prisma.XOR<Prisma.TenantCreateWithoutRateFeesInput, Prisma.TenantUncheckedCreateWithoutRateFeesInput>
+  where?: Prisma.TenantWhereInput
+}
+
+export type TenantUpdateToOneWithWhereWithoutRateFeesInput = {
+  where?: Prisma.TenantWhereInput
+  data: Prisma.XOR<Prisma.TenantUpdateWithoutRateFeesInput, Prisma.TenantUncheckedUpdateWithoutRateFeesInput>
+}
+
+export type TenantUpdateWithoutRateFeesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  domains?: Prisma.TenantDomainUpdateManyWithoutTenantNestedInput
+  settings?: Prisma.TenantSettingsUpdateOneWithoutTenantNestedInput
+  staff?: Prisma.StaffMembershipUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  siteNotices?: Prisma.SiteNoticeUpdateManyWithoutTenantNestedInput
+  heroSlides?: Prisma.HomeHeroSlideUpdateManyWithoutTenantNestedInput
+  highlights?: Prisma.HomeHighlightUpdateManyWithoutTenantNestedInput
+  homeSettings?: Prisma.HomeSettingsUpdateOneWithoutTenantNestedInput
+  services?: Prisma.ServiceUpdateManyWithoutTenantNestedInput
+  forms?: Prisma.FormDocumentUpdateManyWithoutTenantNestedInput
+  newsNotices?: Prisma.NewsNoticeUpdateManyWithoutTenantNestedInput
+  faqs?: Prisma.FAQUpdateManyWithoutTenantNestedInput
+  contactSettings?: Prisma.ContactSettingsUpdateOneWithoutTenantNestedInput
+  mediaAssets?: Prisma.MediaAssetUpdateManyWithoutTenantNestedInput
+  cmsDrafts?: Prisma.CmsDraftUpdateManyWithoutTenantNestedInput
+  pageContent?: Prisma.PageContentUpdateManyWithoutTenantNestedInput
+  leaders?: Prisma.LeadershipRecordUpdateManyWithoutTenantNestedInput
+  calculatorSettings?: Prisma.CalculatorSettingsUpdateOneWithoutTenantNestedInput
+  contactSubmissions?: Prisma.ContactSubmissionUpdateManyWithoutTenantNestedInput
+  contactRateLimits?: Prisma.ContactRateLimitUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantUncheckedUpdateWithoutRateFeesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  domains?: Prisma.TenantDomainUncheckedUpdateManyWithoutTenantNestedInput
+  settings?: Prisma.TenantSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  staff?: Prisma.StaffMembershipUncheckedUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  siteNotices?: Prisma.SiteNoticeUncheckedUpdateManyWithoutTenantNestedInput
+  heroSlides?: Prisma.HomeHeroSlideUncheckedUpdateManyWithoutTenantNestedInput
+  highlights?: Prisma.HomeHighlightUncheckedUpdateManyWithoutTenantNestedInput
+  homeSettings?: Prisma.HomeSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  services?: Prisma.ServiceUncheckedUpdateManyWithoutTenantNestedInput
+  forms?: Prisma.FormDocumentUncheckedUpdateManyWithoutTenantNestedInput
+  newsNotices?: Prisma.NewsNoticeUncheckedUpdateManyWithoutTenantNestedInput
+  faqs?: Prisma.FAQUncheckedUpdateManyWithoutTenantNestedInput
+  contactSettings?: Prisma.ContactSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutTenantNestedInput
+  cmsDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutTenantNestedInput
+  pageContent?: Prisma.PageContentUncheckedUpdateManyWithoutTenantNestedInput
+  leaders?: Prisma.LeadershipRecordUncheckedUpdateManyWithoutTenantNestedInput
+  calculatorSettings?: Prisma.CalculatorSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  contactSubmissions?: Prisma.ContactSubmissionUncheckedUpdateManyWithoutTenantNestedInput
+  contactRateLimits?: Prisma.ContactRateLimitUncheckedUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantCreateWithoutCalculatorSettingsInput = {
+  id?: string
+  slug: string
+  displayName: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  domains?: Prisma.TenantDomainCreateNestedManyWithoutTenantInput
+  settings?: Prisma.TenantSettingsCreateNestedOneWithoutTenantInput
+  staff?: Prisma.StaffMembershipCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  siteNotices?: Prisma.SiteNoticeCreateNestedManyWithoutTenantInput
+  heroSlides?: Prisma.HomeHeroSlideCreateNestedManyWithoutTenantInput
+  highlights?: Prisma.HomeHighlightCreateNestedManyWithoutTenantInput
+  homeSettings?: Prisma.HomeSettingsCreateNestedOneWithoutTenantInput
+  services?: Prisma.ServiceCreateNestedManyWithoutTenantInput
+  forms?: Prisma.FormDocumentCreateNestedManyWithoutTenantInput
+  newsNotices?: Prisma.NewsNoticeCreateNestedManyWithoutTenantInput
+  faqs?: Prisma.FAQCreateNestedManyWithoutTenantInput
+  contactSettings?: Prisma.ContactSettingsCreateNestedOneWithoutTenantInput
+  mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutTenantInput
+  cmsDrafts?: Prisma.CmsDraftCreateNestedManyWithoutTenantInput
+  pageContent?: Prisma.PageContentCreateNestedManyWithoutTenantInput
+  leaders?: Prisma.LeadershipRecordCreateNestedManyWithoutTenantInput
+  rateFees?: Prisma.RateFeeCreateNestedManyWithoutTenantInput
+  contactSubmissions?: Prisma.ContactSubmissionCreateNestedManyWithoutTenantInput
+  contactRateLimits?: Prisma.ContactRateLimitCreateNestedManyWithoutTenantInput
+}
+
+export type TenantUncheckedCreateWithoutCalculatorSettingsInput = {
+  id?: string
+  slug: string
+  displayName: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  domains?: Prisma.TenantDomainUncheckedCreateNestedManyWithoutTenantInput
+  settings?: Prisma.TenantSettingsUncheckedCreateNestedOneWithoutTenantInput
+  staff?: Prisma.StaffMembershipUncheckedCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  siteNotices?: Prisma.SiteNoticeUncheckedCreateNestedManyWithoutTenantInput
+  heroSlides?: Prisma.HomeHeroSlideUncheckedCreateNestedManyWithoutTenantInput
+  highlights?: Prisma.HomeHighlightUncheckedCreateNestedManyWithoutTenantInput
+  homeSettings?: Prisma.HomeSettingsUncheckedCreateNestedOneWithoutTenantInput
+  services?: Prisma.ServiceUncheckedCreateNestedManyWithoutTenantInput
+  forms?: Prisma.FormDocumentUncheckedCreateNestedManyWithoutTenantInput
+  newsNotices?: Prisma.NewsNoticeUncheckedCreateNestedManyWithoutTenantInput
+  faqs?: Prisma.FAQUncheckedCreateNestedManyWithoutTenantInput
+  contactSettings?: Prisma.ContactSettingsUncheckedCreateNestedOneWithoutTenantInput
+  mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutTenantInput
+  cmsDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutTenantInput
+  pageContent?: Prisma.PageContentUncheckedCreateNestedManyWithoutTenantInput
+  leaders?: Prisma.LeadershipRecordUncheckedCreateNestedManyWithoutTenantInput
+  rateFees?: Prisma.RateFeeUncheckedCreateNestedManyWithoutTenantInput
+  contactSubmissions?: Prisma.ContactSubmissionUncheckedCreateNestedManyWithoutTenantInput
+  contactRateLimits?: Prisma.ContactRateLimitUncheckedCreateNestedManyWithoutTenantInput
+}
+
+export type TenantCreateOrConnectWithoutCalculatorSettingsInput = {
+  where: Prisma.TenantWhereUniqueInput
+  create: Prisma.XOR<Prisma.TenantCreateWithoutCalculatorSettingsInput, Prisma.TenantUncheckedCreateWithoutCalculatorSettingsInput>
+}
+
+export type TenantUpsertWithoutCalculatorSettingsInput = {
+  update: Prisma.XOR<Prisma.TenantUpdateWithoutCalculatorSettingsInput, Prisma.TenantUncheckedUpdateWithoutCalculatorSettingsInput>
+  create: Prisma.XOR<Prisma.TenantCreateWithoutCalculatorSettingsInput, Prisma.TenantUncheckedCreateWithoutCalculatorSettingsInput>
+  where?: Prisma.TenantWhereInput
+}
+
+export type TenantUpdateToOneWithWhereWithoutCalculatorSettingsInput = {
+  where?: Prisma.TenantWhereInput
+  data: Prisma.XOR<Prisma.TenantUpdateWithoutCalculatorSettingsInput, Prisma.TenantUncheckedUpdateWithoutCalculatorSettingsInput>
+}
+
+export type TenantUpdateWithoutCalculatorSettingsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  domains?: Prisma.TenantDomainUpdateManyWithoutTenantNestedInput
+  settings?: Prisma.TenantSettingsUpdateOneWithoutTenantNestedInput
+  staff?: Prisma.StaffMembershipUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  siteNotices?: Prisma.SiteNoticeUpdateManyWithoutTenantNestedInput
+  heroSlides?: Prisma.HomeHeroSlideUpdateManyWithoutTenantNestedInput
+  highlights?: Prisma.HomeHighlightUpdateManyWithoutTenantNestedInput
+  homeSettings?: Prisma.HomeSettingsUpdateOneWithoutTenantNestedInput
+  services?: Prisma.ServiceUpdateManyWithoutTenantNestedInput
+  forms?: Prisma.FormDocumentUpdateManyWithoutTenantNestedInput
+  newsNotices?: Prisma.NewsNoticeUpdateManyWithoutTenantNestedInput
+  faqs?: Prisma.FAQUpdateManyWithoutTenantNestedInput
+  contactSettings?: Prisma.ContactSettingsUpdateOneWithoutTenantNestedInput
+  mediaAssets?: Prisma.MediaAssetUpdateManyWithoutTenantNestedInput
+  cmsDrafts?: Prisma.CmsDraftUpdateManyWithoutTenantNestedInput
+  pageContent?: Prisma.PageContentUpdateManyWithoutTenantNestedInput
+  leaders?: Prisma.LeadershipRecordUpdateManyWithoutTenantNestedInput
+  rateFees?: Prisma.RateFeeUpdateManyWithoutTenantNestedInput
+  contactSubmissions?: Prisma.ContactSubmissionUpdateManyWithoutTenantNestedInput
+  contactRateLimits?: Prisma.ContactRateLimitUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantUncheckedUpdateWithoutCalculatorSettingsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  domains?: Prisma.TenantDomainUncheckedUpdateManyWithoutTenantNestedInput
+  settings?: Prisma.TenantSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  staff?: Prisma.StaffMembershipUncheckedUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  siteNotices?: Prisma.SiteNoticeUncheckedUpdateManyWithoutTenantNestedInput
+  heroSlides?: Prisma.HomeHeroSlideUncheckedUpdateManyWithoutTenantNestedInput
+  highlights?: Prisma.HomeHighlightUncheckedUpdateManyWithoutTenantNestedInput
+  homeSettings?: Prisma.HomeSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  services?: Prisma.ServiceUncheckedUpdateManyWithoutTenantNestedInput
+  forms?: Prisma.FormDocumentUncheckedUpdateManyWithoutTenantNestedInput
+  newsNotices?: Prisma.NewsNoticeUncheckedUpdateManyWithoutTenantNestedInput
+  faqs?: Prisma.FAQUncheckedUpdateManyWithoutTenantNestedInput
+  contactSettings?: Prisma.ContactSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutTenantNestedInput
+  cmsDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutTenantNestedInput
+  pageContent?: Prisma.PageContentUncheckedUpdateManyWithoutTenantNestedInput
+  leaders?: Prisma.LeadershipRecordUncheckedUpdateManyWithoutTenantNestedInput
+  rateFees?: Prisma.RateFeeUncheckedUpdateManyWithoutTenantNestedInput
+  contactSubmissions?: Prisma.ContactSubmissionUncheckedUpdateManyWithoutTenantNestedInput
+  contactRateLimits?: Prisma.ContactRateLimitUncheckedUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantCreateWithoutContactSubmissionsInput = {
+  id?: string
+  slug: string
+  displayName: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  domains?: Prisma.TenantDomainCreateNestedManyWithoutTenantInput
+  settings?: Prisma.TenantSettingsCreateNestedOneWithoutTenantInput
+  staff?: Prisma.StaffMembershipCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  siteNotices?: Prisma.SiteNoticeCreateNestedManyWithoutTenantInput
+  heroSlides?: Prisma.HomeHeroSlideCreateNestedManyWithoutTenantInput
+  highlights?: Prisma.HomeHighlightCreateNestedManyWithoutTenantInput
+  homeSettings?: Prisma.HomeSettingsCreateNestedOneWithoutTenantInput
+  services?: Prisma.ServiceCreateNestedManyWithoutTenantInput
+  forms?: Prisma.FormDocumentCreateNestedManyWithoutTenantInput
+  newsNotices?: Prisma.NewsNoticeCreateNestedManyWithoutTenantInput
+  faqs?: Prisma.FAQCreateNestedManyWithoutTenantInput
+  contactSettings?: Prisma.ContactSettingsCreateNestedOneWithoutTenantInput
+  mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutTenantInput
+  cmsDrafts?: Prisma.CmsDraftCreateNestedManyWithoutTenantInput
+  pageContent?: Prisma.PageContentCreateNestedManyWithoutTenantInput
+  leaders?: Prisma.LeadershipRecordCreateNestedManyWithoutTenantInput
+  rateFees?: Prisma.RateFeeCreateNestedManyWithoutTenantInput
+  calculatorSettings?: Prisma.CalculatorSettingsCreateNestedOneWithoutTenantInput
+  contactRateLimits?: Prisma.ContactRateLimitCreateNestedManyWithoutTenantInput
+}
+
+export type TenantUncheckedCreateWithoutContactSubmissionsInput = {
+  id?: string
+  slug: string
+  displayName: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  domains?: Prisma.TenantDomainUncheckedCreateNestedManyWithoutTenantInput
+  settings?: Prisma.TenantSettingsUncheckedCreateNestedOneWithoutTenantInput
+  staff?: Prisma.StaffMembershipUncheckedCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  siteNotices?: Prisma.SiteNoticeUncheckedCreateNestedManyWithoutTenantInput
+  heroSlides?: Prisma.HomeHeroSlideUncheckedCreateNestedManyWithoutTenantInput
+  highlights?: Prisma.HomeHighlightUncheckedCreateNestedManyWithoutTenantInput
+  homeSettings?: Prisma.HomeSettingsUncheckedCreateNestedOneWithoutTenantInput
+  services?: Prisma.ServiceUncheckedCreateNestedManyWithoutTenantInput
+  forms?: Prisma.FormDocumentUncheckedCreateNestedManyWithoutTenantInput
+  newsNotices?: Prisma.NewsNoticeUncheckedCreateNestedManyWithoutTenantInput
+  faqs?: Prisma.FAQUncheckedCreateNestedManyWithoutTenantInput
+  contactSettings?: Prisma.ContactSettingsUncheckedCreateNestedOneWithoutTenantInput
+  mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutTenantInput
+  cmsDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutTenantInput
+  pageContent?: Prisma.PageContentUncheckedCreateNestedManyWithoutTenantInput
+  leaders?: Prisma.LeadershipRecordUncheckedCreateNestedManyWithoutTenantInput
+  rateFees?: Prisma.RateFeeUncheckedCreateNestedManyWithoutTenantInput
+  calculatorSettings?: Prisma.CalculatorSettingsUncheckedCreateNestedOneWithoutTenantInput
+  contactRateLimits?: Prisma.ContactRateLimitUncheckedCreateNestedManyWithoutTenantInput
+}
+
+export type TenantCreateOrConnectWithoutContactSubmissionsInput = {
+  where: Prisma.TenantWhereUniqueInput
+  create: Prisma.XOR<Prisma.TenantCreateWithoutContactSubmissionsInput, Prisma.TenantUncheckedCreateWithoutContactSubmissionsInput>
+}
+
+export type TenantUpsertWithoutContactSubmissionsInput = {
+  update: Prisma.XOR<Prisma.TenantUpdateWithoutContactSubmissionsInput, Prisma.TenantUncheckedUpdateWithoutContactSubmissionsInput>
+  create: Prisma.XOR<Prisma.TenantCreateWithoutContactSubmissionsInput, Prisma.TenantUncheckedCreateWithoutContactSubmissionsInput>
+  where?: Prisma.TenantWhereInput
+}
+
+export type TenantUpdateToOneWithWhereWithoutContactSubmissionsInput = {
+  where?: Prisma.TenantWhereInput
+  data: Prisma.XOR<Prisma.TenantUpdateWithoutContactSubmissionsInput, Prisma.TenantUncheckedUpdateWithoutContactSubmissionsInput>
+}
+
+export type TenantUpdateWithoutContactSubmissionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  domains?: Prisma.TenantDomainUpdateManyWithoutTenantNestedInput
+  settings?: Prisma.TenantSettingsUpdateOneWithoutTenantNestedInput
+  staff?: Prisma.StaffMembershipUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  siteNotices?: Prisma.SiteNoticeUpdateManyWithoutTenantNestedInput
+  heroSlides?: Prisma.HomeHeroSlideUpdateManyWithoutTenantNestedInput
+  highlights?: Prisma.HomeHighlightUpdateManyWithoutTenantNestedInput
+  homeSettings?: Prisma.HomeSettingsUpdateOneWithoutTenantNestedInput
+  services?: Prisma.ServiceUpdateManyWithoutTenantNestedInput
+  forms?: Prisma.FormDocumentUpdateManyWithoutTenantNestedInput
+  newsNotices?: Prisma.NewsNoticeUpdateManyWithoutTenantNestedInput
+  faqs?: Prisma.FAQUpdateManyWithoutTenantNestedInput
+  contactSettings?: Prisma.ContactSettingsUpdateOneWithoutTenantNestedInput
+  mediaAssets?: Prisma.MediaAssetUpdateManyWithoutTenantNestedInput
+  cmsDrafts?: Prisma.CmsDraftUpdateManyWithoutTenantNestedInput
+  pageContent?: Prisma.PageContentUpdateManyWithoutTenantNestedInput
+  leaders?: Prisma.LeadershipRecordUpdateManyWithoutTenantNestedInput
+  rateFees?: Prisma.RateFeeUpdateManyWithoutTenantNestedInput
+  calculatorSettings?: Prisma.CalculatorSettingsUpdateOneWithoutTenantNestedInput
+  contactRateLimits?: Prisma.ContactRateLimitUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantUncheckedUpdateWithoutContactSubmissionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  domains?: Prisma.TenantDomainUncheckedUpdateManyWithoutTenantNestedInput
+  settings?: Prisma.TenantSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  staff?: Prisma.StaffMembershipUncheckedUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  siteNotices?: Prisma.SiteNoticeUncheckedUpdateManyWithoutTenantNestedInput
+  heroSlides?: Prisma.HomeHeroSlideUncheckedUpdateManyWithoutTenantNestedInput
+  highlights?: Prisma.HomeHighlightUncheckedUpdateManyWithoutTenantNestedInput
+  homeSettings?: Prisma.HomeSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  services?: Prisma.ServiceUncheckedUpdateManyWithoutTenantNestedInput
+  forms?: Prisma.FormDocumentUncheckedUpdateManyWithoutTenantNestedInput
+  newsNotices?: Prisma.NewsNoticeUncheckedUpdateManyWithoutTenantNestedInput
+  faqs?: Prisma.FAQUncheckedUpdateManyWithoutTenantNestedInput
+  contactSettings?: Prisma.ContactSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutTenantNestedInput
+  cmsDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutTenantNestedInput
+  pageContent?: Prisma.PageContentUncheckedUpdateManyWithoutTenantNestedInput
+  leaders?: Prisma.LeadershipRecordUncheckedUpdateManyWithoutTenantNestedInput
+  rateFees?: Prisma.RateFeeUncheckedUpdateManyWithoutTenantNestedInput
+  calculatorSettings?: Prisma.CalculatorSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  contactRateLimits?: Prisma.ContactRateLimitUncheckedUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantCreateWithoutContactRateLimitsInput = {
+  id?: string
+  slug: string
+  displayName: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  domains?: Prisma.TenantDomainCreateNestedManyWithoutTenantInput
+  settings?: Prisma.TenantSettingsCreateNestedOneWithoutTenantInput
+  staff?: Prisma.StaffMembershipCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogCreateNestedManyWithoutTenantInput
+  siteNotices?: Prisma.SiteNoticeCreateNestedManyWithoutTenantInput
+  heroSlides?: Prisma.HomeHeroSlideCreateNestedManyWithoutTenantInput
+  highlights?: Prisma.HomeHighlightCreateNestedManyWithoutTenantInput
+  homeSettings?: Prisma.HomeSettingsCreateNestedOneWithoutTenantInput
+  services?: Prisma.ServiceCreateNestedManyWithoutTenantInput
+  forms?: Prisma.FormDocumentCreateNestedManyWithoutTenantInput
+  newsNotices?: Prisma.NewsNoticeCreateNestedManyWithoutTenantInput
+  faqs?: Prisma.FAQCreateNestedManyWithoutTenantInput
+  contactSettings?: Prisma.ContactSettingsCreateNestedOneWithoutTenantInput
+  mediaAssets?: Prisma.MediaAssetCreateNestedManyWithoutTenantInput
+  cmsDrafts?: Prisma.CmsDraftCreateNestedManyWithoutTenantInput
+  pageContent?: Prisma.PageContentCreateNestedManyWithoutTenantInput
+  leaders?: Prisma.LeadershipRecordCreateNestedManyWithoutTenantInput
+  rateFees?: Prisma.RateFeeCreateNestedManyWithoutTenantInput
+  calculatorSettings?: Prisma.CalculatorSettingsCreateNestedOneWithoutTenantInput
+  contactSubmissions?: Prisma.ContactSubmissionCreateNestedManyWithoutTenantInput
+}
+
+export type TenantUncheckedCreateWithoutContactRateLimitsInput = {
+  id?: string
+  slug: string
+  displayName: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  domains?: Prisma.TenantDomainUncheckedCreateNestedManyWithoutTenantInput
+  settings?: Prisma.TenantSettingsUncheckedCreateNestedOneWithoutTenantInput
+  staff?: Prisma.StaffMembershipUncheckedCreateNestedManyWithoutTenantInput
+  auditLogs?: Prisma.AuditLogUncheckedCreateNestedManyWithoutTenantInput
+  siteNotices?: Prisma.SiteNoticeUncheckedCreateNestedManyWithoutTenantInput
+  heroSlides?: Prisma.HomeHeroSlideUncheckedCreateNestedManyWithoutTenantInput
+  highlights?: Prisma.HomeHighlightUncheckedCreateNestedManyWithoutTenantInput
+  homeSettings?: Prisma.HomeSettingsUncheckedCreateNestedOneWithoutTenantInput
+  services?: Prisma.ServiceUncheckedCreateNestedManyWithoutTenantInput
+  forms?: Prisma.FormDocumentUncheckedCreateNestedManyWithoutTenantInput
+  newsNotices?: Prisma.NewsNoticeUncheckedCreateNestedManyWithoutTenantInput
+  faqs?: Prisma.FAQUncheckedCreateNestedManyWithoutTenantInput
+  contactSettings?: Prisma.ContactSettingsUncheckedCreateNestedOneWithoutTenantInput
+  mediaAssets?: Prisma.MediaAssetUncheckedCreateNestedManyWithoutTenantInput
+  cmsDrafts?: Prisma.CmsDraftUncheckedCreateNestedManyWithoutTenantInput
+  pageContent?: Prisma.PageContentUncheckedCreateNestedManyWithoutTenantInput
+  leaders?: Prisma.LeadershipRecordUncheckedCreateNestedManyWithoutTenantInput
+  rateFees?: Prisma.RateFeeUncheckedCreateNestedManyWithoutTenantInput
+  calculatorSettings?: Prisma.CalculatorSettingsUncheckedCreateNestedOneWithoutTenantInput
+  contactSubmissions?: Prisma.ContactSubmissionUncheckedCreateNestedManyWithoutTenantInput
+}
+
+export type TenantCreateOrConnectWithoutContactRateLimitsInput = {
+  where: Prisma.TenantWhereUniqueInput
+  create: Prisma.XOR<Prisma.TenantCreateWithoutContactRateLimitsInput, Prisma.TenantUncheckedCreateWithoutContactRateLimitsInput>
+}
+
+export type TenantUpsertWithoutContactRateLimitsInput = {
+  update: Prisma.XOR<Prisma.TenantUpdateWithoutContactRateLimitsInput, Prisma.TenantUncheckedUpdateWithoutContactRateLimitsInput>
+  create: Prisma.XOR<Prisma.TenantCreateWithoutContactRateLimitsInput, Prisma.TenantUncheckedCreateWithoutContactRateLimitsInput>
+  where?: Prisma.TenantWhereInput
+}
+
+export type TenantUpdateToOneWithWhereWithoutContactRateLimitsInput = {
+  where?: Prisma.TenantWhereInput
+  data: Prisma.XOR<Prisma.TenantUpdateWithoutContactRateLimitsInput, Prisma.TenantUncheckedUpdateWithoutContactRateLimitsInput>
+}
+
+export type TenantUpdateWithoutContactRateLimitsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  domains?: Prisma.TenantDomainUpdateManyWithoutTenantNestedInput
+  settings?: Prisma.TenantSettingsUpdateOneWithoutTenantNestedInput
+  staff?: Prisma.StaffMembershipUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUpdateManyWithoutTenantNestedInput
+  siteNotices?: Prisma.SiteNoticeUpdateManyWithoutTenantNestedInput
+  heroSlides?: Prisma.HomeHeroSlideUpdateManyWithoutTenantNestedInput
+  highlights?: Prisma.HomeHighlightUpdateManyWithoutTenantNestedInput
+  homeSettings?: Prisma.HomeSettingsUpdateOneWithoutTenantNestedInput
+  services?: Prisma.ServiceUpdateManyWithoutTenantNestedInput
+  forms?: Prisma.FormDocumentUpdateManyWithoutTenantNestedInput
+  newsNotices?: Prisma.NewsNoticeUpdateManyWithoutTenantNestedInput
+  faqs?: Prisma.FAQUpdateManyWithoutTenantNestedInput
+  contactSettings?: Prisma.ContactSettingsUpdateOneWithoutTenantNestedInput
+  mediaAssets?: Prisma.MediaAssetUpdateManyWithoutTenantNestedInput
+  cmsDrafts?: Prisma.CmsDraftUpdateManyWithoutTenantNestedInput
+  pageContent?: Prisma.PageContentUpdateManyWithoutTenantNestedInput
+  leaders?: Prisma.LeadershipRecordUpdateManyWithoutTenantNestedInput
+  rateFees?: Prisma.RateFeeUpdateManyWithoutTenantNestedInput
+  calculatorSettings?: Prisma.CalculatorSettingsUpdateOneWithoutTenantNestedInput
+  contactSubmissions?: Prisma.ContactSubmissionUpdateManyWithoutTenantNestedInput
+}
+
+export type TenantUncheckedUpdateWithoutContactRateLimitsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  domains?: Prisma.TenantDomainUncheckedUpdateManyWithoutTenantNestedInput
+  settings?: Prisma.TenantSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  staff?: Prisma.StaffMembershipUncheckedUpdateManyWithoutTenantNestedInput
+  auditLogs?: Prisma.AuditLogUncheckedUpdateManyWithoutTenantNestedInput
+  siteNotices?: Prisma.SiteNoticeUncheckedUpdateManyWithoutTenantNestedInput
+  heroSlides?: Prisma.HomeHeroSlideUncheckedUpdateManyWithoutTenantNestedInput
+  highlights?: Prisma.HomeHighlightUncheckedUpdateManyWithoutTenantNestedInput
+  homeSettings?: Prisma.HomeSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  services?: Prisma.ServiceUncheckedUpdateManyWithoutTenantNestedInput
+  forms?: Prisma.FormDocumentUncheckedUpdateManyWithoutTenantNestedInput
+  newsNotices?: Prisma.NewsNoticeUncheckedUpdateManyWithoutTenantNestedInput
+  faqs?: Prisma.FAQUncheckedUpdateManyWithoutTenantNestedInput
+  contactSettings?: Prisma.ContactSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  mediaAssets?: Prisma.MediaAssetUncheckedUpdateManyWithoutTenantNestedInput
+  cmsDrafts?: Prisma.CmsDraftUncheckedUpdateManyWithoutTenantNestedInput
+  pageContent?: Prisma.PageContentUncheckedUpdateManyWithoutTenantNestedInput
+  leaders?: Prisma.LeadershipRecordUncheckedUpdateManyWithoutTenantNestedInput
+  rateFees?: Prisma.RateFeeUncheckedUpdateManyWithoutTenantNestedInput
+  calculatorSettings?: Prisma.CalculatorSettingsUncheckedUpdateOneWithoutTenantNestedInput
+  contactSubmissions?: Prisma.ContactSubmissionUncheckedUpdateManyWithoutTenantNestedInput
 }
 
 
@@ -2297,6 +3575,11 @@ export type TenantCountOutputType = {
   faqs: number
   mediaAssets: number
   cmsDrafts: number
+  pageContent: number
+  leaders: number
+  rateFees: number
+  contactSubmissions: number
+  contactRateLimits: number
 }
 
 export type TenantCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2312,6 +3595,11 @@ export type TenantCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions
   faqs?: boolean | TenantCountOutputTypeCountFaqsArgs
   mediaAssets?: boolean | TenantCountOutputTypeCountMediaAssetsArgs
   cmsDrafts?: boolean | TenantCountOutputTypeCountCmsDraftsArgs
+  pageContent?: boolean | TenantCountOutputTypeCountPageContentArgs
+  leaders?: boolean | TenantCountOutputTypeCountLeadersArgs
+  rateFees?: boolean | TenantCountOutputTypeCountRateFeesArgs
+  contactSubmissions?: boolean | TenantCountOutputTypeCountContactSubmissionsArgs
+  contactRateLimits?: boolean | TenantCountOutputTypeCountContactRateLimitsArgs
 }
 
 /**
@@ -2408,6 +3696,41 @@ export type TenantCountOutputTypeCountCmsDraftsArgs<ExtArgs extends runtime.Type
   where?: Prisma.CmsDraftWhereInput
 }
 
+/**
+ * TenantCountOutputType without action
+ */
+export type TenantCountOutputTypeCountPageContentArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PageContentWhereInput
+}
+
+/**
+ * TenantCountOutputType without action
+ */
+export type TenantCountOutputTypeCountLeadersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.LeadershipRecordWhereInput
+}
+
+/**
+ * TenantCountOutputType without action
+ */
+export type TenantCountOutputTypeCountRateFeesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.RateFeeWhereInput
+}
+
+/**
+ * TenantCountOutputType without action
+ */
+export type TenantCountOutputTypeCountContactSubmissionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ContactSubmissionWhereInput
+}
+
+/**
+ * TenantCountOutputType without action
+ */
+export type TenantCountOutputTypeCountContactRateLimitsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ContactRateLimitWhereInput
+}
+
 
 export type TenantSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -2431,6 +3754,12 @@ export type TenantSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   contactSettings?: boolean | Prisma.Tenant$contactSettingsArgs<ExtArgs>
   mediaAssets?: boolean | Prisma.Tenant$mediaAssetsArgs<ExtArgs>
   cmsDrafts?: boolean | Prisma.Tenant$cmsDraftsArgs<ExtArgs>
+  pageContent?: boolean | Prisma.Tenant$pageContentArgs<ExtArgs>
+  leaders?: boolean | Prisma.Tenant$leadersArgs<ExtArgs>
+  rateFees?: boolean | Prisma.Tenant$rateFeesArgs<ExtArgs>
+  calculatorSettings?: boolean | Prisma.Tenant$calculatorSettingsArgs<ExtArgs>
+  contactSubmissions?: boolean | Prisma.Tenant$contactSubmissionsArgs<ExtArgs>
+  contactRateLimits?: boolean | Prisma.Tenant$contactRateLimitsArgs<ExtArgs>
   _count?: boolean | Prisma.TenantCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["tenant"]>
 
@@ -2478,6 +3807,12 @@ export type TenantInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   contactSettings?: boolean | Prisma.Tenant$contactSettingsArgs<ExtArgs>
   mediaAssets?: boolean | Prisma.Tenant$mediaAssetsArgs<ExtArgs>
   cmsDrafts?: boolean | Prisma.Tenant$cmsDraftsArgs<ExtArgs>
+  pageContent?: boolean | Prisma.Tenant$pageContentArgs<ExtArgs>
+  leaders?: boolean | Prisma.Tenant$leadersArgs<ExtArgs>
+  rateFees?: boolean | Prisma.Tenant$rateFeesArgs<ExtArgs>
+  calculatorSettings?: boolean | Prisma.Tenant$calculatorSettingsArgs<ExtArgs>
+  contactSubmissions?: boolean | Prisma.Tenant$contactSubmissionsArgs<ExtArgs>
+  contactRateLimits?: boolean | Prisma.Tenant$contactRateLimitsArgs<ExtArgs>
   _count?: boolean | Prisma.TenantCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type TenantIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -2501,6 +3836,12 @@ export type $TenantPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     contactSettings: Prisma.$ContactSettingsPayload<ExtArgs> | null
     mediaAssets: Prisma.$MediaAssetPayload<ExtArgs>[]
     cmsDrafts: Prisma.$CmsDraftPayload<ExtArgs>[]
+    pageContent: Prisma.$PageContentPayload<ExtArgs>[]
+    leaders: Prisma.$LeadershipRecordPayload<ExtArgs>[]
+    rateFees: Prisma.$RateFeePayload<ExtArgs>[]
+    calculatorSettings: Prisma.$CalculatorSettingsPayload<ExtArgs> | null
+    contactSubmissions: Prisma.$ContactSubmissionPayload<ExtArgs>[]
+    contactRateLimits: Prisma.$ContactRateLimitPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -2918,6 +4259,12 @@ export interface Prisma__TenantClient<T, Null = never, ExtArgs extends runtime.T
   contactSettings<T extends Prisma.Tenant$contactSettingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$contactSettingsArgs<ExtArgs>>): Prisma.Prisma__ContactSettingsClient<runtime.Types.Result.GetResult<Prisma.$ContactSettingsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   mediaAssets<T extends Prisma.Tenant$mediaAssetsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$mediaAssetsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MediaAssetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   cmsDrafts<T extends Prisma.Tenant$cmsDraftsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$cmsDraftsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CmsDraftPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  pageContent<T extends Prisma.Tenant$pageContentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$pageContentArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PageContentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  leaders<T extends Prisma.Tenant$leadersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$leadersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LeadershipRecordPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  rateFees<T extends Prisma.Tenant$rateFeesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$rateFeesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RateFeePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  calculatorSettings<T extends Prisma.Tenant$calculatorSettingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$calculatorSettingsArgs<ExtArgs>>): Prisma.Prisma__CalculatorSettingsClient<runtime.Types.Result.GetResult<Prisma.$CalculatorSettingsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  contactSubmissions<T extends Prisma.Tenant$contactSubmissionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$contactSubmissionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ContactSubmissionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  contactRateLimits<T extends Prisma.Tenant$contactRateLimitsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Tenant$contactRateLimitsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ContactRateLimitPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3688,6 +5035,145 @@ export type Tenant$cmsDraftsArgs<ExtArgs extends runtime.Types.Extensions.Intern
   take?: number
   skip?: number
   distinct?: Prisma.CmsDraftScalarFieldEnum | Prisma.CmsDraftScalarFieldEnum[]
+}
+
+/**
+ * Tenant.pageContent
+ */
+export type Tenant$pageContentArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PageContent
+   */
+  select?: Prisma.PageContentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PageContent
+   */
+  omit?: Prisma.PageContentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PageContentInclude<ExtArgs> | null
+  where?: Prisma.PageContentWhereInput
+  orderBy?: Prisma.PageContentOrderByWithRelationInput | Prisma.PageContentOrderByWithRelationInput[]
+  cursor?: Prisma.PageContentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PageContentScalarFieldEnum | Prisma.PageContentScalarFieldEnum[]
+}
+
+/**
+ * Tenant.leaders
+ */
+export type Tenant$leadersArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the LeadershipRecord
+   */
+  select?: Prisma.LeadershipRecordSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the LeadershipRecord
+   */
+  omit?: Prisma.LeadershipRecordOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.LeadershipRecordInclude<ExtArgs> | null
+  where?: Prisma.LeadershipRecordWhereInput
+  orderBy?: Prisma.LeadershipRecordOrderByWithRelationInput | Prisma.LeadershipRecordOrderByWithRelationInput[]
+  cursor?: Prisma.LeadershipRecordWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.LeadershipRecordScalarFieldEnum | Prisma.LeadershipRecordScalarFieldEnum[]
+}
+
+/**
+ * Tenant.rateFees
+ */
+export type Tenant$rateFeesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the RateFee
+   */
+  select?: Prisma.RateFeeSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the RateFee
+   */
+  omit?: Prisma.RateFeeOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RateFeeInclude<ExtArgs> | null
+  where?: Prisma.RateFeeWhereInput
+  orderBy?: Prisma.RateFeeOrderByWithRelationInput | Prisma.RateFeeOrderByWithRelationInput[]
+  cursor?: Prisma.RateFeeWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.RateFeeScalarFieldEnum | Prisma.RateFeeScalarFieldEnum[]
+}
+
+/**
+ * Tenant.calculatorSettings
+ */
+export type Tenant$calculatorSettingsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CalculatorSettings
+   */
+  select?: Prisma.CalculatorSettingsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the CalculatorSettings
+   */
+  omit?: Prisma.CalculatorSettingsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CalculatorSettingsInclude<ExtArgs> | null
+  where?: Prisma.CalculatorSettingsWhereInput
+}
+
+/**
+ * Tenant.contactSubmissions
+ */
+export type Tenant$contactSubmissionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ContactSubmission
+   */
+  select?: Prisma.ContactSubmissionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ContactSubmission
+   */
+  omit?: Prisma.ContactSubmissionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ContactSubmissionInclude<ExtArgs> | null
+  where?: Prisma.ContactSubmissionWhereInput
+  orderBy?: Prisma.ContactSubmissionOrderByWithRelationInput | Prisma.ContactSubmissionOrderByWithRelationInput[]
+  cursor?: Prisma.ContactSubmissionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ContactSubmissionScalarFieldEnum | Prisma.ContactSubmissionScalarFieldEnum[]
+}
+
+/**
+ * Tenant.contactRateLimits
+ */
+export type Tenant$contactRateLimitsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ContactRateLimit
+   */
+  select?: Prisma.ContactRateLimitSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ContactRateLimit
+   */
+  omit?: Prisma.ContactRateLimitOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ContactRateLimitInclude<ExtArgs> | null
+  where?: Prisma.ContactRateLimitWhereInput
+  orderBy?: Prisma.ContactRateLimitOrderByWithRelationInput | Prisma.ContactRateLimitOrderByWithRelationInput[]
+  cursor?: Prisma.ContactRateLimitWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ContactRateLimitScalarFieldEnum | Prisma.ContactRateLimitScalarFieldEnum[]
 }
 
 /**

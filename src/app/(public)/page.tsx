@@ -2,6 +2,9 @@ import { HomeExperience } from "@/components/home-experience";
 import { getHomeData } from "@/lib/home-data";
 import { headers } from "next/headers";
 import { requireTenant } from "@/lib/tenant";
+import { buildPublicMetadata } from "./metadata";
+
+export async function generateMetadata() { return buildPublicMetadata((await headers()).get("host") ?? "", "/", "Service Worker Credit Union | SWCU", "A clear, trusted public website for Service Worker Credit Union members in Fiji."); }
 
 export default async function HomePage() {
   const tenant = await requireTenant((await headers()).get("host") ?? "");

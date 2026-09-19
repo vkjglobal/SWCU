@@ -28,6 +28,7 @@ enum CmsDraftKind {
   FORM_DOCUMENT
   HERO
   MEDIA
+  PAGE_CONTENT
 }
 
 enum CmsDraftOperation {
@@ -63,6 +64,12 @@ model Tenant {
   contactSettings ContactSettings?
   mediaAssets MediaAsset[]
   cmsDrafts   CmsDraft[] @relation("DraftTenant")
+  pageContent PageContent[]
+  leaders     LeadershipRecord[]
+  rateFees    RateFee[]
+  calculatorSettings CalculatorSettings?
+  contactSubmissions ContactSubmission[]
+  contactRateLimits ContactRateLimit[]
 
   @@map("tenants")
 }
@@ -291,6 +298,9 @@ model FormDocument {
   mediaAssetId String?
   sortOrder    Int      @default(0)
   isEnabled    Boolean  @default(true)
+  category     String?  @db.VarChar(50)
+  isAnnualReport Boolean @default(false)
+  publicApprovedAt DateTime?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   tenant       Tenant   @relation(fields: [tenantId], references: [id], onDelete: Restrict)
@@ -337,6 +347,7 @@ model ContactSettings {
   publicEmail    String   @db.VarChar(160)
   officeHours    String?  @db.VarChar(300)
   directionsUrl  String?  @db.VarChar(500)
+  notificationRecipients Json?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
   tenant         Tenant   @relation(fields: [tenantId], references: [id], onDelete: Restrict)
@@ -367,6 +378,8 @@ model MediaAsset {
   cmsDrafts        CmsDraft[] @relation("DraftMedia")
   heroSlides       HomeHeroSlide[]
   formDocuments    FormDocument[]
+  pageContent      PageContent[]
+  leadershipRecords LeadershipRecord[]
   @@index([tenantId, purpose, retiredAt])
   @@index([tenantId, createdAt])
   @@index([createdBy])
@@ -408,4 +421,116 @@ model CmsDraft {
   @@index([mediaAssetId])
   @@index([tenantId, assignedTo, status])
   @@map("cms_drafts")
+}
+
+model PageContent {
+  id String @id @default(cuid())
+  tenantId String
+  slot String @db.VarChar(60)
+  heading String? @db.VarChar(180)
+  body String? @db.VarChar(8000)
+  mediaAssetId String?
+  isPublished Boolean @default(false)
+  publishedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  mediaAsset MediaAsset? @relation(fields: [mediaAssetId], references: [id], onDelete: SetNull)
+  @@unique([tenantId, slot])
+  @@index([tenantId, isPublished, slot])
+  @@map("page_content")
+}
+
+model LeadershipRecord {
+  id String @id @default(cuid())
+  tenantId String
+  name String @db.VarChar(160)
+  title String @db.VarChar(160)
+  profile String? @db.VarChar(1000)
+  group String @db.VarChar(80)
+  mediaAssetId String?
+  sortOrder Int @default(0)
+  isEnabled Boolean @default(true)
+  isPublished Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  mediaAsset MediaAsset? @relation(fields: [mediaAssetId], references: [id], onDelete: SetNull)
+  @@index([tenantId, group, isPublished, isEnabled, sortOrder])
+  @@map("leadership_records")
+}
+
+model RateFee {
+  id String @id @default(cuid())
+  tenantId String
+  category String @db.VarChar(40)
+  product String @db.VarChar(120)
+  label String @db.VarChar(160)
+  displayValue String @db.VarChar(120)
+  note String? @db.VarChar(500)
+  effectiveAt DateTime?
+  sortOrder Int @default(0)
+  isEnabled Boolean @default(true)
+  isPublished Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  @@index([tenantId, isPublished, isEnabled, sortOrder])
+  @@map("rate_fees")
+}
+
+model CalculatorSettings {
+  id String @id @default(cuid())
+  tenantId String @unique
+  status String @default("AWAITING_SWCU_CONFIGURATION") @db.VarChar(60)
+  disclaimer String @default("Repayment figures are estimates only. Actual repayments, terms and loan approval are subject to SWCU requirements and approval.") @db.VarChar(300)
+  securityReminder String @default("SWCU will never ask you to disclose your password, PIN or security/verification code by email, phone, chat or through an unsolicited link. If you are unsure, contact SWCU using the contact details published on this website.") @db.VarChar(500)
+  isEnabled Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  @@map("calculator_settings")
+}
+
+enum ContactSubmissionStatus {
+  NEW
+  BEING_HANDLED
+  CLOSED
+}
+
+model ContactSubmission {
+  id String @id @default(cuid())
+  tenantId String
+  reference String @db.VarChar(30)
+  name String @db.VarChar(160)
+  email String @db.VarChar(320)
+  phone String? @db.VarChar(80)
+  subject String @db.VarChar(40)
+  message String @db.VarChar(4000)
+  status ContactSubmissionStatus @default(NEW)
+  internalNote String? @db.VarChar(1000)
+  submittedAt DateTime @default(now())
+  viewedAt DateTime?
+  handledAt DateTime?
+  closedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  @@unique([tenantId, reference])
+  @@index([tenantId, status, submittedAt])
+  @@map("contact_submissions")
+}
+
+model ContactRateLimit {
+  id String @id @default(cuid())
+  key String @unique
+  tenantId String
+  ipAddress String? @db.VarChar(80)
+  windowStart DateTime @default(now())
+  attempts Int @default(0)
+  blockedUntil DateTime?
+  updatedAt DateTime @updatedAt
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Restrict)
+  @@index([tenantId, ipAddress])
+  @@map("contact_rate_limits")
 }

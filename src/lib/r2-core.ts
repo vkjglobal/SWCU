@@ -1,4 +1,4 @@
-import { GetObjectCommand, ListObjectsV2Command, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { DeleteObjectCommand, GetObjectCommand, ListObjectsV2Command, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 
 export type R2Configuration = {
   endpoint: string;
@@ -53,4 +53,8 @@ export async function getR2Object(
   objectKey: string,
 ) {
   return client.send(new GetObjectCommand({ Bucket: configuration.bucketName, Key: objectKey }));
+}
+
+export async function deleteR2Object(client: S3Client, configuration: Pick<R2Configuration, "bucketName">, objectKey: string) {
+  return client.send(new DeleteObjectCommand({ Bucket: configuration.bucketName, Key: objectKey }));
 }

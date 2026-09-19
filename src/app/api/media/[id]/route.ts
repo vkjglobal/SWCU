@@ -1,16 +1,15 @@
-import { headers } from "next/headers";
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { readMediaObject } from "@/lib/r2";
-import { requireTenant } from "@/lib/tenant";
+import { resolveTenant } from "@/lib/tenant";
 import { mediaCacheControl } from "@/lib/media-cache";
 import { canServeMedia } from "@/lib/media-access";
 
 export const runtime = "nodejs";
 
 export async function GET(request: Request, context: { params: Promise<{ id: string }> }) {
-  const tenant = await requireTenant((await headers()).get("host") ?? "");
+  const tenant = await resolveTenant(request.headers.get("x-forwarded-host") ?? request.headers.get("host") ?? "", { allowDevelopmentFallback: false });
+  if (!tenant) return NextResponse.json({ error: "Media not found" }, { status: 404 });
   const { id } = await context.params;
   const asset = await db.mediaAsset.findFirst({
     where: { id, tenantId: tenant.id, retiredAt: null },
@@ -23,15 +22,27 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
         take: 1,
       },
       formDocuments: {
-        where: { tenantId: tenant.id, isEnabled: true },
+        where: { tenantId: tenant.id, isEnabled: true, OR: [{ isAnnualReport: false }, { isAnnualReport: true, publicApprovedAt: { not: null } }] },
+        select: { id: true, isAnnualReport: true, publicApprovedAt: true },
+        take: 1,
+      },
+      pageContent: {
+        where: { tenantId: tenant.id, isPublished: true },
+        select: { id: true },
+        take: 1,
+      },
+      leadershipRecords: {
+        where: { tenantId: tenant.id, isEnabled: true, isPublished: true },
         select: { id: true },
         take: 1,
       },
     },
   });
   if (!asset) return NextResponse.json({ error: "Media not found" }, { status: 404 });
-  const isPublished = asset.heroSlides.length > 0 || asset.formDocuments.length > 0;
+  const isPublished = asset.heroSlides.length > 0 || asset.formDocuments.length > 0 || asset.pageContent.length > 0 || asset.leadershipRecords.length > 0;
   if (!isPublished) {
+    if (!request.headers.get("cookie")) return NextResponse.json({ error: "Media not found" }, { status: 404 });
+    const { auth } = await import("@/lib/auth");
     const session = await auth.api.getSession({ headers: request.headers });
     const membership = session?.user
       ? await db.staffMembership.findUnique({

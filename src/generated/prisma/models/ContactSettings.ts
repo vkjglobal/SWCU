@@ -62,6 +62,7 @@ export type ContactSettingsCountAggregateOutputType = {
   publicEmail: number
   officeHours: number
   directionsUrl: number
+  notificationRecipients: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -106,6 +107,7 @@ export type ContactSettingsCountAggregateInputType = {
   publicEmail?: true
   officeHours?: true
   directionsUrl?: true
+  notificationRecipients?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -193,6 +195,7 @@ export type ContactSettingsGroupByOutputType = {
   publicEmail: string
   officeHours: string | null
   directionsUrl: string | null
+  notificationRecipients: runtime.JsonValue | null
   createdAt: Date
   updatedAt: Date
   _count: ContactSettingsCountAggregateOutputType | null
@@ -228,6 +231,7 @@ export type ContactSettingsWhereInput = {
   publicEmail?: Prisma.StringFilter<"ContactSettings"> | string
   officeHours?: Prisma.StringNullableFilter<"ContactSettings"> | string | null
   directionsUrl?: Prisma.StringNullableFilter<"ContactSettings"> | string | null
+  notificationRecipients?: Prisma.JsonNullableFilter<"ContactSettings">
   createdAt?: Prisma.DateTimeFilter<"ContactSettings"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ContactSettings"> | Date | string
   tenant?: Prisma.XOR<Prisma.TenantScalarRelationFilter, Prisma.TenantWhereInput>
@@ -243,6 +247,7 @@ export type ContactSettingsOrderByWithRelationInput = {
   publicEmail?: Prisma.SortOrder
   officeHours?: Prisma.SortOrderInput | Prisma.SortOrder
   directionsUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  notificationRecipients?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   tenant?: Prisma.TenantOrderByWithRelationInput
@@ -261,6 +266,7 @@ export type ContactSettingsWhereUniqueInput = Prisma.AtLeast<{
   publicEmail?: Prisma.StringFilter<"ContactSettings"> | string
   officeHours?: Prisma.StringNullableFilter<"ContactSettings"> | string | null
   directionsUrl?: Prisma.StringNullableFilter<"ContactSettings"> | string | null
+  notificationRecipients?: Prisma.JsonNullableFilter<"ContactSettings">
   createdAt?: Prisma.DateTimeFilter<"ContactSettings"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"ContactSettings"> | Date | string
   tenant?: Prisma.XOR<Prisma.TenantScalarRelationFilter, Prisma.TenantWhereInput>
@@ -276,6 +282,7 @@ export type ContactSettingsOrderByWithAggregationInput = {
   publicEmail?: Prisma.SortOrder
   officeHours?: Prisma.SortOrderInput | Prisma.SortOrder
   directionsUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  notificationRecipients?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.ContactSettingsCountOrderByAggregateInput
@@ -296,6 +303,7 @@ export type ContactSettingsScalarWhereWithAggregatesInput = {
   publicEmail?: Prisma.StringWithAggregatesFilter<"ContactSettings"> | string
   officeHours?: Prisma.StringNullableWithAggregatesFilter<"ContactSettings"> | string | null
   directionsUrl?: Prisma.StringNullableWithAggregatesFilter<"ContactSettings"> | string | null
+  notificationRecipients?: Prisma.JsonNullableWithAggregatesFilter<"ContactSettings">
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"ContactSettings"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"ContactSettings"> | Date | string
 }
@@ -309,6 +317,7 @@ export type ContactSettingsCreateInput = {
   publicEmail: string
   officeHours?: string | null
   directionsUrl?: string | null
+  notificationRecipients?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
   tenant: Prisma.TenantCreateNestedOneWithoutContactSettingsInput
@@ -324,6 +333,7 @@ export type ContactSettingsUncheckedCreateInput = {
   publicEmail: string
   officeHours?: string | null
   directionsUrl?: string | null
+  notificationRecipients?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -337,6 +347,7 @@ export type ContactSettingsUpdateInput = {
   publicEmail?: Prisma.StringFieldUpdateOperationsInput | string
   officeHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   directionsUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notificationRecipients?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tenant?: Prisma.TenantUpdateOneRequiredWithoutContactSettingsNestedInput
@@ -352,6 +363,7 @@ export type ContactSettingsUncheckedUpdateInput = {
   publicEmail?: Prisma.StringFieldUpdateOperationsInput | string
   officeHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   directionsUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notificationRecipients?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -366,6 +378,7 @@ export type ContactSettingsCreateManyInput = {
   publicEmail: string
   officeHours?: string | null
   directionsUrl?: string | null
+  notificationRecipients?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -379,6 +392,7 @@ export type ContactSettingsUpdateManyMutationInput = {
   publicEmail?: Prisma.StringFieldUpdateOperationsInput | string
   officeHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   directionsUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notificationRecipients?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -393,6 +407,7 @@ export type ContactSettingsUncheckedUpdateManyInput = {
   publicEmail?: Prisma.StringFieldUpdateOperationsInput | string
   officeHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   directionsUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notificationRecipients?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -412,6 +427,7 @@ export type ContactSettingsCountOrderByAggregateInput = {
   publicEmail?: Prisma.SortOrder
   officeHours?: Prisma.SortOrder
   directionsUrl?: Prisma.SortOrder
+  notificationRecipients?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -485,6 +501,7 @@ export type ContactSettingsCreateWithoutTenantInput = {
   publicEmail: string
   officeHours?: string | null
   directionsUrl?: string | null
+  notificationRecipients?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -498,6 +515,7 @@ export type ContactSettingsUncheckedCreateWithoutTenantInput = {
   publicEmail: string
   officeHours?: string | null
   directionsUrl?: string | null
+  notificationRecipients?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -527,6 +545,7 @@ export type ContactSettingsUpdateWithoutTenantInput = {
   publicEmail?: Prisma.StringFieldUpdateOperationsInput | string
   officeHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   directionsUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notificationRecipients?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -540,6 +559,7 @@ export type ContactSettingsUncheckedUpdateWithoutTenantInput = {
   publicEmail?: Prisma.StringFieldUpdateOperationsInput | string
   officeHours?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   directionsUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notificationRecipients?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -556,6 +576,7 @@ export type ContactSettingsSelect<ExtArgs extends runtime.Types.Extensions.Inter
   publicEmail?: boolean
   officeHours?: boolean
   directionsUrl?: boolean
+  notificationRecipients?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
@@ -571,6 +592,7 @@ export type ContactSettingsSelectCreateManyAndReturn<ExtArgs extends runtime.Typ
   publicEmail?: boolean
   officeHours?: boolean
   directionsUrl?: boolean
+  notificationRecipients?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
@@ -586,6 +608,7 @@ export type ContactSettingsSelectUpdateManyAndReturn<ExtArgs extends runtime.Typ
   publicEmail?: boolean
   officeHours?: boolean
   directionsUrl?: boolean
+  notificationRecipients?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
@@ -601,11 +624,12 @@ export type ContactSettingsSelectScalar = {
   publicEmail?: boolean
   officeHours?: boolean
   directionsUrl?: boolean
+  notificationRecipients?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type ContactSettingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tenantId" | "organisationName" | "streetAddress" | "postalAddress" | "telephone" | "publicEmail" | "officeHours" | "directionsUrl" | "createdAt" | "updatedAt", ExtArgs["result"]["contactSettings"]>
+export type ContactSettingsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tenantId" | "organisationName" | "streetAddress" | "postalAddress" | "telephone" | "publicEmail" | "officeHours" | "directionsUrl" | "notificationRecipients" | "createdAt" | "updatedAt", ExtArgs["result"]["contactSettings"]>
 export type ContactSettingsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
 }
@@ -631,6 +655,7 @@ export type $ContactSettingsPayload<ExtArgs extends runtime.Types.Extensions.Int
     publicEmail: string
     officeHours: string | null
     directionsUrl: string | null
+    notificationRecipients: runtime.JsonValue | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["contactSettings"]>
@@ -1066,6 +1091,7 @@ export interface ContactSettingsFieldRefs {
   readonly publicEmail: Prisma.FieldRef<"ContactSettings", 'String'>
   readonly officeHours: Prisma.FieldRef<"ContactSettings", 'String'>
   readonly directionsUrl: Prisma.FieldRef<"ContactSettings", 'String'>
+  readonly notificationRecipients: Prisma.FieldRef<"ContactSettings", 'Json'>
   readonly createdAt: Prisma.FieldRef<"ContactSettings", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"ContactSettings", 'DateTime'>
 }

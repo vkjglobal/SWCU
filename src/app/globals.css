@@ -64,6 +64,12 @@ a {
   text-decoration: none;
 }
 
+.mobile-member-login {
+  color: #fff;
+  background: #163b5c;
+  border-color: #176db3;
+}
+
 button,
 a {
   -webkit-tap-highlight-color: transparent;
@@ -108,12 +114,36 @@ a {
   color: #176db3;
 }
 
+.header-join,
+.header-member-login {
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .header-member-login {
+    display: inline-flex;
+  }
+}
+
+@media (min-width: 1024px) {
+  .header-join {
+    display: inline-flex;
+  }
+}
+
 @media (max-width: 390px) {
   .header-member-login {
     min-height: 2.75rem;
-    padding-inline: 0.7rem;
+    padding-inline: 0.55rem;
     font-size: 0.8125rem;
     white-space: nowrap;
+  }
+}
+
+@media (max-width: 359px) {
+  .header-member-login {
+    font-size: 0.75rem;
+    padding-inline: 0.45rem;
   }
 }
 

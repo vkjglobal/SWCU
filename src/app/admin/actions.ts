@@ -16,6 +16,7 @@ import {
   withdrawCmsDraft as withdrawCmsDraftWorkflow,
   retireIfUnreferenced,
   lockCmsTenant,
+  PAGE_CONTENT_SLOTS,
 } from "@/lib/cms-workflow";
 import { CmsDraftKind, CmsDraftOperation } from "@/generated/prisma/client";
 
@@ -25,6 +26,7 @@ async function createCmsDraft(input: Parameters<typeof createCmsDraftWorkflow>[0
 }
 import { createStaffAccount, changeStaffRole, setStaffAccountActive, initiateStaffPasswordReset, disableEditorWithReassignment, completeStaffPasswordReset } from "@/lib/staff-accounts";
 import { reassignCmsDraft } from "@/lib/cms-workflow";
+import { updateContactStatus, openContactEnquiry, contactRecipientsSchema, parseContactRecipientsForm } from "@/lib/contact";
 
 const idSchema = z.string().cuid();
 const text = (max: number) => z.string().trim().min(1).max(max);
@@ -43,6 +45,14 @@ async function staff(roles?: ("ADMINISTRATOR" | "EDITOR")[]) {
 
 function value(form: FormData, key: string) {
   return form.get(key)?.toString() ?? "";
+}
+function checkbox(form: FormData, key: string) {
+  const raw = form.get(key);
+  if (raw === null) return false;
+  const value = raw.toString().toLowerCase();
+  if (value === "on" || value === "true") return true;
+  if (value === "off" || value === "false" || value === "") return false;
+  throw new Error(`Invalid checkbox value for ${key}.`);
 }
 
 export async function saveSiteNotice(form: FormData) {
@@ -303,23 +313,25 @@ export async function saveFaq(form: FormData) {
 
 export async function saveFormDocument(form: FormData) {
   const { tenant, userId, role } = await staff();
-  const input = z.object({ id: idSchema.optional(), title: text(160), description: z.string().trim().max(500).optional(), mediaAssetId: idSchema.optional(), sortOrder: z.coerce.number().int().min(0).max(100), isEnabled: z.boolean() }).parse({
+  const input = z.object({ id: idSchema.optional(), title: text(160), description: z.string().trim().max(500).optional(), mediaAssetId: idSchema.optional(), category: text(50), isAnnualReport: z.boolean(), sortOrder: z.coerce.number().int().min(0).max(100), isEnabled: z.boolean() }).parse({
     id: value(form, "id") || undefined, title: value(form, "title"), description: value(form, "description") || undefined,
-    mediaAssetId: value(form, "mediaAssetId") || undefined, sortOrder: value(form, "sortOrder") || "0", isEnabled: form.get("isEnabled") === "on",
+    mediaAssetId: value(form, "mediaAssetId") || undefined, category: value(form, "category"), isAnnualReport: form.get("isAnnualReport") === "on", sortOrder: value(form, "sortOrder") || "0", isEnabled: form.get("isEnabled") === "on",
   });
   if (input.mediaAssetId && !(await db.mediaAsset.findFirst({ where: { id: input.mediaAssetId, tenantId: tenant.id, retiredAt: null, mimeType: "application/pdf" } }))) throw new Error("A live PDF media asset is required.");
   const expectedRevision = form.get("revision") ? Number(form.get("revision")) : undefined;
   if (role === "EDITOR") {
+    if (input.isAnnualReport) throw new Error("Editors cannot release annual reports.");
     await createCmsDraft({ tenant, actorUserId: userId, kind: CmsDraftKind.FORM_DOCUMENT, operation: input.id ? CmsDraftOperation.UPDATE : CmsDraftOperation.CREATE, targetId: input.id, expectedRevision, mediaAssetId: input.mediaAssetId, payload: input });
     return;
   }
   await db.$transaction(async (tx) => {
+    await lockCmsTenant(tx, tenant.id);
     let record;
     let before = null;
     if (input.id) {
       before = await tx.formDocument.findFirst({ where: { id: input.id, tenantId: tenant.id } });
       if (!before) throw new Error("Document not found.");
-      record = await tx.formDocument.update({ where: { id: input.id }, data: input });
+      record = await tx.formDocument.update({ where: { id: input.id }, data: { ...input, publicApprovedAt: null } });
     } else record = await tx.formDocument.create({ data: { tenantId: tenant.id, ...input } });
     await tx.auditLog.create({ data: { tenantId: tenant.id, actorUserId: userId, action: "FORM_DOCUMENT_UPDATE", targetType: "FormDocument", targetId: record.id, changeMetadata: { before: before ? { title: before.title, mediaAssetId: before.mediaAssetId, sortOrder: before.sortOrder, isEnabled: before.isEnabled } : null, after: { title: record.title, mediaAssetId: record.mediaAssetId, sortOrder: record.sortOrder, isEnabled: record.isEnabled } } } });
   });
@@ -334,13 +346,15 @@ export async function uploadFormDocument(form: FormData) {
     title: text(160),
     description: z.string().trim().max(500).optional(),
     sortOrder: z.coerce.number().int().min(0).max(100),
-    isEnabled: z.boolean(),
+    isEnabled: z.boolean(), category: text(50), isAnnualReport: z.boolean(),
   }).parse({
     title: value(form, "title"),
     description: value(form, "description") || undefined,
     sortOrder: value(form, "sortOrder") || "0",
     isEnabled: form.get("isEnabled") === "on",
+    category: value(form, "category"), isAnnualReport: form.get("isAnnualReport") === "on",
   });
+  if (role === "EDITOR" && input.isAnnualReport) throw new Error("Editors cannot release annual reports.");
   const media = await uploadDocument({ tenant, actorUserId: userId, file, altText: input.title });
   if (role === "EDITOR") {
     try {
@@ -353,6 +367,7 @@ export async function uploadFormDocument(form: FormData) {
   }
   try {
     await db.$transaction(async (tx) => {
+      await lockCmsTenant(tx, tenant.id);
       const created = await tx.formDocument.create({ data: { tenantId: tenant.id, ...input, mediaAssetId: media.id } });
       await tx.auditLog.create({ data: { tenantId: tenant.id, actorUserId: userId, action: "FORM_DOCUMENT_CREATE", targetType: "FormDocument", targetId: created.id, changeMetadata: { before: null, after: { title: input.title, description: input.description, sortOrder: input.sortOrder, isEnabled: input.isEnabled, mediaAssetId: media.id } } } });
     });
@@ -376,6 +391,20 @@ export async function removeFormDocument(form: FormData) {
     await tx.formDocument.update({ where: { id }, data: { isEnabled: false, mediaAssetId: null } });
     await tx.auditLog.create({ data: { tenantId: tenant.id, actorUserId: userId, action: "FORM_DOCUMENT_REMOVE", targetType: "FormDocument", targetId: id, changeMetadata: { before: { title: existing.title, mediaAssetId: existing.mediaAssetId }, after: { removed: true } } } });
   });
+  revalidatePath("/");
+}
+
+export async function setFormPublicApproval(form: FormData) {
+  const { tenant, userId } = await staff(["ADMINISTRATOR"]);
+  const id = idSchema.parse(value(form, "id"));
+  const approved = value(form, "approved") === "true";
+  await db.$transaction(async (tx) => {
+    await lockCmsTenant(tx, tenant.id);
+    const before = await tx.formDocument.findFirstOrThrow({ where: { id, tenantId: tenant.id } });
+    const record = await tx.formDocument.update({ where: { id }, data: { publicApprovedAt: approved ? new Date() : null, isEnabled: approved || !before.isAnnualReport ? before.isEnabled : false } });
+    await tx.auditLog.create({ data: { tenantId: tenant.id, actorUserId: userId, action: approved ? "FORM_DOCUMENT_PUBLIC_APPROVED" : "FORM_DOCUMENT_PUBLIC_REVOKED", targetType: "FormDocument", targetId: id, changeMetadata: { before: { publicApprovedAt: before.publicApprovedAt?.toISOString() ?? null, isEnabled: before.isEnabled }, after: { publicApprovedAt: record.publicApprovedAt?.toISOString() ?? null, isEnabled: record.isEnabled } } } });
+  });
+  revalidatePath("/admin/forms");
   revalidatePath("/");
 }
 
@@ -437,13 +466,18 @@ export async function removeFaq(form: FormData) {
 
 export async function saveContactSettings(form: FormData) {
   const { tenant, userId } = await staff(["ADMINISTRATOR"]);
-  const input = z.object({ organisationName: text(160), streetAddress: text(240), postalAddress: text(240), telephone: text(80), publicEmail: z.string().email().max(160), officeHours: z.string().trim().max(300).optional(), directionsUrl: z.string().url().max(500).optional() }).parse({
+  const input = z.object({ organisationName: text(160), streetAddress: text(240), postalAddress: text(240), telephone: text(80), publicEmail: z.string().email().max(160), officeHours: z.string().trim().max(300).optional(), directionsUrl: z.string().url().max(500).optional(), notificationRecipients: contactRecipientsSchema }).parse({
     organisationName: value(form, "organisationName"), streetAddress: value(form, "streetAddress"), postalAddress: value(form, "postalAddress"),
-    telephone: value(form, "telephone"), publicEmail: value(form, "publicEmail"), officeHours: value(form, "officeHours") || undefined, directionsUrl: value(form, "directionsUrl") || undefined,
+    telephone: value(form, "telephone"), publicEmail: value(form, "publicEmail"), officeHours: value(form, "officeHours") || undefined, directionsUrl: value(form, "directionsUrl") || undefined, notificationRecipients: parseContactRecipientsForm(form),
   });
+  const recipients = input.notificationRecipients;
+  if (recipients.length) {
+    const admins = await db.user.findMany({ where: { email: { in: recipients }, memberships: { some: { tenantId: tenant.id, role: "ADMINISTRATOR", isActive: true } } }, select: { email: true } });
+    if (admins.length !== recipients.length) throw new Error("Notification recipients must be active Administrators for this tenant.");
+  }
   await db.$transaction(async (tx) => {
     const before = await tx.contactSettings.findUnique({ where: { tenantId: tenant.id } });
-    const record = await tx.contactSettings.upsert({ where: { tenantId: tenant.id }, update: input, create: { tenantId: tenant.id, ...input } });
+    const record = await tx.contactSettings.upsert({ where: { tenantId: tenant.id }, update: { ...input, notificationRecipients: recipients }, create: { tenantId: tenant.id, ...input, notificationRecipients: recipients } });
     await tx.auditLog.create({ data: { tenantId: tenant.id, actorUserId: userId, action: "CONTACT_SETTINGS_UPDATE", targetType: "ContactSettings", targetId: record.id, changeMetadata: { before: before ? { organisationName: before.organisationName, telephone: before.telephone, publicEmail: before.publicEmail } : null, after: { organisationName: record.organisationName, telephone: record.telephone, publicEmail: record.publicEmail } } } });
   });
   revalidatePath("/", "layout");
@@ -596,6 +630,101 @@ export async function completeStaffPasswordResetAction(form: FormData) {
   } catch {
     throw new Error("This password reset link is invalid or expired.");
   }
+}
+
+export async function savePageContentDraft(form: FormData) {
+  const { tenant, userId, role } = await staff();
+  const slot = text(60).parse(value(form, "slot"));
+  if (!PAGE_CONTENT_SLOTS.includes(slot as (typeof PAGE_CONTENT_SLOTS)[number])) throw new Error("Unknown fixed page content slot.");
+  if (role === "EDITOR" && ["PRIVACY", "TERMS_OF_USE", "ACCESSIBILITY"].includes(slot)) throw new Error("Only Administrators may manage legal content.");
+  const expectedRevision = form.get("revision") ? Number(form.get("revision")) : undefined;
+  await createCmsDraft({
+    tenant,
+    actorUserId: userId,
+    kind: CmsDraftKind.PAGE_CONTENT,
+    operation: CmsDraftOperation.UPDATE,
+    targetId: `${tenant.id}:page:${slot}`,
+    expectedRevision,
+    payload: {
+      slot,
+      heading: value(form, "heading") || null,
+      body: value(form, "body") || null,
+    },
+  });
+  revalidatePath("/admin");
+}
+
+export async function updateContactEnquiryAction(form: FormData) {
+  const { tenant, userId } = await staff(["ADMINISTRATOR"]);
+  const id = idSchema.parse(value(form, "id"));
+  const status = z.enum(["NEW", "BEING_HANDLED", "CLOSED"]).parse(value(form, "status"));
+  const note = z.string().trim().max(1000).parse(value(form, "note"));
+  await updateContactStatus({ tenant, actorUserId: userId, id, status, note });
+  revalidatePath("/admin/contact");
+}
+
+export async function openContactEnquiryAction(form: FormData) {
+  const { tenant, userId } = await staff(["ADMINISTRATOR"]);
+  const id = idSchema.parse(value(form, "id"));
+  await openContactEnquiry({ tenant, actorUserId: userId, id });
+  revalidatePath("/admin/contact");
+}
+
+export async function saveRateFeeAction(form: FormData) {
+  const { tenant, userId } = await staff(["ADMINISTRATOR"]);
+  const input = z.object({
+    category: text(40), product: text(120), label: text(160), displayValue: text(120),
+    note: z.string().trim().max(500).optional(), effectiveAt: dateOrNull, sortOrder: z.coerce.number().int().min(0).max(999), isEnabled: z.boolean(),
+  }).parse({ category: value(form, "category"), product: value(form, "product"), label: value(form, "label"), displayValue: value(form, "displayValue"), note: value(form, "note") || undefined, effectiveAt: value(form, "effectiveAt"), sortOrder: value(form, "sortOrder") || 0, isEnabled: checkbox(form, "isEnabled") });
+  const id = value(form, "id");
+  if (id && !(await db.rateFee.findFirst({ where: { id, tenantId: tenant.id }, select: { id: true } }))) throw new Error("Rate does not belong to this tenant.");
+  const record = await db.$transaction(async (tx) => {
+    await lockCmsTenant(tx, tenant.id);
+    return id ? tx.rateFee.update({ where: { id }, data: input }) : tx.rateFee.create({ data: { tenantId: tenant.id, ...input } });
+  });
+  await db.auditLog.create({ data: { tenantId: tenant.id, actorUserId: userId, action: "RATE_FEE_UPDATED", targetType: "RateFee", targetId: record.id, changeMetadata: { published: false } } });
+  revalidatePath("/admin/rates");
+}
+
+export async function saveCalculatorSettingsAction() {
+  const { tenant, userId } = await staff(["ADMINISTRATOR"]);
+  const record = await db.calculatorSettings.upsert({
+    where: { tenantId: tenant.id },
+    update: { status: "AWAITING_SWCU_CONFIGURATION", isEnabled: false },
+    create: { tenantId: tenant.id, status: "AWAITING_SWCU_CONFIGURATION", isEnabled: false },
+  });
+  await db.auditLog.create({ data: { tenantId: tenant.id, actorUserId: userId, action: "CALCULATOR_SETTINGS_UPDATED", targetType: "CalculatorSettings", targetId: record.id, changeMetadata: { enabled: false } } });
+  revalidatePath("/admin/calculator");
+}
+
+export async function saveLeadershipAction(form: FormData) {
+  const { tenant, userId } = await staff(["ADMINISTRATOR"]);
+  const input = z.object({ name: text(160), title: text(160), group: text(80), profile: z.string().trim().max(1000).optional(), sortOrder: z.coerce.number().int().min(0).max(999), mediaAssetId: idSchema.optional() }).parse({ name: value(form, "name"), title: value(form, "title"), group: value(form, "group"), profile: value(form, "profile") || undefined, sortOrder: value(form, "sortOrder") || 0, mediaAssetId: value(form, "mediaAssetId") || undefined });
+  if (input.mediaAssetId && !(await db.mediaAsset.findFirst({ where: { id: input.mediaAssetId, tenantId: tenant.id, retiredAt: null, mimeType: { startsWith: "image/" } } }))) throw new Error("Approved active image media is required.");
+  const record = await db.$transaction(async (tx) => { await lockCmsTenant(tx, tenant.id); return tx.leadershipRecord.create({ data: { tenantId: tenant.id, ...input } }); });
+  await db.auditLog.create({ data: { tenantId: tenant.id, actorUserId: userId, action: "LEADERSHIP_RECORD_CREATED", targetType: "LeadershipRecord", targetId: record.id, changeMetadata: { group: record.group } } });
+  revalidatePath("/admin/leadership");
+}
+
+export async function updateLeadershipAction(form: FormData) {
+  const { tenant, userId } = await staff(["ADMINISTRATOR"]);
+  const id = idSchema.parse(value(form, "id"));
+  const existing = await db.leadershipRecord.findFirst({ where: { id, tenantId: tenant.id } });
+  if (!existing) throw new Error("Leadership record not found.");
+  const data = z.object({ name: text(160), title: text(160), group: text(80), profile: z.string().trim().max(1000).optional(), sortOrder: z.coerce.number().int().min(0).max(999), mediaAssetId: idSchema.optional(), isEnabled: z.boolean(), isPublished: z.boolean() }).parse({ name: value(form, "name"), title: value(form, "title"), group: value(form, "group"), profile: value(form, "profile") || undefined, sortOrder: value(form, "sortOrder") || 0, mediaAssetId: value(form, "mediaAssetId") || undefined, isEnabled: checkbox(form, "isEnabled"), isPublished: checkbox(form, "isPublished") });
+  if (data.mediaAssetId && !(await db.mediaAsset.findFirst({ where: { id: data.mediaAssetId, tenantId: tenant.id, retiredAt: null, mimeType: { startsWith: "image/" } } }))) throw new Error("Approved active image media is required.");
+  await db.$transaction(async (tx) => { await lockCmsTenant(tx, tenant.id); const before = await tx.leadershipRecord.findUniqueOrThrow({ where: { id } }); const updated = await tx.leadershipRecord.update({ where: { id }, data }); await tx.auditLog.create({ data: { tenantId: tenant.id, actorUserId: userId, action: "LEADERSHIP_RECORD_UPDATED", targetType: "LeadershipRecord", targetId: id, changeMetadata: { before: { group: before.group, sortOrder: before.sortOrder, isEnabled: before.isEnabled, isPublished: before.isPublished }, after: { group: updated.group, sortOrder: updated.sortOrder, isEnabled: updated.isEnabled, isPublished: updated.isPublished } } } }); });
+  revalidatePath("/admin/leadership");
+}
+
+export async function updateRateFeeAction(form: FormData) {
+  const { tenant, userId } = await staff(["ADMINISTRATOR"]);
+  const id = idSchema.parse(value(form, "id"));
+  const existing = await db.rateFee.findFirst({ where: { id, tenantId: tenant.id } });
+  if (!existing) throw new Error("Rate not found.");
+  const data = z.object({ category: text(40), product: text(120), label: text(160), displayValue: text(120), note: z.string().trim().max(500).optional(), sortOrder: z.coerce.number().int().min(0).max(999), isEnabled: z.boolean(), isPublished: z.boolean(), effectiveAt: dateOrNull }).parse({ category: value(form, "category"), product: value(form, "product"), label: value(form, "label"), displayValue: value(form, "displayValue"), note: value(form, "note") || undefined, sortOrder: value(form, "sortOrder") || 0, isEnabled: checkbox(form, "isEnabled"), isPublished: checkbox(form, "isPublished"), effectiveAt: value(form, "effectiveAt") });
+  await db.$transaction(async (tx) => { await lockCmsTenant(tx, tenant.id); const before = await tx.rateFee.findUniqueOrThrow({ where: { id } }); const updated = await tx.rateFee.update({ where: { id }, data }); await tx.auditLog.create({ data: { tenantId: tenant.id, actorUserId: userId, action: "RATE_FEE_UPDATED", targetType: "RateFee", targetId: id, changeMetadata: { before: { category: before.category, isEnabled: before.isEnabled, isPublished: before.isPublished }, after: { category: updated.category, isEnabled: updated.isEnabled, isPublished: updated.isPublished } } } }); });
+  revalidatePath("/admin/rates");
 }
 
 export async function disableEditorWithReassignmentAction(form: FormData) {

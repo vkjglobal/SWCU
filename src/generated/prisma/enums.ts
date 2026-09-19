@@ -35,7 +35,8 @@ export const CmsDraftKind = {
   FAQ: 'FAQ',
   FORM_DOCUMENT: 'FORM_DOCUMENT',
   HERO: 'HERO',
-  MEDIA: 'MEDIA'
+  MEDIA: 'MEDIA',
+  PAGE_CONTENT: 'PAGE_CONTENT'
 } as const
 
 export type CmsDraftKind = (typeof CmsDraftKind)[keyof typeof CmsDraftKind]
@@ -53,3 +54,12 @@ export const CmsDraftOperation = {
 } as const
 
 export type CmsDraftOperation = (typeof CmsDraftOperation)[keyof typeof CmsDraftOperation]
+
+
+export const ContactSubmissionStatus = {
+  NEW: 'NEW',
+  BEING_HANDLED: 'BEING_HANDLED',
+  CLOSED: 'CLOSED'
+} as const
+
+export type ContactSubmissionStatus = (typeof ContactSubmissionStatus)[keyof typeof ContactSubmissionStatus]

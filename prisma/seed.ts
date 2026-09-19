@@ -24,21 +24,13 @@ async function seed() {
     },
   });
 
-  await db.tenantSettings.upsert({
-    where: { tenantId: tenant.id },
-    update: { organisationName: "Service Worker Credit Union" },
-    create: {
-      tenantId: tenant.id,
-      organisationName: "Service Worker Credit Union",
-    },
-  });
+  await db.pageContent.deleteMany({ where: { tenantId: tenant.id, slot: "MEMBERSHIP_LOANS" } });
 
   await db.homeSettings.upsert({
     where: { tenantId: tenant.id },
     update: {},
     create: { tenantId: tenant.id },
   });
-
   const highlights = [
     ["1,500+", "Members"],
     ["Member-owned", "A credit union for its members"],
@@ -51,7 +43,6 @@ async function seed() {
       create: { id: `${tenant.id}-${value.toLowerCase().replaceAll(/[^a-z0-9]+/g, "-")}`, tenantId: tenant.id, value, label },
     });
   }
-
   const services = [
     ["Savings", "Build a steady savings habit with SWCU.", "piggy-bank"],
     ["Loans", "Access member loan support when you need it.", "hand-coins"],
@@ -65,34 +56,27 @@ async function seed() {
       create: { id: `${tenant.id}-service-${index + 1}`, tenantId: tenant.id, title, description, icon, sortOrder: index },
     });
   }
-
   const faqs = [
-    [
-      "Where can I find SWCU forms?",
-      "Approved forms and documents are available in the Forms & Resources area when they are published.",
-    ],
-    [
-      "How can I learn about joining SWCU?",
-      "Visit the Membership & Services page for approved membership information and next steps.",
-    ],
-    [
-      "How do I contact SWCU?",
-      "Use the contact details published on this website so you know you are reaching SWCU through an official channel.",
-    ],
+    ["Where can I find SWCU forms?", "Approved forms and documents are available in the Forms & Resources area when they are published."],
+    ["How can I learn about joining SWCU?", "Visit the Membership & Services page for approved membership information and next steps."],
+    ["How do I contact SWCU?", "Use the contact details published on this website so you know you are reaching SWCU through an official channel."],
   ] as const;
   for (const [index, [question, answer]] of faqs.entries()) {
     await db.fAQ.upsert({
       where: { id: `${tenant.id}-faq-${index + 1}` },
       update: { question, answer, sortOrder: index, isEnabled: true },
-      create: {
-        id: `${tenant.id}-faq-${index + 1}`,
-        tenantId: tenant.id,
-        question,
-        answer,
-        sortOrder: index,
-      },
+      create: { id: `${tenant.id}-faq-${index + 1}`, tenantId: tenant.id, question, answer, sortOrder: index },
     });
   }
+
+  await db.tenantSettings.upsert({
+    where: { tenantId: tenant.id },
+    update: { organisationName: "Service Worker Credit Union" },
+    create: {
+      tenantId: tenant.id,
+      organisationName: "Service Worker Credit Union",
+    },
+  });
 
   await db.contactSettings.upsert({
     where: { tenantId: tenant.id },
@@ -111,6 +95,31 @@ async function seed() {
       telephone: "(679) 7730445",
       publicEmail: "swcu2016@gmail.com",
     },
+  });
+
+  for (const page of [
+    {
+      slot: "ABOUT_STORY",
+      heading: "Our Story",
+      body: "Founded around 2000; now serving members from 300 Waimanu Road.",
+    },
+    {
+      slot: "LOANS_INTRO",
+      heading: "Loans",
+      body: "SWCU loans are for provident or productive purposes. Applications are considered against repayment ability, income or salary, and the member account position.",
+    },
+  ]) {
+    await db.pageContent.upsert({
+      where: { tenantId_slot: { tenantId: tenant.id, slot: page.slot } },
+      update: { heading: page.heading, body: page.body, isPublished: true, publishedAt: new Date() },
+      create: { tenantId: tenant.id, ...page, isPublished: true, publishedAt: new Date() },
+    });
+  }
+
+  await db.calculatorSettings.upsert({
+    where: { tenantId: tenant.id },
+    update: { status: "AWAITING_SWCU_CONFIGURATION", isEnabled: false },
+    create: { tenantId: tenant.id },
   });
 
   const domains = [

@@ -1,0 +1,1 @@
+ALTER TABLE "contact_settings" ADD COLUMN IF NOT EXISTS "notificationRecipients" VARCHAR(1000);

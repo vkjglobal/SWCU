@@ -33,6 +33,12 @@ const PUBLISHED_CHANGED_WARNING =
   "The published version has changed since this draft was started. Please review the current version before publishing.";
 const RETIRED_TARGET_ERROR =
   "This item has since been retired. This draft cannot be published.";
+export const PAGE_CONTENT_SLOTS = [
+  "ABOUT_STORY", "ABOUT_VISION", "ABOUT_MISSION", "ABOUT_PURPOSE", "ABOUT_GOVERNANCE", "IMPORTANT_INFORMATION",
+  "MEMBERSHIP_INTRO", "SAVINGS_INTRO", "LOANS_INTRO", "RETIREMENT_INTRO",
+  "DEATH_BENEFIT_INTRO", "FORMS_INTRO", "CONTACT_INTRO", "PRIVACY",
+  "TERMS_OF_USE", "ACCESSIBILITY",
+] as const;
 
 function json(payload: DraftPayload): Prisma.InputJsonValue {
   return JSON.parse(JSON.stringify(payload)) as Prisma.InputJsonValue;
@@ -80,11 +86,16 @@ async function targetRecord(
   targetId?: string | null,
 ) {
   if (!targetId) return null;
+  if (kind === CmsDraftKind.PAGE_CONTENT && targetId.includes(":page:")) {
+    const slot = targetId.split(":page:")[1];
+    return tx.pageContent.findFirst({ where: { tenantId, slot, isPublished: true }, select: { id: true, updatedAt: true, isPublished: true } });
+  }
   if (kind === CmsDraftKind.NEWS) return tx.newsNotice.findFirst({ where: { id: targetId, tenantId, isPublished: true }, select: { id: true, updatedAt: true, isPublished: true } });
   if (kind === CmsDraftKind.FAQ) return tx.fAQ.findFirst({ where: { id: targetId, tenantId, isEnabled: true }, select: { id: true, updatedAt: true, isEnabled: true } });
   if (kind === CmsDraftKind.FORM_DOCUMENT) return tx.formDocument.findFirst({ where: { id: targetId, tenantId, isEnabled: true }, select: { id: true, updatedAt: true, isEnabled: true } });
   if (kind === CmsDraftKind.HERO) return tx.homeHeroSlide.findFirst({ where: { id: targetId, tenantId, isEnabled: true }, select: { id: true, updatedAt: true, isEnabled: true } });
   if (kind === CmsDraftKind.MEDIA) return tx.mediaAsset.findFirst({ where: { id: targetId, tenantId, retiredAt: null }, select: { id: true, updatedAt: true, retiredAt: true } });
+  if (kind === CmsDraftKind.PAGE_CONTENT) return tx.pageContent.findFirst({ where: { id: targetId, tenantId, isPublished: true }, select: { id: true, updatedAt: true, isPublished: true } });
   return tx.siteNotice.findFirst({
     where: targetId === `${tenantId}:site-notice` ? { tenantId } : { id: targetId, tenantId },
     select: { id: true, updatedAt: true, isEnabled: true },
@@ -97,6 +108,12 @@ function fingerprint(record: { updatedAt: Date } | null) {
 
 export async function resolveCmsDraftTarget(tenant: ResolvedTenant, kind: CmsDraftKind, targetId?: string | null) {
   if (!targetId) return null;
+  if (kind === CmsDraftKind.PAGE_CONTENT && targetId.startsWith(`${tenant.id}:page:`)) {
+    const slot = targetId.split(":page:")[1];
+    return (await db.pageContent.findFirst({ where: { tenantId: tenant.id, slot } })) ?? {
+      id: targetId, tenantId: tenant.id, slot, updatedAt: new Date(0), isPublished: false,
+    };
+  }
   if (kind === CmsDraftKind.SITE_NOTICE && targetId === `${tenant.id}:site-notice`) {
     return (await db.siteNotice.findUnique({ where: { tenantId: tenant.id } })) ?? {
       id: `${tenant.id}:site-notice`,
@@ -111,6 +128,7 @@ export async function resolveCmsDraftTarget(tenant: ResolvedTenant, kind: CmsDra
   if (kind === CmsDraftKind.FORM_DOCUMENT) return db.formDocument.findFirst({ where: { id: targetId, tenantId: tenant.id } });
   if (kind === CmsDraftKind.HERO) return db.homeHeroSlide.findFirst({ where: { id: targetId, tenantId: tenant.id } });
   if (kind === CmsDraftKind.MEDIA) return db.mediaAsset.findFirst({ where: { id: targetId, tenantId: tenant.id, retiredAt: null } });
+  if (kind === CmsDraftKind.PAGE_CONTENT) return db.pageContent.findFirst({ where: { id: targetId, tenantId: tenant.id, isPublished: true } });
   return db.siteNotice.findFirst({ where: { id: targetId, tenantId: tenant.id } });
 }
 
@@ -144,6 +162,12 @@ export async function lockCmsTenant(
 }
 
 export async function createCmsDraft(input: DraftInput) {
+  if (input.kind === CmsDraftKind.PAGE_CONTENT) {
+    const slot = stringValue(input.payload, "slot");
+    if (!slot || !PAGE_CONTENT_SLOTS.includes(slot as (typeof PAGE_CONTENT_SLOTS)[number])) {
+      throw new Error("Unknown fixed page content slot.");
+    }
+  }
   const role = await roleFor(input.tenant.id, input.actorUserId);
   return db.$transaction(async (tx) => {
     await lockCmsTenant(tx, input.tenant.id);
@@ -181,7 +205,7 @@ export async function createCmsDraft(input: DraftInput) {
         return revised;
       }
     }
-    if (input.targetId) {
+    if (input.targetId && !(input.kind === CmsDraftKind.PAGE_CONTENT && input.targetId.startsWith(`${input.tenant.id}:page:`))) {
       const owned = input.kind === CmsDraftKind.NEWS
         ? await tx.newsNotice.findFirst({ where: { id: input.targetId, tenantId: input.tenant.id }, select: { id: true } })
         : input.kind === CmsDraftKind.FAQ
@@ -405,7 +429,8 @@ export async function publishCmsDraft(input: {
     });
     if (!draft) throw new Error("Draft not found or is no longer pending.");
     const currentTarget = await targetRecord(tx, input.tenant.id, draft.kind, draft.targetId);
-    if (draft.targetId && !currentTarget && draft.kind !== CmsDraftKind.SITE_NOTICE && draft.operation !== CmsDraftOperation.REMOVE) throw new Error(RETIRED_TARGET_ERROR);
+    const canCreateFirstVersion = draft.kind === CmsDraftKind.SITE_NOTICE || draft.kind === CmsDraftKind.PAGE_CONTENT;
+    if (draft.targetId && !currentTarget && !canCreateFirstVersion && draft.operation !== CmsDraftOperation.REMOVE) throw new Error(RETIRED_TARGET_ERROR);
     if (currentTarget && draft.publishedBaseFingerprint !== fingerprint(currentTarget) && !input.confirmPublishedChange) {
       throw new Error(PUBLISHED_CHANGED_WARNING);
     }
@@ -413,7 +438,36 @@ export async function publishCmsDraft(input: {
     const before: DraftPayload = {};
     const targetId = draft.targetId;
 
-    if (draft.kind === CmsDraftKind.SITE_NOTICE) {
+    if (draft.kind === CmsDraftKind.PAGE_CONTENT) {
+      const slot = targetId?.split(":page:")[1] ?? stringValue(payload, "slot");
+      if (!slot) throw new Error("Page content slot is required.");
+      const mediaAssetId = stringValue(payload, "mediaAssetId") ?? null;
+      if (mediaAssetId) {
+        const media = await tx.mediaAsset.findFirst({ where: { id: mediaAssetId, tenantId: input.tenant.id, retiredAt: null } });
+        if (!media) throw new Error("Page content media is not a live tenant asset.");
+      }
+      const existing = await tx.pageContent.findFirst({ where: { tenantId: input.tenant.id, slot } });
+      Object.assign(before, existing ?? {});
+      await tx.pageContent.upsert({
+        where: { tenantId_slot: { tenantId: input.tenant.id, slot } },
+        update: {
+          heading: nullableStringValue(payload, "heading") ?? null,
+          body: nullableStringValue(payload, "body") ?? null,
+          mediaAssetId,
+          isPublished: true,
+          publishedAt: new Date(),
+        },
+        create: {
+          tenantId: input.tenant.id,
+          slot,
+          heading: nullableStringValue(payload, "heading") ?? null,
+          body: nullableStringValue(payload, "body") ?? null,
+          mediaAssetId,
+          isPublished: true,
+          publishedAt: new Date(),
+        },
+      });
+    } else if (draft.kind === CmsDraftKind.SITE_NOTICE) {
       const existing = await tx.siteNotice.findUnique({
         where: { tenantId: input.tenant.id },
       });

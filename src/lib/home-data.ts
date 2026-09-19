@@ -27,7 +27,12 @@ export async function getHomeData(tenant: ResolvedTenant) {
       db.homeSettings.findUnique({ where: { tenantId: tenant.id } }),
       db.service.findMany({ where: { tenantId: tenant.id, isEnabled: true }, orderBy: { sortOrder: "asc" } }),
       db.formDocument.findMany({
-        where: { tenantId: tenant.id, isEnabled: true },
+        where: {
+          tenantId: tenant.id,
+          isEnabled: true,
+          mediaAsset: { retiredAt: null },
+          OR: [{ isAnnualReport: false }, { isAnnualReport: true, publicApprovedAt: { not: null } }],
+        },
         include: { mediaAsset: { select: { id: true, originalFilename: true, retiredAt: true } } },
         orderBy: { sortOrder: "asc" },
         take: 6,

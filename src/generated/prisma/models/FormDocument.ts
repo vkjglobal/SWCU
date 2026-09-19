@@ -42,6 +42,9 @@ export type FormDocumentMinAggregateOutputType = {
   mediaAssetId: string | null
   sortOrder: number | null
   isEnabled: boolean | null
+  category: string | null
+  isAnnualReport: boolean | null
+  publicApprovedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -54,6 +57,9 @@ export type FormDocumentMaxAggregateOutputType = {
   mediaAssetId: string | null
   sortOrder: number | null
   isEnabled: boolean | null
+  category: string | null
+  isAnnualReport: boolean | null
+  publicApprovedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -66,6 +72,9 @@ export type FormDocumentCountAggregateOutputType = {
   mediaAssetId: number
   sortOrder: number
   isEnabled: number
+  category: number
+  isAnnualReport: number
+  publicApprovedAt: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -88,6 +97,9 @@ export type FormDocumentMinAggregateInputType = {
   mediaAssetId?: true
   sortOrder?: true
   isEnabled?: true
+  category?: true
+  isAnnualReport?: true
+  publicApprovedAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -100,6 +112,9 @@ export type FormDocumentMaxAggregateInputType = {
   mediaAssetId?: true
   sortOrder?: true
   isEnabled?: true
+  category?: true
+  isAnnualReport?: true
+  publicApprovedAt?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -112,6 +127,9 @@ export type FormDocumentCountAggregateInputType = {
   mediaAssetId?: true
   sortOrder?: true
   isEnabled?: true
+  category?: true
+  isAnnualReport?: true
+  publicApprovedAt?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -211,6 +229,9 @@ export type FormDocumentGroupByOutputType = {
   mediaAssetId: string | null
   sortOrder: number
   isEnabled: boolean
+  category: string | null
+  isAnnualReport: boolean
+  publicApprovedAt: Date | null
   createdAt: Date
   updatedAt: Date
   _count: FormDocumentCountAggregateOutputType | null
@@ -246,6 +267,9 @@ export type FormDocumentWhereInput = {
   mediaAssetId?: Prisma.StringNullableFilter<"FormDocument"> | string | null
   sortOrder?: Prisma.IntFilter<"FormDocument"> | number
   isEnabled?: Prisma.BoolFilter<"FormDocument"> | boolean
+  category?: Prisma.StringNullableFilter<"FormDocument"> | string | null
+  isAnnualReport?: Prisma.BoolFilter<"FormDocument"> | boolean
+  publicApprovedAt?: Prisma.DateTimeNullableFilter<"FormDocument"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"FormDocument"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"FormDocument"> | Date | string
   tenant?: Prisma.XOR<Prisma.TenantScalarRelationFilter, Prisma.TenantWhereInput>
@@ -260,6 +284,9 @@ export type FormDocumentOrderByWithRelationInput = {
   mediaAssetId?: Prisma.SortOrderInput | Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   isEnabled?: Prisma.SortOrder
+  category?: Prisma.SortOrderInput | Prisma.SortOrder
+  isAnnualReport?: Prisma.SortOrder
+  publicApprovedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   tenant?: Prisma.TenantOrderByWithRelationInput
@@ -277,6 +304,9 @@ export type FormDocumentWhereUniqueInput = Prisma.AtLeast<{
   mediaAssetId?: Prisma.StringNullableFilter<"FormDocument"> | string | null
   sortOrder?: Prisma.IntFilter<"FormDocument"> | number
   isEnabled?: Prisma.BoolFilter<"FormDocument"> | boolean
+  category?: Prisma.StringNullableFilter<"FormDocument"> | string | null
+  isAnnualReport?: Prisma.BoolFilter<"FormDocument"> | boolean
+  publicApprovedAt?: Prisma.DateTimeNullableFilter<"FormDocument"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"FormDocument"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"FormDocument"> | Date | string
   tenant?: Prisma.XOR<Prisma.TenantScalarRelationFilter, Prisma.TenantWhereInput>
@@ -291,6 +321,9 @@ export type FormDocumentOrderByWithAggregationInput = {
   mediaAssetId?: Prisma.SortOrderInput | Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   isEnabled?: Prisma.SortOrder
+  category?: Prisma.SortOrderInput | Prisma.SortOrder
+  isAnnualReport?: Prisma.SortOrder
+  publicApprovedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.FormDocumentCountOrderByAggregateInput
@@ -311,6 +344,9 @@ export type FormDocumentScalarWhereWithAggregatesInput = {
   mediaAssetId?: Prisma.StringNullableWithAggregatesFilter<"FormDocument"> | string | null
   sortOrder?: Prisma.IntWithAggregatesFilter<"FormDocument"> | number
   isEnabled?: Prisma.BoolWithAggregatesFilter<"FormDocument"> | boolean
+  category?: Prisma.StringNullableWithAggregatesFilter<"FormDocument"> | string | null
+  isAnnualReport?: Prisma.BoolWithAggregatesFilter<"FormDocument"> | boolean
+  publicApprovedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"FormDocument"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"FormDocument"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"FormDocument"> | Date | string
 }
@@ -321,6 +357,9 @@ export type FormDocumentCreateInput = {
   description?: string | null
   sortOrder?: number
   isEnabled?: boolean
+  category?: string | null
+  isAnnualReport?: boolean
+  publicApprovedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   tenant: Prisma.TenantCreateNestedOneWithoutFormsInput
@@ -335,6 +374,9 @@ export type FormDocumentUncheckedCreateInput = {
   mediaAssetId?: string | null
   sortOrder?: number
   isEnabled?: boolean
+  category?: string | null
+  isAnnualReport?: boolean
+  publicApprovedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -345,6 +387,9 @@ export type FormDocumentUpdateInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isAnnualReport?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  publicApprovedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tenant?: Prisma.TenantUpdateOneRequiredWithoutFormsNestedInput
@@ -359,6 +404,9 @@ export type FormDocumentUncheckedUpdateInput = {
   mediaAssetId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isAnnualReport?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  publicApprovedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -371,6 +419,9 @@ export type FormDocumentCreateManyInput = {
   mediaAssetId?: string | null
   sortOrder?: number
   isEnabled?: boolean
+  category?: string | null
+  isAnnualReport?: boolean
+  publicApprovedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -381,6 +432,9 @@ export type FormDocumentUpdateManyMutationInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isAnnualReport?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  publicApprovedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -393,6 +447,9 @@ export type FormDocumentUncheckedUpdateManyInput = {
   mediaAssetId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isAnnualReport?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  publicApprovedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -415,6 +472,9 @@ export type FormDocumentCountOrderByAggregateInput = {
   mediaAssetId?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   isEnabled?: Prisma.SortOrder
+  category?: Prisma.SortOrder
+  isAnnualReport?: Prisma.SortOrder
+  publicApprovedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -431,6 +491,9 @@ export type FormDocumentMaxOrderByAggregateInput = {
   mediaAssetId?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   isEnabled?: Prisma.SortOrder
+  category?: Prisma.SortOrder
+  isAnnualReport?: Prisma.SortOrder
+  publicApprovedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -443,6 +506,9 @@ export type FormDocumentMinOrderByAggregateInput = {
   mediaAssetId?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   isEnabled?: Prisma.SortOrder
+  category?: Prisma.SortOrder
+  isAnnualReport?: Prisma.SortOrder
+  publicApprovedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -541,6 +607,9 @@ export type FormDocumentCreateWithoutTenantInput = {
   description?: string | null
   sortOrder?: number
   isEnabled?: boolean
+  category?: string | null
+  isAnnualReport?: boolean
+  publicApprovedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   mediaAsset?: Prisma.MediaAssetCreateNestedOneWithoutFormDocumentsInput
@@ -553,6 +622,9 @@ export type FormDocumentUncheckedCreateWithoutTenantInput = {
   mediaAssetId?: string | null
   sortOrder?: number
   isEnabled?: boolean
+  category?: string | null
+  isAnnualReport?: boolean
+  publicApprovedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -594,6 +666,9 @@ export type FormDocumentScalarWhereInput = {
   mediaAssetId?: Prisma.StringNullableFilter<"FormDocument"> | string | null
   sortOrder?: Prisma.IntFilter<"FormDocument"> | number
   isEnabled?: Prisma.BoolFilter<"FormDocument"> | boolean
+  category?: Prisma.StringNullableFilter<"FormDocument"> | string | null
+  isAnnualReport?: Prisma.BoolFilter<"FormDocument"> | boolean
+  publicApprovedAt?: Prisma.DateTimeNullableFilter<"FormDocument"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"FormDocument"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"FormDocument"> | Date | string
 }
@@ -604,6 +679,9 @@ export type FormDocumentCreateWithoutMediaAssetInput = {
   description?: string | null
   sortOrder?: number
   isEnabled?: boolean
+  category?: string | null
+  isAnnualReport?: boolean
+  publicApprovedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   tenant: Prisma.TenantCreateNestedOneWithoutFormsInput
@@ -616,6 +694,9 @@ export type FormDocumentUncheckedCreateWithoutMediaAssetInput = {
   description?: string | null
   sortOrder?: number
   isEnabled?: boolean
+  category?: string | null
+  isAnnualReport?: boolean
+  publicApprovedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -653,6 +734,9 @@ export type FormDocumentCreateManyTenantInput = {
   mediaAssetId?: string | null
   sortOrder?: number
   isEnabled?: boolean
+  category?: string | null
+  isAnnualReport?: boolean
+  publicApprovedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -663,6 +747,9 @@ export type FormDocumentUpdateWithoutTenantInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isAnnualReport?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  publicApprovedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   mediaAsset?: Prisma.MediaAssetUpdateOneWithoutFormDocumentsNestedInput
@@ -675,6 +762,9 @@ export type FormDocumentUncheckedUpdateWithoutTenantInput = {
   mediaAssetId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isAnnualReport?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  publicApprovedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -686,6 +776,9 @@ export type FormDocumentUncheckedUpdateManyWithoutTenantInput = {
   mediaAssetId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isAnnualReport?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  publicApprovedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -697,6 +790,9 @@ export type FormDocumentCreateManyMediaAssetInput = {
   description?: string | null
   sortOrder?: number
   isEnabled?: boolean
+  category?: string | null
+  isAnnualReport?: boolean
+  publicApprovedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -707,6 +803,9 @@ export type FormDocumentUpdateWithoutMediaAssetInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isAnnualReport?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  publicApprovedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   tenant?: Prisma.TenantUpdateOneRequiredWithoutFormsNestedInput
@@ -719,6 +818,9 @@ export type FormDocumentUncheckedUpdateWithoutMediaAssetInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isAnnualReport?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  publicApprovedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -730,6 +832,9 @@ export type FormDocumentUncheckedUpdateManyWithoutMediaAssetInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   isEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isAnnualReport?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  publicApprovedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -744,6 +849,9 @@ export type FormDocumentSelect<ExtArgs extends runtime.Types.Extensions.Internal
   mediaAssetId?: boolean
   sortOrder?: boolean
   isEnabled?: boolean
+  category?: boolean
+  isAnnualReport?: boolean
+  publicApprovedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
@@ -758,6 +866,9 @@ export type FormDocumentSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   mediaAssetId?: boolean
   sortOrder?: boolean
   isEnabled?: boolean
+  category?: boolean
+  isAnnualReport?: boolean
+  publicApprovedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
@@ -772,6 +883,9 @@ export type FormDocumentSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   mediaAssetId?: boolean
   sortOrder?: boolean
   isEnabled?: boolean
+  category?: boolean
+  isAnnualReport?: boolean
+  publicApprovedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
@@ -786,11 +900,14 @@ export type FormDocumentSelectScalar = {
   mediaAssetId?: boolean
   sortOrder?: boolean
   isEnabled?: boolean
+  category?: boolean
+  isAnnualReport?: boolean
+  publicApprovedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type FormDocumentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tenantId" | "title" | "description" | "mediaAssetId" | "sortOrder" | "isEnabled" | "createdAt" | "updatedAt", ExtArgs["result"]["formDocument"]>
+export type FormDocumentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "tenantId" | "title" | "description" | "mediaAssetId" | "sortOrder" | "isEnabled" | "category" | "isAnnualReport" | "publicApprovedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["formDocument"]>
 export type FormDocumentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   tenant?: boolean | Prisma.TenantDefaultArgs<ExtArgs>
   mediaAsset?: boolean | Prisma.FormDocument$mediaAssetArgs<ExtArgs>
@@ -818,6 +935,9 @@ export type $FormDocumentPayload<ExtArgs extends runtime.Types.Extensions.Intern
     mediaAssetId: string | null
     sortOrder: number
     isEnabled: boolean
+    category: string | null
+    isAnnualReport: boolean
+    publicApprovedAt: Date | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["formDocument"]>
@@ -1252,6 +1372,9 @@ export interface FormDocumentFieldRefs {
   readonly mediaAssetId: Prisma.FieldRef<"FormDocument", 'String'>
   readonly sortOrder: Prisma.FieldRef<"FormDocument", 'Int'>
   readonly isEnabled: Prisma.FieldRef<"FormDocument", 'Boolean'>
+  readonly category: Prisma.FieldRef<"FormDocument", 'String'>
+  readonly isAnnualReport: Prisma.FieldRef<"FormDocument", 'Boolean'>
+  readonly publicApprovedAt: Prisma.FieldRef<"FormDocument", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"FormDocument", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"FormDocument", 'DateTime'>
 }

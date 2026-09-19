@@ -20,6 +20,8 @@
     "check:media": "NODE_OPTIONS=--conditions=react-server tsx scripts/check-media.ts",
     "check:cms-workflow": "NODE_OPTIONS=--conditions=react-server tsx scripts/check-cms-workflow.ts",
     "check:prompt3a": "NODE_OPTIONS=--conditions=react-server tsx scripts/check-prompt3a.ts",
+    "check:prompt3b": "NODE_OPTIONS=--conditions=react-server tsx scripts/check-prompt3b.ts",
+    "check:prompt3b:http": "NODE_OPTIONS=--conditions=react-server tsx scripts/check-prompt3b-http.ts",
     "check:tenant": "tsx scripts/check-tenant.ts",
     "bootstrap:admin": "tsx scripts/bootstrap-admin.ts"
   },

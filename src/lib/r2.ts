@@ -6,6 +6,7 @@ import {
   checkR2ClientConnectivity,
   createR2Client,
   getR2Object,
+  deleteR2Object,
   putR2Object,
 } from "@/lib/r2-core";
 
@@ -39,4 +40,9 @@ export async function uploadMediaObject(objectKey: string, body: Uint8Array, con
 export async function readMediaObject(objectKey: string) {
   const environment = getServerEnvironment();
   return getR2Object(getR2Client(), { bucketName: environment.R2_BUCKET_NAME }, objectKey);
+}
+
+export async function deleteMediaObject(objectKey: string) {
+  const environment = getServerEnvironment();
+  return deleteR2Object(getR2Client(), { bucketName: environment.R2_BUCKET_NAME }, objectKey);
 }

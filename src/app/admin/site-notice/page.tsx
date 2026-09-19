@@ -1,4 +1,5 @@
 import { headers } from "next/headers";
+import Link from "next/link";
 import { db } from "@/lib/db";
 import { requireStaffMembership } from "@/lib/authorise";
 import { requireTenant } from "@/lib/tenant";
@@ -14,7 +15,7 @@ export default async function SiteNoticeAdminPage() {
   const editor = membership.role === "EDITOR";
   return (
     <main className="min-h-screen bg-soft-blue-grey"><div className="site-container py-12">
-      <a href="/admin" className="text-sm font-semibold text-swcu-blue">← Dashboard</a>
+      <Link href="/admin" className="text-sm font-semibold text-swcu-blue">← Dashboard</Link>
       <p className="eyebrow mt-8">Site Notice</p><h1 className="mt-2 font-heading text-4xl font-bold text-deep-navy">A clear message for every public page</h1>
       <p className="mt-2 text-sm text-charcoal/65">Times are entered and displayed in Fiji local time (UTC+12).</p>
       <AdminWorkflowNotice editor={editor} />

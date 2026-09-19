@@ -14,7 +14,7 @@ export type ResolvedTenant = {
   displayName: string;
 };
 
-export async function resolveTenant(hostname: string): Promise<ResolvedTenant | null> {
+export async function resolveTenant(hostname: string, options?: { allowDevelopmentFallback?: boolean }): Promise<ResolvedTenant | null> {
   const environment = getServerEnvironment();
   const normalisedHostname = normaliseHostname(hostname);
 
@@ -35,6 +35,7 @@ export async function resolveTenant(hostname: string): Promise<ResolvedTenant | 
     return domain.tenant;
   }
 
+  if (options?.allowDevelopmentFallback === false) return null;
   const developmentSlug = selectDevelopmentTenantSlug({
     hostname: normalisedHostname,
     nodeEnv: environment.NODE_ENV,

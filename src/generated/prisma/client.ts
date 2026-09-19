@@ -146,3 +146,33 @@ export type MediaAsset = Prisma.MediaAssetModel
  * 
  */
 export type CmsDraft = Prisma.CmsDraftModel
+/**
+ * Model PageContent
+ * 
+ */
+export type PageContent = Prisma.PageContentModel
+/**
+ * Model LeadershipRecord
+ * 
+ */
+export type LeadershipRecord = Prisma.LeadershipRecordModel
+/**
+ * Model RateFee
+ * 
+ */
+export type RateFee = Prisma.RateFeeModel
+/**
+ * Model CalculatorSettings
+ * 
+ */
+export type CalculatorSettings = Prisma.CalculatorSettingsModel
+/**
+ * Model ContactSubmission
+ * 
+ */
+export type ContactSubmission = Prisma.ContactSubmissionModel
+/**
+ * Model ContactRateLimit
+ * 
+ */
+export type ContactRateLimit = Prisma.ContactRateLimitModel

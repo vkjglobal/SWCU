@@ -71,7 +71,13 @@ export const ModelName = {
   FAQ: 'FAQ',
   ContactSettings: 'ContactSettings',
   MediaAsset: 'MediaAsset',
-  CmsDraft: 'CmsDraft'
+  CmsDraft: 'CmsDraft',
+  PageContent: 'PageContent',
+  LeadershipRecord: 'LeadershipRecord',
+  RateFee: 'RateFee',
+  CalculatorSettings: 'CalculatorSettings',
+  ContactSubmission: 'ContactSubmission',
+  ContactRateLimit: 'ContactRateLimit'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -307,6 +313,9 @@ export const FormDocumentScalarFieldEnum = {
   mediaAssetId: 'mediaAssetId',
   sortOrder: 'sortOrder',
   isEnabled: 'isEnabled',
+  category: 'category',
+  isAnnualReport: 'isAnnualReport',
+  publicApprovedAt: 'publicApprovedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -352,6 +361,7 @@ export const ContactSettingsScalarFieldEnum = {
   publicEmail: 'publicEmail',
   officeHours: 'officeHours',
   directionsUrl: 'directionsUrl',
+  notificationRecipients: 'notificationRecipients',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -406,6 +416,109 @@ export const CmsDraftScalarFieldEnum = {
 } as const
 
 export type CmsDraftScalarFieldEnum = (typeof CmsDraftScalarFieldEnum)[keyof typeof CmsDraftScalarFieldEnum]
+
+
+export const PageContentScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  slot: 'slot',
+  heading: 'heading',
+  body: 'body',
+  mediaAssetId: 'mediaAssetId',
+  isPublished: 'isPublished',
+  publishedAt: 'publishedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PageContentScalarFieldEnum = (typeof PageContentScalarFieldEnum)[keyof typeof PageContentScalarFieldEnum]
+
+
+export const LeadershipRecordScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  name: 'name',
+  title: 'title',
+  profile: 'profile',
+  group: 'group',
+  mediaAssetId: 'mediaAssetId',
+  sortOrder: 'sortOrder',
+  isEnabled: 'isEnabled',
+  isPublished: 'isPublished',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type LeadershipRecordScalarFieldEnum = (typeof LeadershipRecordScalarFieldEnum)[keyof typeof LeadershipRecordScalarFieldEnum]
+
+
+export const RateFeeScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  category: 'category',
+  product: 'product',
+  label: 'label',
+  displayValue: 'displayValue',
+  note: 'note',
+  effectiveAt: 'effectiveAt',
+  sortOrder: 'sortOrder',
+  isEnabled: 'isEnabled',
+  isPublished: 'isPublished',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RateFeeScalarFieldEnum = (typeof RateFeeScalarFieldEnum)[keyof typeof RateFeeScalarFieldEnum]
+
+
+export const CalculatorSettingsScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  status: 'status',
+  disclaimer: 'disclaimer',
+  securityReminder: 'securityReminder',
+  isEnabled: 'isEnabled',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CalculatorSettingsScalarFieldEnum = (typeof CalculatorSettingsScalarFieldEnum)[keyof typeof CalculatorSettingsScalarFieldEnum]
+
+
+export const ContactSubmissionScalarFieldEnum = {
+  id: 'id',
+  tenantId: 'tenantId',
+  reference: 'reference',
+  name: 'name',
+  email: 'email',
+  phone: 'phone',
+  subject: 'subject',
+  message: 'message',
+  status: 'status',
+  internalNote: 'internalNote',
+  submittedAt: 'submittedAt',
+  viewedAt: 'viewedAt',
+  handledAt: 'handledAt',
+  closedAt: 'closedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ContactSubmissionScalarFieldEnum = (typeof ContactSubmissionScalarFieldEnum)[keyof typeof ContactSubmissionScalarFieldEnum]
+
+
+export const ContactRateLimitScalarFieldEnum = {
+  id: 'id',
+  key: 'key',
+  tenantId: 'tenantId',
+  ipAddress: 'ipAddress',
+  windowStart: 'windowStart',
+  attempts: 'attempts',
+  blockedUntil: 'blockedUntil',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ContactRateLimitScalarFieldEnum = (typeof ContactRateLimitScalarFieldEnum)[keyof typeof ContactRateLimitScalarFieldEnum]
 
 
 export const SortOrder = {
