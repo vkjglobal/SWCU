@@ -18,7 +18,7 @@ export default async function UtilityPage({ params }: { params: Promise<{ utilit
     const pages = await getPublishedPageContent(tenant, ["IMPORTANT_INFORMATION"]);
     const approved = pages[0];
     if (!approved) notFound();
-    return <><InnerHero eyebrow="Important Information" title="Stay safe when dealing with SWCU" summary="Please take care when sharing personal or security information."/><div className="site-container section-shell"><div className="grid max-w-3xl gap-8"><Content heading={approved.heading} body={approved.body}/></div></div></>;
+    return <><InnerHero title={approved.heading || "Important Information"}/><div className="site-container section-shell"><div className="grid max-w-3xl gap-8"><Content body={approved.body}/></div></div></>;
   }
   const slot = utility === "privacy" ? "PRIVACY" : utility === "terms-of-use" ? "TERMS_OF_USE" : utility === "accessibility" ? "ACCESSIBILITY" : "";
   if (!slot) notFound();

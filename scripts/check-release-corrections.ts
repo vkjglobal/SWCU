@@ -42,6 +42,10 @@ async function main() {
   const security = "SWCU will never ask you to disclose your password, PIN or security/verification code by email, phone, chat or through an unsolicited link. If you are unsure, contact SWCU using the contact details published on this website.";
   assert(utility.includes('getPublishedPageContent(tenant, ["IMPORTANT_INFORMATION"])'), "Important Information reads published PageContent");
   assert(!utility.includes("getCalculatorSettings"), "Important Information does not render CalculatorSettings fallback");
+  assert(!utility.includes("Stay safe when dealing with SWCU"), "Important Information has no unapproved hero wording");
+  assert(!utility.includes("Please take care when sharing personal or security information."), "Important Information has no unapproved explanatory wording");
+  assert(utility.includes('title={approved.heading || "Important Information"}'), "Important Information uses only its neutral published heading");
+  assert(utility.includes("<Content body={approved.body}/>"), "Important Information renders locked body without a duplicate section heading");
   assert(count(seed, disclaimer) === 1 && count(seed, security) === 1, "seed contains each locked text exactly once");
   assert(count(utility, disclaimer) === 0 && count(utility, security) === 0, "utility does not hard-code locked text");
   const footer = await source("src/app/(public)/_components.tsx");
