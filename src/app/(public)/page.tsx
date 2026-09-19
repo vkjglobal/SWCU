@@ -13,6 +13,10 @@ export default async function HomePage() {
         alt: slide.altText,
         src: slide.mediaAsset ? `/api/media/${slide.mediaAsset.id}` : undefined,
       }))}
+      memberApp={{
+        enabled: data.homeSettings?.memberAppEnabled ?? true,
+        label: data.homeSettings?.memberAppLabel ?? "Member App — Coming Soon",
+      }}
       highlights={data.highlights.map((item) => ({ value: item.value, label: item.label }))}
       services={data.services.map((item) => ({
         title: item.title,
