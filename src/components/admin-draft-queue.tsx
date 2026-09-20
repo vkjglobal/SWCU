@@ -1,5 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import { archiveCmsDraft, publishCmsDraft } from "@/app/admin/actions";
+import { AdminActionForm, AdminSubmitButton } from "@/components/admin-action-form";
 
 export type AdminDraftSummary = {
   id: string;
@@ -64,14 +65,14 @@ export function AdminDraftQueue({ drafts }: { drafts: AdminDraftSummary[] }) {
                 </p>
                 </div>
                 <div className="flex gap-2">
-                  <form action={publishCmsDraft}>
+                  <AdminActionForm action={publishCmsDraft} className="contents" successMessage="Draft published.">
                     <input type="hidden" name="draftId" value={draft.id} />
-                    <button aria-label={`Publish ${kindLabels[draft.kind] ?? draft.kind} draft`} className="rounded bg-swcu-blue px-3 py-2 text-sm font-semibold text-white">Publish</button>
-                  </form>
-                  <form action={archiveCmsDraft}>
+                    <AdminSubmitButton pendingLabel="Publishing…" ariaLabel={`Publish ${kindLabels[draft.kind] ?? draft.kind} draft`} className="rounded bg-swcu-blue px-3 py-2 text-sm font-semibold text-white">Publish</AdminSubmitButton>
+                  </AdminActionForm>
+                  <AdminActionForm action={archiveCmsDraft} className="contents" successMessage="Draft archived.">
                     <input type="hidden" name="draftId" value={draft.id} />
-                    <button aria-label={`Archive ${kindLabels[draft.kind] ?? draft.kind} draft`} className="rounded border border-deep-navy/15 px-3 py-2 text-sm font-semibold text-charcoal">Archive</button>
-                  </form>
+                    <AdminSubmitButton pendingLabel="Archiving…" ariaLabel={`Archive ${kindLabels[draft.kind] ?? draft.kind} draft`} className="rounded border border-deep-navy/15 px-3 py-2 text-sm font-semibold text-charcoal">Archive</AdminSubmitButton>
+                  </AdminActionForm>
                 </div>
               </div>
               <div className="mt-4 grid gap-3 text-sm md:grid-cols-2">

@@ -5,6 +5,8 @@ import { requireTenant } from "@/lib/tenant";
 import { createStaffAccountAction, changeStaffRoleAction, setStaffActiveAction } from "@/app/admin/actions";
 import { AdminShell, StatusBadge } from "@/app/admin/admin-shell";
 import { StaffResetInitiation } from "@/components/staff-reset-initiation";
+import { AdminActionForm, AdminSubmitButton } from "@/components/admin-action-form";
+import { ConfirmSubmitButton } from "@/components/admin-media-upload";
 
 const openStatuses = ["DRAFT", "WAITING_FOR_APPROVAL", "RETURNED_FOR_CHANGES"] as const;
 
@@ -33,13 +35,13 @@ export default async function StaffPage() {
       <section className="rounded-card border border-deep-navy/10 bg-white p-6 shadow-card">
         <h2 className="font-heading text-xl font-bold text-deep-navy">Add a staff account</h2>
         <p className="mt-2 text-sm text-charcoal/65">Use a temporary setup password. The staff member can sign in and change it through the supported account process.</p>
-        <form action={createStaffAccountAction} className="mt-5 space-y-4">
+        <AdminActionForm action={createStaffAccountAction} className="mt-5 space-y-4" successMessage="Staff account created.">
           <label className="block text-sm font-semibold">Name<input name="name" required className="mt-1 w-full rounded-lg border border-deep-navy/15 px-3 py-2"/></label>
           <label className="block text-sm font-semibold">Email<input name="email" type="email" required className="mt-1 w-full rounded-lg border border-deep-navy/15 px-3 py-2"/></label>
           <label className="block text-sm font-semibold">Temporary setup password<input name="password" type="password" minLength={8} required className="mt-1 w-full rounded-lg border border-deep-navy/15 px-3 py-2"/></label>
           <label className="block text-sm font-semibold">Role<select name="role" className="mt-1 w-full rounded-lg border border-deep-navy/15 px-3 py-2"><option value="EDITOR">Editor</option><option value="ADMINISTRATOR">Administrator</option></select></label>
-          <button className="button-primary" type="submit">Create account</button>
-        </form>
+          <AdminSubmitButton pendingLabel="Creating…" className="button-primary">Create account</AdminSubmitButton>
+        </AdminActionForm>
         <p className="mt-4 text-sm text-charcoal/60">For an existing staff member, an Administrator can start the supported password reset process below. No passwords are displayed here.</p>
       </section>
       <section className="rounded-card border border-deep-navy/10 bg-white p-6 shadow-card">
@@ -59,7 +61,7 @@ export default async function StaffPage() {
                 <p className="text-sm font-semibold text-deep-navy">Deal with {affectedDrafts.length} open draft{affectedDrafts.length === 1 ? "" : "s"} {item.isActive ? "before disabling" : "while this Editor is disabled"}.</p>
                 <ul className="mt-2 space-y-1 text-xs text-charcoal/70">{affectedDrafts.map((draft) => <li key={draft.id}>{draft.kind.replaceAll("_", " ")} · {draft.status.replaceAll("_", " ")}</li>)}</ul>
                 <div className="mt-3 flex flex-wrap gap-2">
-                  <form action={setStaffActiveAction} className="flex flex-wrap gap-2">
+                  <AdminActionForm action={setStaffActiveAction} className="flex flex-wrap gap-2" successMessage="Editor reassigned and disabled.">
                     <input type="hidden" name="membershipId" value={item.id}/>
                     <input type="hidden" name="isActive" value="false"/>
                     <input type="hidden" name="decision" value="REASSIGN"/>
@@ -68,28 +70,28 @@ export default async function StaffPage() {
                       <option value="">Choose replacement Editor</option>
                       {editors.filter((editor) => editor.userId !== item.userId).map((editor) => <option key={editor.userId} value={editor.userId}>{editor.user.name}</option>)}
                     </select>
-                    <button className="rounded-lg border border-swcu-red/30 px-3 py-1 text-sm font-semibold text-swcu-red" type="submit">Reassign and disable</button>
-                  </form>
-                  <form action={setStaffActiveAction}>
+                     <AdminSubmitButton pendingLabel="Reassigning…" className="rounded-lg border border-swcu-red/30 px-3 py-1 text-sm font-semibold text-swcu-red">Reassign and disable</AdminSubmitButton>
+                  </AdminActionForm>
+                  <AdminActionForm action={setStaffActiveAction} className="contents" successMessage="Drafts archived and Editor disabled.">
                     <input type="hidden" name="membershipId" value={item.id}/>
                     <input type="hidden" name="isActive" value="false"/>
                     <input type="hidden" name="decision" value="ARCHIVE"/>
-                    <button className="rounded-lg border border-deep-navy/20 px-3 py-1 text-sm font-semibold text-charcoal" type="submit">Archive drafts and disable</button>
-                  </form>
+                     <ConfirmSubmitButton label="Archive drafts and disable" message="Archive this Editor's open drafts and disable access?" className="rounded-lg border border-deep-navy/20 px-3 py-1 text-sm font-semibold text-charcoal"/>
+                  </AdminActionForm>
                 </div>
               </div>}
               <div className="mt-3 flex flex-wrap gap-2">
                 <StaffResetInitiation membershipId={item.id}/>
-                <form action={changeStaffRoleAction}>
+                 <AdminActionForm action={changeStaffRoleAction} className="contents" successMessage="Staff role saved.">
                   <input type="hidden" name="membershipId" value={item.id}/>
                   <select name="role" defaultValue={item.role} aria-label={`Role for ${item.user.name}`} className="rounded-lg border border-deep-navy/15 px-2 py-1 text-sm"><option value="EDITOR">Editor</option><option value="ADMINISTRATOR">Administrator</option></select>
-                  <button className="ml-2 rounded-lg border border-swcu-blue/30 px-3 py-1 text-sm font-semibold text-swcu-blue" type="submit">Save role</button>
-                </form>
-                {!needsDecision && <form action={setStaffActiveAction}>
+                   <AdminSubmitButton pendingLabel="Saving…" className="ml-2 rounded-lg border border-swcu-blue/30 px-3 py-1 text-sm font-semibold text-swcu-blue">Save role</AdminSubmitButton>
+                 </AdminActionForm>
+                 {!needsDecision && <AdminActionForm action={setStaffActiveAction} className="contents" successMessage={item.isActive ? "Staff access disabled." : "Staff access reactivated."}>
                   <input type="hidden" name="membershipId" value={item.id}/>
                   <input type="hidden" name="isActive" value={item.isActive ? "false" : "true"}/>
-                  <button className="rounded-lg border border-deep-navy/15 px-3 py-1 text-sm font-semibold text-charcoal" type="submit">{item.isActive ? "Disable access" : "Reactivate"}</button>
-                </form>}
+                   {item.isActive ? <ConfirmSubmitButton label="Disable access" message="Disable this staff member's access?" className="rounded-lg border border-deep-navy/15 px-3 py-1 text-sm font-semibold text-charcoal"/> : <AdminSubmitButton pendingLabel="Reactivating…" className="rounded-lg border border-deep-navy/15 px-3 py-1 text-sm font-semibold text-charcoal">Reactivate</AdminSubmitButton>}
+                 </AdminActionForm>}
               </div>
             </div>;
           })}

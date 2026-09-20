@@ -33,6 +33,7 @@ export function AdminShell({
           <Link href="/admin" className="whitespace-nowrap hover:text-swcu-blue">Overview</Link>
           <Link href="/admin/drafts" className="whitespace-nowrap hover:text-swcu-blue">My drafts</Link>
           {role === "ADMINISTRATOR" && <Link href="/admin/approvals" className="whitespace-nowrap hover:text-swcu-blue">Waiting for approval</Link>}
+          {role === "ADMINISTRATOR" && <Link href="/admin/contact-enquiries" className="whitespace-nowrap hover:text-swcu-blue">Contact enquiries</Link>}
         </div>
       </nav>
       <section className="site-container py-10">

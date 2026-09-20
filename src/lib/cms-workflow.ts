@@ -398,7 +398,14 @@ async function assertHeroLimit(
   const current = targetId
     ? await tx.homeHeroSlide.findFirst({ where: { id: targetId, tenantId } })
     : null;
-  const adding = operation === CmsDraftOperation.CREATE && enabled !== false;
+  const total = await tx.homeHeroSlide.count({
+    where: { tenantId, mediaAssetId: { not: null } },
+  });
+  const creating = operation === CmsDraftOperation.CREATE;
+  const adding = creating && enabled !== false;
+  if (creating && total >= 4) {
+    throw new Error("A maximum of four Hero images is allowed.");
+  }
   const enabling =
     operation === CmsDraftOperation.TOGGLE &&
     enabled === true &&
@@ -615,15 +622,21 @@ export async function publishCmsDraft(input: {
         if (!existing) throw new Error("Hero slide not found.");
         Object.assign(before, existing);
         const nextMediaId = proposedMediaId;
-        await tx.homeHeroSlide.update({
-          where: { id: existing.id },
-          data: {
-            mediaAssetId: draft.operation === CmsDraftOperation.REMOVE ? null : nextMediaId,
-            altText: stringValue(payload, "altText"),
-            sortOrder: numberValue(payload, "sortOrder"),
-            isEnabled: draft.operation === CmsDraftOperation.REMOVE ? false : enabled,
-          },
-        });
+        if (draft.operation === CmsDraftOperation.REMOVE) {
+          // Do not leave a null-media slide behind: it can be mistaken for a
+          // live slot by admin/public consumers and must not produce /api/media/null.
+          await tx.homeHeroSlide.delete({ where: { id: existing.id } });
+        } else {
+          await tx.homeHeroSlide.update({
+            where: { id: existing.id },
+            data: {
+              mediaAssetId: nextMediaId,
+              altText: stringValue(payload, "altText"),
+              sortOrder: numberValue(payload, "sortOrder"),
+              isEnabled: enabled,
+            },
+          });
+        }
         if (existing.mediaAssetId && (draft.operation === CmsDraftOperation.REMOVE || nextMediaId !== existing.mediaAssetId)) {
           await retireIfUnreferenced(tx, input.tenant.id, existing.mediaAssetId, nextMediaId ?? undefined);
         }
@@ -659,9 +672,10 @@ export async function publishCmsDraft(input: {
         const activeHeroRefs = await tx.homeHeroSlide.count({ where: { tenantId: input.tenant.id, mediaAssetId: existing.id, isEnabled: true } });
         const activeHeroCount = await tx.homeHeroSlide.count({ where: { tenantId: input.tenant.id, isEnabled: true } });
         if (activeHeroCount - activeHeroRefs < 1) throw new Error("Keep at least one active hero slide.");
-        await tx.homeHeroSlide.updateMany({
+        // Retiring a media asset must remove its Hero slot, not leave a
+        // null-media row that could be rendered or counted as a slide.
+        await tx.homeHeroSlide.deleteMany({
           where: { tenantId: input.tenant.id, mediaAssetId: existing.id },
-          data: { mediaAssetId: null, isEnabled: false },
         });
         await tx.formDocument.updateMany({
           where: { tenantId: input.tenant.id, mediaAssetId: existing.id },

@@ -92,7 +92,9 @@ export async function retireMedia(tenant: ResolvedTenant, actorUserId: string, m
     const activeHeroRefs = await tx.homeHeroSlide.count({ where: { tenantId: tenant.id, mediaAssetId: existing.id, isEnabled: true } });
     const activeHeroCount = await tx.homeHeroSlide.count({ where: { tenantId: tenant.id, isEnabled: true } });
     if (activeHeroRefs > 0 && activeHeroCount - activeHeroRefs < 1) throw new Error("Keep at least one active hero slide.");
-    const heroRefs = await tx.homeHeroSlide.updateMany({ where: { tenantId: tenant.id, mediaAssetId: existing.id }, data: { mediaAssetId: null, isEnabled: false } });
+    // Retiring media removes the hero slot rather than leaving an unusable
+    // null-media row that could be rendered or counted as a slide.
+    const heroRefs = await tx.homeHeroSlide.deleteMany({ where: { tenantId: tenant.id, mediaAssetId: existing.id } });
     const formRefs = await tx.formDocument.updateMany({ where: { tenantId: tenant.id, mediaAssetId: existing.id }, data: { mediaAssetId: null } });
     const contactMapRefs = await tx.contactSettings.updateMany({ where: { tenantId: tenant.id, contactMapMediaAssetId: existing.id }, data: { contactMapMediaAssetId: null } });
     const retired = await tx.mediaAsset.update({ where: { id: existing.id }, data: { retiredAt: new Date() } });

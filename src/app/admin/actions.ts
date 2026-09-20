@@ -28,6 +28,7 @@ async function createCmsDraft(input: Parameters<typeof createCmsDraftWorkflow>[0
 import { createStaffAccount, changeStaffRole, setStaffAccountActive, initiateStaffPasswordReset, disableEditorWithReassignment, completeStaffPasswordReset } from "@/lib/staff-accounts";
 import { reassignCmsDraft } from "@/lib/cms-workflow";
 import { updateContactStatus, openContactEnquiry, contactRecipientsSchema, parseContactRecipientsForm } from "@/lib/contact";
+import { sanitizeRichText } from "@/lib/rich-text";
 
 const idSchema = z.string().cuid();
 const text = (max: number) => z.string().trim().min(1).max(max);
@@ -207,6 +208,8 @@ export async function uploadHeroSlide(form: FormData) {
   try {
     await db.$transaction(async (tx) => {
       await lockCmsTenant(tx, tenant.id);
+      const totalCount = await tx.homeHeroSlide.count({ where: { tenantId: tenant.id, mediaAssetId: { not: null } } });
+      if (totalCount >= 4) throw new Error("A maximum of four Hero images is allowed.");
       const activeCount = await tx.homeHeroSlide.count({ where: { tenantId: tenant.id, isEnabled: true } });
       const created = await tx.homeHeroSlide.create({
         data: { tenantId: tenant.id, mediaAssetId: media.id, altText, sortOrder: await tx.homeHeroSlide.count({ where: { tenantId: tenant.id } }), isEnabled: activeCount < 4 },
@@ -265,7 +268,9 @@ export async function removeHeroSlide(form: FormData) {
     await lockCmsTenant(tx, tenant.id);
     const activeCount = await tx.homeHeroSlide.count({ where: { tenantId: tenant.id, isEnabled: true } });
     if (slide.isEnabled && activeCount <= 1) throw new Error("Keep at least one active hero slide.");
-    await tx.homeHeroSlide.update({ where: { id }, data: { mediaAssetId: null, isEnabled: false } });
+    // A removed slide must not remain as a visible/null-media row. Delete the
+    // slot itself; the asset is retired below and remains recoverable/audited.
+    await tx.homeHeroSlide.delete({ where: { id } });
     if (slide.mediaAssetId) await retireIfUnreferenced(tx, tenant.id, slide.mediaAssetId);
     await tx.auditLog.create({ data: { tenantId: tenant.id, actorUserId: userId, action: "HERO_REMOVE", targetType: "HomeHeroSlide", targetId: id, changeMetadata: { before: { mediaAssetId: slide.mediaAssetId, altText: slide.altText }, after: { removed: true } } } });
   });
@@ -679,6 +684,7 @@ export async function savePageContentDraft(form: FormData) {
   if (!PAGE_CONTENT_SLOTS.includes(slot as (typeof PAGE_CONTENT_SLOTS)[number])) throw new Error("Unknown fixed page content slot.");
   if (role === "EDITOR" && isUtilityPageSlot(slot)) throw new Error("Only Administrators may manage utility pages.");
   const expectedRevision = form.get("revision") ? Number(form.get("revision")) : undefined;
+  const rawBody = value(form, "body");
   await createCmsDraft({
     tenant,
     actorUserId: userId,
@@ -689,7 +695,7 @@ export async function savePageContentDraft(form: FormData) {
     payload: {
       slot,
       heading: value(form, "heading") || null,
-      body: value(form, "body") || null,
+      body: (isUtilityPageSlot(slot) ? sanitizeRichText(rawBody) : rawBody) || null,
     },
   });
   revalidatePath("/admin");

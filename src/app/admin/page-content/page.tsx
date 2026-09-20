@@ -8,6 +8,7 @@ import { getCmsDraftRevision } from "@/lib/cms-workflow";
 import { CmsDraftKind } from "@/generated/prisma/client";
 import { PAGE_CONTENT_SLOTS } from "@/lib/cms-workflow";
 import { isUtilityPageSlot } from "@/lib/utility-pages";
+import { AdminActionForm, AdminSubmitButton } from "@/components/admin-action-form";
 
 const slots = PAGE_CONTENT_SLOTS.filter((slot) => !isUtilityPageSlot(slot));
 
@@ -23,13 +24,13 @@ export default async function PageContentAdminPage() {
     <p className="mt-2 text-charcoal/70">Fixed content slots keep the public site safe and consistent. {membership.role === "EDITOR" ? "Your changes require Administrator approval." : "Administrator changes still use the approval workflow where applicable."}</p>
     <div className="mt-8 space-y-4">{slots.map((slot) => {
       const item = content.find((entry) => entry.slot === slot);
-      return <form key={slot} action={savePageContentDraft} className="rounded-card bg-white p-5">
+       return <AdminActionForm key={slot} action={savePageContentDraft} className="rounded-card bg-white p-5" successMessage="Page content draft saved.">
         <input type="hidden" name="slot" value={slot} />
         {revisionMap.get(slot) !== undefined && <input type="hidden" name="revision" value={revisionMap.get(slot)} />}
         <label className="text-sm font-semibold">Content area<input name="heading" defaultValue={item?.heading ?? ""} placeholder={slot.replaceAll("_", " ")} className="mt-1 w-full rounded border p-2" /></label>
         <label className="mt-3 block text-sm font-semibold">Approved copy<textarea name="body" defaultValue={item?.body ?? ""} rows={3} className="mt-1 w-full rounded border p-2" /></label>
-        <button className="mt-3 rounded bg-swcu-blue px-4 py-2 font-semibold text-white">Save for review</button>
-      </form>;
+         <AdminSubmitButton pendingLabel="Saving…" className="mt-3 rounded bg-swcu-blue px-4 py-2 font-semibold text-white">Save for review</AdminSubmitButton>
+       </AdminActionForm>;
     })}</div>
   </main>;
 }
