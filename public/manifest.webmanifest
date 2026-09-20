@@ -1,0 +1,20 @@
+{
+  "name": "Service Worker Credit Union",
+  "short_name": "SWCU",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#163b5c",
+  "icons": [
+    {
+      "src": "/brand/swcu/pwa-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/brand/swcu/pwa-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

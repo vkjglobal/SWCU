@@ -22,11 +22,13 @@ export const metadata: Metadata = {
   },
   description:
     "The public website of Service Worker Credit Union in Suva, Fiji.",
+  manifest: "/manifest.webmanifest",
   icons: {
     icon: [
       { url: "/brand/swcu/favicon.ico" },
       { url: "/brand/swcu/favicon-32.png", sizes: "32x32", type: "image/png" },
       { url: "/brand/swcu/favicon-16.png", sizes: "16x16", type: "image/png" },
+      { url: "/brand/swcu/favicon-48.png", sizes: "48x48", type: "image/png" },
     ],
     apple: "/brand/swcu/apple-touch-icon.png",
   },
