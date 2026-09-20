@@ -24,13 +24,11 @@ export function AdminActionForm({
   children,
   className,
   successMessage = "Changes saved successfully.",
-  encType,
 }: {
   action: ServerAction;
   children: ReactNode;
   className?: string;
   successMessage?: string;
-  encType?: "application/x-www-form-urlencoded" | "multipart/form-data" | "text/plain";
 }) {
   const [state, formAction, pending] = useActionState<ActionState, FormData>(
     async (_previous, formData) => {
@@ -49,7 +47,7 @@ export function AdminActionForm({
   );
 
   return (
-    <form action={formAction} encType={encType} className={className}>
+    <form action={formAction} className={className}>
       {children}
       {state.status !== "idle" && (
         <p
@@ -82,7 +80,7 @@ export function AdminSubmitButton({
 }) {
   const { pending } = useFormStatus();
   return (
-    <button type={type} disabled={pending || disabled} aria-label={ariaLabel} className={`${className} disabled:cursor-not-allowed disabled:opacity-55`}>
+    <button type={type} disabled={pending || disabled} aria-label={ariaLabel} className={`${className} admin-action-control disabled:cursor-not-allowed disabled:opacity-55`}>
       {pending ? pendingLabel : children}
     </button>
   );

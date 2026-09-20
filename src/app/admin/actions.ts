@@ -746,11 +746,19 @@ export async function saveCalculatorSettingsAction() {
 
 export async function saveLeadershipAction(form: FormData) {
   const { tenant, userId } = await staff(["ADMINISTRATOR"]);
-  const input = z.object({ name: text(160), title: text(160), group: text(80), profile: z.string().trim().max(1000).optional(), sortOrder: z.coerce.number().int().min(0).max(999), mediaAssetId: idSchema.optional() }).parse({ name: value(form, "name"), title: value(form, "title"), group: value(form, "group"), profile: value(form, "profile") || undefined, sortOrder: value(form, "sortOrder") || 0, mediaAssetId: value(form, "mediaAssetId") || undefined });
-  if (input.mediaAssetId && !(await db.mediaAsset.findFirst({ where: { id: input.mediaAssetId, tenantId: tenant.id, retiredAt: null, mimeType: { startsWith: "image/" } } }))) throw new Error("Approved active image media is required.");
-  const record = await db.$transaction(async (tx) => { await lockCmsTenant(tx, tenant.id); return tx.leadershipRecord.create({ data: { tenantId: tenant.id, ...input } }); });
+  const input = z.object({ name: text(160), title: text(160), group: z.enum(["Board", "Credit Committee", "Supervisory Committee"]), profile: z.string().trim().max(1000).optional(), sortOrder: z.coerce.number().int().min(0).max(999) }).parse({ name: value(form, "name"), title: value(form, "title"), group: value(form, "group"), profile: value(form, "profile") || undefined, sortOrder: value(form, "sortOrder") || 0 });
+  const photo = form.get("photo");
+  const media = photo instanceof File && photo.size > 0 ? await uploadMedia({ tenant, actorUserId: userId, file: photo, purpose: "general", altText: input.name }) : null;
+  let record;
+  try {
+    record = await db.$transaction(async (tx) => { await lockCmsTenant(tx, tenant.id); return tx.leadershipRecord.create({ data: { tenantId: tenant.id, ...input, mediaAssetId: media?.id ?? null } }); });
+  } catch (error) {
+    if (media) await db.mediaAsset.update({ where: { id: media.id }, data: { retiredAt: new Date() } });
+    throw error;
+  }
   await db.auditLog.create({ data: { tenantId: tenant.id, actorUserId: userId, action: "LEADERSHIP_RECORD_CREATED", targetType: "LeadershipRecord", targetId: record.id, changeMetadata: { group: record.group } } });
   revalidatePath("/admin/leadership");
+  revalidatePath("/about-swcu");
 }
 
 export async function updateLeadershipAction(form: FormData) {
@@ -758,10 +766,18 @@ export async function updateLeadershipAction(form: FormData) {
   const id = idSchema.parse(value(form, "id"));
   const existing = await db.leadershipRecord.findFirst({ where: { id, tenantId: tenant.id } });
   if (!existing) throw new Error("Leadership record not found.");
-  const data = z.object({ name: text(160), title: text(160), group: text(80), profile: z.string().trim().max(1000).optional(), sortOrder: z.coerce.number().int().min(0).max(999), mediaAssetId: idSchema.optional(), isEnabled: z.boolean(), isPublished: z.boolean() }).parse({ name: value(form, "name"), title: value(form, "title"), group: value(form, "group"), profile: value(form, "profile") || undefined, sortOrder: value(form, "sortOrder") || 0, mediaAssetId: value(form, "mediaAssetId") || undefined, isEnabled: checkbox(form, "isEnabled"), isPublished: checkbox(form, "isPublished") });
-  if (data.mediaAssetId && !(await db.mediaAsset.findFirst({ where: { id: data.mediaAssetId, tenantId: tenant.id, retiredAt: null, mimeType: { startsWith: "image/" } } }))) throw new Error("Approved active image media is required.");
-  await db.$transaction(async (tx) => { await lockCmsTenant(tx, tenant.id); const before = await tx.leadershipRecord.findUniqueOrThrow({ where: { id } }); const updated = await tx.leadershipRecord.update({ where: { id }, data }); await tx.auditLog.create({ data: { tenantId: tenant.id, actorUserId: userId, action: "LEADERSHIP_RECORD_UPDATED", targetType: "LeadershipRecord", targetId: id, changeMetadata: { before: { group: before.group, sortOrder: before.sortOrder, isEnabled: before.isEnabled, isPublished: before.isPublished }, after: { group: updated.group, sortOrder: updated.sortOrder, isEnabled: updated.isEnabled, isPublished: updated.isPublished } } } }); });
+  const removePhoto = checkbox(form, "removePhoto");
+  const data = z.object({ name: text(160), title: text(160), group: text(80), profile: z.string().trim().max(1000).optional(), sortOrder: z.coerce.number().int().min(0).max(999), isEnabled: z.boolean(), isPublished: z.boolean() }).parse({ name: value(form, "name"), title: value(form, "title"), group: value(form, "group"), profile: value(form, "profile") || undefined, sortOrder: value(form, "sortOrder") || 0, isEnabled: checkbox(form, "isEnabled"), isPublished: checkbox(form, "isPublished") });
+  const photo = form.get("photo");
+  const media = photo instanceof File && photo.size > 0 ? await uploadMedia({ tenant, actorUserId: userId, file: photo, purpose: "general", altText: data.name }) : null;
+  try {
+    await db.$transaction(async (tx) => { await lockCmsTenant(tx, tenant.id); const before = await tx.leadershipRecord.findUniqueOrThrow({ where: { id } }); const updated = await tx.leadershipRecord.update({ where: { id }, data: { ...data, mediaAssetId: media?.id ?? (removePhoto ? null : before.mediaAssetId) } }); if (before.mediaAssetId && (media || removePhoto)) await retireIfUnreferenced(tx, tenant.id, before.mediaAssetId, media?.id); await tx.auditLog.create({ data: { tenantId: tenant.id, actorUserId: userId, action: "LEADERSHIP_RECORD_UPDATED", targetType: "LeadershipRecord", targetId: id, changeMetadata: { before: { group: before.group, sortOrder: before.sortOrder, isEnabled: before.isEnabled, isPublished: before.isPublished }, after: { group: updated.group, sortOrder: updated.sortOrder, isEnabled: updated.isEnabled, isPublished: updated.isPublished, photoChanged: Boolean(media) || removePhoto } } } }); });
+  } catch (error) {
+    if (media) await db.mediaAsset.update({ where: { id: media.id }, data: { retiredAt: new Date() } });
+    throw error;
+  }
   revalidatePath("/admin/leadership");
+  revalidatePath("/about-swcu");
 }
 
 export async function updateRateFeeAction(form: FormData) {
