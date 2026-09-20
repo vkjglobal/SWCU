@@ -4,17 +4,21 @@ import { readMediaObject } from "@/lib/r2";
 import { resolveTenant } from "@/lib/tenant";
 import { mediaCacheControl } from "@/lib/media-cache";
 import { canServeMedia } from "@/lib/media-access";
+import { buildMediaDownloadHeaders } from "@/lib/media-download";
 
 export const runtime = "nodejs";
 
 export async function GET(request: Request, context: { params: Promise<{ id: string }> }) {
-  const tenant = await resolveTenant(request.headers.get("x-forwarded-host") ?? request.headers.get("host") ?? "", { allowDevelopmentFallback: false });
+  const forwardedHost = request.headers.get("x-forwarded-host")?.split(",")[0]?.trim();
+  const hostname = forwardedHost || request.headers.get("host") || "";
+  const tenant = await resolveTenant(hostname);
   if (!tenant) return NextResponse.json({ error: "Media not found" }, { status: 404 });
   const { id } = await context.params;
   const asset = await db.mediaAsset.findFirst({
     where: { id, tenantId: tenant.id, retiredAt: null },
     select: {
       objectKey: true,
+      originalFilename: true,
       mimeType: true,
       heroSlides: {
         where: { tenantId: tenant.id, isEnabled: true },
@@ -61,14 +65,21 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
       return NextResponse.json({ error: "Media not found" }, { status: 404 });
     }
   }
-  const object = await readMediaObject(asset.objectKey);
-  if (!object.Body) return NextResponse.json({ error: "Media unavailable" }, { status: 404 });
-  const bytes = await object.Body.transformToByteArray();
-  return new NextResponse(Buffer.from(bytes), {
-    headers: {
-      "Content-Type": asset.mimeType,
-       "Cache-Control": mediaCacheControl(isPublished),
-      "X-Content-Type-Options": "nosniff",
-    },
-  });
+  try {
+    const object = await readMediaObject(asset.objectKey);
+    if (!object.Body) return NextResponse.json({ error: "Media unavailable" }, { status: 404 });
+    const headers = buildMediaDownloadHeaders({
+      mimeType: asset.mimeType,
+      filename: asset.originalFilename,
+      isPdf: asset.formDocuments.length > 0,
+      cacheControl: mediaCacheControl(isPublished),
+    });
+    const body =
+      typeof object.Body.transformToWebStream === "function"
+        ? object.Body.transformToWebStream()
+        : Buffer.from(await object.Body.transformToByteArray());
+    return new NextResponse(body, { headers });
+  } catch {
+    return NextResponse.json({ error: "Media unavailable" }, { status: 404 });
+  }
 }
