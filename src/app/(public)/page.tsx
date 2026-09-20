@@ -6,7 +6,7 @@ import { buildPublicMetadata } from "./metadata";
 import { getMemberAppHref } from "@/lib/public-links";
 import { getServiceDestination } from "@/lib/service-links";
 
-export async function generateMetadata() { return buildPublicMetadata((await headers()).get("host") ?? "", "/", "Service Worker Credit Union | SWCU", "A clear, trusted public website for Service Worker Credit Union members in Fiji."); }
+export async function generateMetadata() { return buildPublicMetadata((await headers()).get("host") ?? "", "/", "Service Worker Credit Union | SWCU", "Service Worker Credit Union website with membership information, member services, forms and contact details."); }
 
 export default async function HomePage() {
   const tenant = await requireTenant((await headers()).get("host") ?? "");

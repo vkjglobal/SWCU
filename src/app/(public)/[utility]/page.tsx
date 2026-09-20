@@ -9,7 +9,8 @@ export const dynamicParams = false;
 export function generateStaticParams() { return [{ utility: "privacy" }, { utility: "terms-of-use" }, { utility: "accessibility" }, { utility: "important-information" }]; }
 export async function generateMetadata({ params }: { params: Promise<{ utility: string }> }): Promise<Metadata> {
   const { utility } = await params;
-  return { title: `${utility.replaceAll("-", " ")} | SWCU`, description: "Published information from Service Worker Credit Union." };
+  const title = utility === "privacy" ? "Privacy" : utility === "terms-of-use" ? "Terms of Use" : utility === "accessibility" ? "Accessibility" : "Important Information";
+  return { title: { absolute: `${title} | SWCU` }, description: "Information from Service Worker Credit Union." };
 }
 export default async function UtilityPage({ params }: { params: Promise<{ utility: string }> }) {
   const { utility } = await params;

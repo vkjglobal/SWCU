@@ -122,7 +122,7 @@ async function seed() {
     const id = `${tenant.id}-faq-${index + 1}`;
     await createIfMissing(
       () => db.fAQ.findUnique({ where: { id } }),
-      () => db.fAQ.create({ data: { id, tenantId: tenant.id, question, answer, sortOrder: index } }),
+      () => db.fAQ.create({ data: { id, tenantId: tenant.id, question, answer, sortOrder: index, isEnabled: false } }),
     );
   }
 

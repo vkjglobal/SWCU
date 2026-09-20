@@ -13,6 +13,33 @@ Classification used by Prompt 4A:
 
 This report does not change public copy. Current database values were inspected read-only for tenant `swcu`.
 
+## Closure decision — 20 September 2026
+
+The owner’s final content decisions supersede the original review classifications where listed below.
+
+**OWNER APPROVED**
+
+- About: the currently published Our Story, Vision, Mission, and Purpose bodies.
+- Membership & Services: the currently published Savings, Loans, Retirement Savings, and Death Benefit Scheme bodies.
+- Home service cards: `Build a steady savings habit with SWCU.`; `Access member loan support when you need it.`; `Plan with a long-term savings mindset.`; `Member support for families when it matters.`
+- Contact: the operational subject choices and `I acknowledge the published Privacy information.`
+- Member Login: `The SWCU Member App is coming soon. Until then, you can use this website for SWCU information, forms and contact details.`
+- Footer: `Service Worker Credit Union. A member-owned credit union in Fiji.`
+
+**MASTER BASED**
+
+- Home Hero, Why SWCU, Trust Strip, Loan Calculator, Become a Member, Member App preview, and Help & Resources.
+- Membership & Services page heading, subheading, jump links, and simplified supporting structure.
+- Forms & Resources page and section names.
+- Contact page heading `Contact SWCU`.
+- Page metadata titles and descriptions specified by the closure decision.
+
+**PENDING SWCU**
+
+- Detailed membership eligibility, joining requirements, contribution values, calculator rules, detailed loan terms, withdrawal rules, Retirement Savings terms, Death Benefit Scheme rules, final FAQs, leadership details, and Annual Report publication approval.
+
+The three seeded FAQ records remain stored but are disabled from public output pending SWCU approval. They are not owner-approved and were not deleted.
+
 ## 1. Page-by-page inventory
 
 ### Home — `/`
