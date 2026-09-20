@@ -7,6 +7,30 @@ function escapeHtml(value: string) {
 }
 
 function plainTextToHtml(value: string) {
+  const lines = value.trim().split(/\r?\n/).map((line) => line.trim());
+  const hasListItems = lines.some((line) => /^[•*-]\s*/.test(line));
+  if (hasListItems) {
+    const parts: string[] = [];
+    for (let index = 0; index < lines.length; index++) {
+      const line = lines[index];
+      if (!line) continue;
+      if (/^[•*-]\s*/.test(line)) {
+        const items: string[] = [];
+        while (index < lines.length && /^[•*-]\s*/.test(lines[index])) {
+          items.push(`<li>${escapeHtml(lines[index].replace(/^[•*-]\s*/, ""))}</li>`);
+          index++;
+        }
+        index--;
+        parts.push(`<ul>${items.join("")}</ul>`);
+        continue;
+      }
+      const isHeading = index === 0 || (line.length <= 60 && !/[.!?;:,]$/.test(line));
+      parts.push(isHeading
+        ? `<${index === 0 ? "h2" : "h3"}>${escapeHtml(line)}</${index === 0 ? "h2" : "h3"}>`
+        : `<p>${escapeHtml(line)}</p>`);
+    }
+    return parts.join("");
+  }
   return value
     .trim()
     .split(/\n{2,}/)

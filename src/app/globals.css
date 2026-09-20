@@ -52,7 +52,7 @@ body {
 .display-heading { font-family: var(--font-poppins), sans-serif; letter-spacing: -.045em; }
 .section-kicker { color: #176db3; font-size: .75rem; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
 .home-link { transition: transform .18s ease, box-shadow .18s ease, background-color .18s ease; }
-.home-link:hover { transform: translateY(-2px); }
+.home-link:hover { transform: translateY(-2px); box-shadow: 0 14px 30px rgba(22, 59, 92, .18); }
 .home-link:active { transform: translateY(0); }
 .story-line { background: linear-gradient(90deg, #c83f45 0 42px, transparent 42px); height: 3px; width: 82px; }
 .service-scroller { scrollbar-width: none; }
@@ -144,9 +144,30 @@ a {
   transform: translateY(-1px);
 }
 
+.button-primary:hover {
+  border-color: #0f4f86;
+  background: #0f4f86;
+  box-shadow: 0 11px 24px rgba(22, 59, 92, 0.28);
+}
+
+.button-secondary:hover {
+  background: #e8f2f9;
+  box-shadow: 0 8px 18px rgba(22, 59, 92, 0.14);
+}
+
 .button-primary:active,
 .button-secondary:active {
   transform: translateY(0) scale(0.98);
+}
+
+.button-primary:active {
+  background: #0b3f6c;
+}
+
+a:not(.button-primary):not(.button-secondary):not(.home-link):hover {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.2em;
 }
 
 button:disabled,
@@ -160,6 +181,35 @@ button:disabled,
 button:not(:disabled),
 a {
   cursor: pointer;
+}
+
+.admin-action-control,
+.admin-file-control {
+  transition:
+    transform 160ms ease,
+    filter 160ms ease,
+    box-shadow 160ms ease,
+    background-color 160ms ease,
+    color 160ms ease;
+}
+
+.admin-action-control:not(:disabled):hover {
+  filter: brightness(0.88);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(22, 59, 92, 0.16);
+}
+
+.admin-file-control:not(:disabled):hover {
+  border-color: #176db3;
+  background: #176db3;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(22, 59, 92, 0.18);
+}
+
+.admin-action-control:not(:disabled):active,
+.admin-file-control:not(:disabled):active {
+  transform: scale(0.97);
 }
 
 .eyebrow {
@@ -229,6 +279,39 @@ a {
   padding-left: 1.5rem;
 }
 
+.prose > div > h2 {
+  margin-top: 2.25rem;
+  margin-bottom: 0.75rem;
+  color: #163b5c;
+  font-family: var(--font-poppins), Arial, sans-serif;
+  font-size: clamp(1.45rem, 3vw, 1.85rem);
+  font-weight: 750;
+  line-height: 1.25;
+}
+
+.prose > div > h3 {
+  margin-top: 1.75rem;
+  margin-bottom: 0.6rem;
+  color: #163b5c;
+  font-family: var(--font-poppins), Arial, sans-serif;
+  font-size: clamp(1.15rem, 2.2vw, 1.35rem);
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.prose > div strong {
+  color: #163b5c;
+  font-weight: 800;
+}
+
+.prose > div a {
+  color: #176db3;
+  font-weight: 650;
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 0.18em;
+}
+
 .route-placeholder h1 {
   max-width: 48rem;
   margin: 0.75rem 0 1rem;
@@ -239,12 +322,12 @@ a {
 }
 
 @keyframes swcu-notice-ticker {
-  0%, 15% { transform: translateX(0); }
-  85%, 100% { transform: translateX(calc(var(--notice-distance) * -1)); }
+  from { transform: translateX(0); }
+  to { transform: translateX(calc(var(--notice-distance) * -1)); }
 }
 
 .site-notice-track {
-  animation: swcu-notice-ticker 24s ease-in-out infinite alternate;
+  animation: swcu-notice-ticker var(--notice-duration) linear infinite;
   animation-play-state: running;
 }
 

@@ -36,6 +36,7 @@ export default async function HomePage() {
       news={data.news.map((item) => ({
         title: item.title,
         date: item.publishedAt ? item.publishedAt.toLocaleDateString("en-FJ", { year: "numeric", month: "short", day: "numeric" }) : "",
+        excerpt: item.summary ?? "",
       }))}
       faqs={data.faqs.map((item) => ({ question: item.question, answer: item.answer }))}
       contact={data.contact ? {
