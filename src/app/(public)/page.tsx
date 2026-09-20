@@ -3,6 +3,7 @@ import { getHomeData } from "@/lib/home-data";
 import { headers } from "next/headers";
 import { requireTenant } from "@/lib/tenant";
 import { buildPublicMetadata } from "./metadata";
+import { getMemberAppHref } from "@/lib/public-links";
 
 export async function generateMetadata() { return buildPublicMetadata((await headers()).get("host") ?? "", "/", "Service Worker Credit Union | SWCU", "A clear, trusted public website for Service Worker Credit Union members in Fiji."); }
 
@@ -19,6 +20,7 @@ export default async function HomePage() {
       memberApp={{
         enabled: data.homeSettings?.memberAppEnabled ?? true,
         label: data.homeSettings?.memberAppLabel ?? "Member App — Coming Soon",
+        href: getMemberAppHref(data.tenantSettings),
       }}
       highlights={data.highlights.map((item) => ({ value: item.value, label: item.label }))}
       services={data.services.map((item) => ({

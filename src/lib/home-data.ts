@@ -5,7 +5,7 @@ import type { ResolvedTenant } from "@/lib/tenant";
 
 export async function getHomeData(tenant: ResolvedTenant) {
   const now = new Date();
-  const [siteNotice, heroSlides, highlights, homeSettings, services, forms, news, faqs, contact] =
+  const [siteNotice, heroSlides, highlights, homeSettings, tenantSettings, services, forms, news, faqs, contact] =
     await Promise.all([
       db.siteNotice.findFirst({
         where: {
@@ -15,7 +15,7 @@ export async function getHomeData(tenant: ResolvedTenant) {
         },
       }),
       db.homeHeroSlide.findMany({
-        where: { tenantId: tenant.id, isEnabled: true, mediaAsset: { retiredAt: null } },
+        where: { tenantId: tenant.id, isEnabled: true, mediaAssetId: { not: null }, mediaAsset: { retiredAt: null } },
         include: { mediaAsset: { select: { id: true, altText: true } } },
         orderBy: { sortOrder: "asc" },
         take: 4,
@@ -25,6 +25,7 @@ export async function getHomeData(tenant: ResolvedTenant) {
         orderBy: { sortOrder: "asc" },
       }),
       db.homeSettings.findUnique({ where: { tenantId: tenant.id } }),
+      db.tenantSettings.findUnique({ where: { tenantId: tenant.id }, select: { memberAppStatus: true, memberAppUrl: true } }),
       db.service.findMany({ where: { tenantId: tenant.id, isEnabled: true }, orderBy: { sortOrder: "asc" } }),
       db.formDocument.findMany({
         where: {
@@ -46,7 +47,7 @@ export async function getHomeData(tenant: ResolvedTenant) {
       db.contactSettings.findUnique({ where: { tenantId: tenant.id } }),
     ]);
 
-  return { tenant, siteNotice, heroSlides, highlights, homeSettings, services, forms, news, faqs, contact };
+  return { tenant, siteNotice, heroSlides, highlights, homeSettings, tenantSettings, services, forms, news, faqs, contact };
 }
 
 export async function getActiveSiteNotice(tenant: ResolvedTenant) {

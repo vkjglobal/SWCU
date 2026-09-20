@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { headers } from "next/headers";
 import { requireTenant } from "@/lib/tenant";
-import { getCalculatorSettings, getPublishedPageContent, getPublishedRates, getPublishedResources } from "@/lib/public-data";
+import { getCalculatorSettings, getPublishedPageContent, getPublishedResources } from "@/lib/public-data";
 import { AnchorNav, Content, InnerHero, ResourceCard } from "../_components";
 import { buildPublicMetadata } from "../metadata";
 
@@ -12,9 +12,8 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function MembershipServicesPage() {
   const tenant = await requireTenant((await headers()).get("host") ?? "");
-  const [pages, rates, settings, resources] = await Promise.all([
+  const [pages, settings, resources] = await Promise.all([
     getPublishedPageContent(tenant, ["MEMBERSHIP_INTRO", "SAVINGS_INTRO", "LOANS_INTRO", "RETIREMENT_INTRO", "DEATH_BENEFIT_INTRO"]),
-    getPublishedRates(tenant),
     getCalculatorSettings(tenant),
     getPublishedResources(tenant),
   ]);
@@ -37,5 +36,5 @@ export default async function MembershipServicesPage() {
         <div className="mt-6 flex flex-wrap gap-3"><Link href="/forms-resources" className="button-secondary">Forms &amp; Resources</Link><Link href="/contact" className="button-primary">Contact SWCU</Link></div>
       </div>}
     </section>)}
-  </div><aside className="h-fit rounded-2xl bg-deep-navy p-6 text-white lg:sticky lg:top-36"><p className="eyebrow text-white/60">Published information</p>{rates.length > 0 ? <div className="mt-5"><h2 className="font-heading text-xl font-bold">Current rates</h2><div className="mt-4 grid gap-3">{rates.map((rate) => <div key={rate.id} className="border-b border-white/15 pb-3"><p className="font-semibold">{rate.label || rate.product}</p><p className="text-lg text-ocean-teal">{rate.displayValue}</p>{rate.note && <p className="text-xs text-white/65">{rate.note}</p>}</div>)}</div></div> : <div className="mt-5 border-t border-white/15 pt-5"><h2 className="font-heading text-xl font-bold">Current rates</h2><p className="mt-3 text-sm text-white/70">Current rate information is not available here.</p></div>}{settings && <div className="mt-8 border-t border-white/15 pt-6"><h2 className="font-heading text-xl font-bold">Loan calculator</h2>{settings.disclaimer && <p className="mt-4 text-sm text-white/70">{settings.disclaimer}</p>}</div>}</aside></div></div></>;
+   </div><aside className="h-fit rounded-2xl bg-deep-navy p-6 text-white lg:sticky lg:top-36"><p className="eyebrow text-white/60">Published information</p>{settings && <div className="mt-5 border-t border-white/15 pt-5"><h2 className="font-heading text-xl font-bold">Loan calculator</h2>{settings.disclaimer && <p className="mt-4 text-sm text-white/70">{settings.disclaimer}</p>}</div>}</aside></div></div></>;
 }
