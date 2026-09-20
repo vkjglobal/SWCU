@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import { requireTenant } from "@/lib/tenant";
 import { buildPublicMetadata } from "./metadata";
 import { getMemberAppHref } from "@/lib/public-links";
+import { getServiceDestination } from "@/lib/service-links";
 
 export async function generateMetadata() { return buildPublicMetadata((await headers()).get("host") ?? "", "/", "Service Worker Credit Union | SWCU", "A clear, trusted public website for Service Worker Credit Union members in Fiji."); }
 
@@ -27,7 +28,7 @@ export default async function HomePage() {
         title: item.title,
         description: item.description,
         icon: item.icon,
-        href: item.destination || "#services",
+        href: getServiceDestination(item.title, item.destination),
       }))}
       forms={data.forms.map((item) => ({
         title: item.title,

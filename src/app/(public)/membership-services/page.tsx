@@ -18,13 +18,13 @@ export default async function MembershipServicesPage() {
     getPublishedResources(tenant),
   ]);
   const by = (slot: string) => pages.find((page) => page.slot === slot);
-  const sections = [["membership", "Membership", "MEMBERSHIP_INTRO"], ["savings", "Savings", "SAVINGS_INTRO"], ["loans", "Loans", "LOANS_INTRO"], ["retirement", "Retirement", "RETIREMENT_INTRO"], ["death-benefit", "Death Benefit", "DEATH_BENEFIT_INTRO"]] as const;
+  const sections = [["membership", "Membership", "MEMBERSHIP_INTRO"], ["savings", "Savings", "SAVINGS_INTRO"], ["loans", "Loans", "LOANS_INTRO"], ["retirement-savings", "Retirement", "RETIREMENT_INTRO"], ["death-benefit", "Death Benefit", "DEATH_BENEFIT_INTRO"]] as const;
   const membershipForms = resources.forms.filter((form) => /membership/i.test(form.title) && form.mediaAssetId);
 
   return <><InnerHero eyebrow="Membership & Services" title="Membership & Member Services" summary={by("MEMBERSHIP_INTRO")?.body?.split(/\n/)[0]} /><AnchorNav items={sections.map(([id, label]) => [id, label])} /><div className="site-container section-shell"><div className="grid gap-12 lg:grid-cols-[1fr_.72fr]"><div className="grid gap-12">
-     {sections.map(([id, label, slot]) => <section id={id} key={id} className="scroll-mt-36">
+     {sections.map(([id, label, slot]) => <section id={id} key={id} className="scroll-mt-52">
         {by(slot) && <Content heading={by(slot)?.heading || label} body={by(slot)?.body} />}
-      {id === "membership" && <div id="joining" className="mt-8 scroll-mt-36 rounded-2xl bg-soft-blue-grey p-7">
+      {id === "membership" && <div id="joining" className="mt-8 scroll-mt-52 rounded-2xl bg-soft-blue-grey p-7">
         <p className="eyebrow">Joining SWCU</p><h2 className="display-heading mt-3 text-3xl font-bold text-deep-navy">Become a Member</h2>
         <ol className="mt-6 grid gap-4 text-charcoal/80">
           <li><strong className="text-deep-navy">1. Review approved membership information.</strong>{by("MEMBERSHIP_INTRO")?.body && <span className="mt-1 block text-sm">Start with the approved information on this page.</span>}</li>

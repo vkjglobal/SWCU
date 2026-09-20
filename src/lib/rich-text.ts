@@ -59,6 +59,14 @@ const sanitizerOptions: sanitizeHtml.IOptions = {
   },
 };
 
+function unwrapInvalidHeadingContainers(value: string) {
+  return value
+    .replace(/<(h2|h3)>([\s\S]*?)<\/\1>/gi, (match, _tag, content: string) =>
+      /<(?:p|h2|h3|ul|ol)(?:\s|>)/i.test(content) ? content : match
+    )
+    .replace(/<(h2|h3)>\s*<\/\1>/gi, "");
+}
+
 /** Normalise the deliberately small, approved CMS rich-content subset. */
 export function sanitizeRichText(input: string) {
   const value = input.trim();
@@ -67,7 +75,7 @@ export function sanitizeRichText(input: string) {
   // so entities such as "&" and quotes are escaped exactly once.
   if (!/<\/?[a-z][^>]*>/i.test(value)) return plainTextToHtml(value);
   const sanitized = sanitizeHtml(value, sanitizerOptions).trim();
-  return sanitized;
+  return unwrapInvalidHeadingContainers(sanitized);
 }
 
 export function richTextToPlainText(input: string) {
