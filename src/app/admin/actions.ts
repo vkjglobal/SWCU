@@ -658,15 +658,18 @@ export async function initiateStaffPasswordResetFormAction(form: FormData) {
   await initiateStaffPasswordResetAction(form);
 }
 
-export async function completeStaffPasswordResetAction(form: FormData) {
+export async function completeStaffPasswordResetAction(_previous: { completed: boolean; error?: string }, form: FormData) {
   const membershipId = idSchema.parse(value(form, "membershipId"));
   const token = value(form, "token");
   const password = value(form, "password");
-  if (password.length < 12 || !/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/\d/.test(password)) throw new Error("Use at least 12 characters with upper-case, lower-case and a number.");
+  const confirmation = value(form, "confirmPassword");
+  if (password.length < 12 || !/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/\d/.test(password)) return { completed: false, error: "Use at least 12 characters with upper-case, lower-case and a number." };
+  if (password !== confirmation) return { completed: false, error: "Passwords do not match." };
   try {
     await completeStaffPasswordReset({ membershipId, token, password });
+    return { completed: true };
   } catch {
-    throw new Error("This password reset link is invalid or expired.");
+    return { completed: false, error: "This setup link is invalid or has expired. Please request a new link." };
   }
 }
 

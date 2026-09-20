@@ -10,9 +10,10 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default async function AdminLoginPage() {
+export default async function AdminLoginPage({ searchParams }: { searchParams: Promise<{ "password-set"?: string }> }) {
   const hostname = (await headers()).get("host") ?? "";
   await requireTenant(hostname);
+  const passwordSet = (await searchParams)["password-set"] === "1";
 
   return (
     <main className="grid min-h-screen place-items-center bg-soft-blue-grey px-4 py-12">
@@ -29,6 +30,7 @@ export default async function AdminLoginPage() {
         <h1 className="mt-2 font-heading text-3xl font-bold text-deep-navy">
           SWCU Content Management
         </h1>
+        {passwordSet && <p role="status" className="mt-5 rounded-lg border border-green-700/25 bg-green-50 p-3 text-sm font-semibold text-green-800">Password set successfully.</p>}
         <AdminLoginForm />
         <Link href="/" className="mt-6 inline-block text-sm font-semibold text-swcu-blue">
           Return to public website

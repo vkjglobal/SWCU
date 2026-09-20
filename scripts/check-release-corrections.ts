@@ -63,6 +63,7 @@ async function main() {
   const bootstrapAdmin = await source("scripts/bootstrap-admin.ts");
   const proxy = await source("src/proxy.ts");
   const staffResetForm = await source("src/components/staff-reset-form.tsx");
+  const adminLogin = await source("src/app/admin/login/page.tsx");
   assert(adminPageContent.includes("PAGE_CONTENT_SLOTS.filter((slot) => !isUtilityPageSlot(slot))"), "generic page content excludes utility slots");
   assert(adminActions.includes("isUtilityPageSlot(slot)") && adminActions.includes("Only Administrators may manage utility pages."), "utility draft action is Administrator-only");
   assert(cmsWorkflow.includes("Only Administrators may manage utility pages."), "CMS workflow blocks Editor utility drafts");
@@ -80,6 +81,9 @@ async function main() {
   assert(bootstrapAdmin.includes("initiateStaffPasswordReset") && bootstrapAdmin.includes("BOOTSTRAP_ADMIN_OUTPUT_FILE"), "Administrator bootstrap uses the one-time reset flow and protected output");
   assert(proxy.includes('request.nextUrl.pathname !== "/admin/reset-password"'), "one-time password setup route remains available without an existing session");
   assert(staffResetForm.includes('useRef(\"\")') && staffResetForm.includes("retainedToken.current = fragmentToken") && staffResetForm.includes("history.replaceState"), "password setup retains the URL fragment across strict-mode effect replay");
+  assert(staffResetForm.includes("noValidate") && staffResetForm.includes("validateSubmission") && staffResetForm.includes('name="confirmPassword"'), "password setup surfaces client validation instead of silently relying on native validation");
+  assert(staffResetForm.includes("Password set successfully.") && staffResetForm.includes('router.replace("/admin/login?password-set=1")'), "password setup confirms success before redirecting to sign-in");
+  assert(adminLogin.includes("Password set successfully.") && adminLogin.includes('"password-set"'), "sign-in page preserves the successful password setup confirmation");
 
   const quickActions = footer.slice(footer.indexOf("export function MobileQuickActions"), footer.indexOf("export function InnerHero"));
   assert(quickActions.indexOf("<span>Join</span>") < quickActions.indexOf("<span>Login</span>") && quickActions.indexOf("<span>Login</span>") < quickActions.indexOf("<span>Call</span>"), "mobile actions order is Join, Login, Call");
