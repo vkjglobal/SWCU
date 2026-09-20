@@ -5,3 +5,7 @@
 - Do not publish newly written public content through a seed, migration, or build prompt unless Arvind has approved the wording word-for-word or the locked master provides the exact wording.
 - Technical seed data may create empty structural records. It must not invent public copy.
 - Ordinary seed behavior is additive only and must preserve existing CMS-managed content, settings, publication status, and ordering.
+
+## Rates publication
+
+- Do not publish an interest-rate or rate table on the public website or Member App. Internal Administrator-only calculator configuration may remain private.

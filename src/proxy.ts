@@ -21,6 +21,7 @@ export async function proxy(request: NextRequest) {
   if (
     request.nextUrl.pathname.startsWith("/admin") &&
     request.nextUrl.pathname !== "/admin/login" &&
+    request.nextUrl.pathname !== "/admin/reset-password" &&
     !hasSessionCookie
   ) {
     return NextResponse.redirect(new URL("/admin/login", request.url));

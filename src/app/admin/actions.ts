@@ -19,6 +19,7 @@ import {
   PAGE_CONTENT_SLOTS,
 } from "@/lib/cms-workflow";
 import { CmsDraftKind, CmsDraftOperation } from "@/generated/prisma/client";
+import { isUtilityPageSlot } from "@/lib/utility-pages";
 
 async function createCmsDraft(input: Parameters<typeof createCmsDraftWorkflow>[0]) {
   const expectedRevision = input.expectedRevision;
@@ -673,7 +674,7 @@ export async function savePageContentDraft(form: FormData) {
   const { tenant, userId, role } = await staff();
   const slot = text(60).parse(value(form, "slot"));
   if (!PAGE_CONTENT_SLOTS.includes(slot as (typeof PAGE_CONTENT_SLOTS)[number])) throw new Error("Unknown fixed page content slot.");
-  if (role === "EDITOR" && ["PRIVACY", "TERMS_OF_USE", "ACCESSIBILITY"].includes(slot)) throw new Error("Only Administrators may manage legal content.");
+  if (role === "EDITOR" && isUtilityPageSlot(slot)) throw new Error("Only Administrators may manage utility pages.");
   const expectedRevision = form.get("revision") ? Number(form.get("revision")) : undefined;
   await createCmsDraft({
     tenant,

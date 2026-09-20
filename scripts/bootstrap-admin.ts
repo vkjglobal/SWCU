@@ -1,31 +1,25 @@
-import { PrismaPg } from "@prisma/adapter-pg";
-import { betterAuth } from "better-auth";
-import { prismaAdapter } from "@better-auth/prisma-adapter";
-import { PrismaClient } from "../src/generated/prisma/client";
+import { open, unlink } from "node:fs/promises";
+import { auth } from "../src/lib/auth";
+import { db } from "../src/lib/db";
+import { initiateStaffPasswordReset } from "../src/lib/staff-accounts";
 
 const required = [
-  "DATABASE_URL",
-  "BETTER_AUTH_SECRET",
   "BOOTSTRAP_ADMIN_EMAIL",
   "BOOTSTRAP_ADMIN_NAME",
-  "BOOTSTRAP_ADMIN_PASSWORD",
+  "BOOTSTRAP_ADMIN_BASE_URL",
+  "BOOTSTRAP_ADMIN_OUTPUT_FILE",
 ] as const;
 
 for (const key of required) {
   if (!process.env[key]) {
-    throw new Error(`${key} is required for the one-time Administrator bootstrap`);
+    throw new Error(`${key} is required for secure Administrator setup`);
   }
 }
 
-const db = new PrismaClient({
-  adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL! }),
-});
-
-const bootstrapAuth = betterAuth({
-  secret: process.env.BETTER_AUTH_SECRET,
-  database: prismaAdapter(db, { provider: "postgresql" }),
-  emailAndPassword: { enabled: true, disableSignUp: false },
-});
+const baseUrl = process.env.BOOTSTRAP_ADMIN_BASE_URL!;
+const outputFile = process.env.BOOTSTRAP_ADMIN_OUTPUT_FILE!;
+if (!/^https?:\/\/[^/]+$/i.test(baseUrl)) throw new Error("BOOTSTRAP_ADMIN_BASE_URL must be an origin without a path.");
+if (!outputFile.startsWith("/tmp/")) throw new Error("BOOTSTRAP_ADMIN_OUTPUT_FILE must be a temporary path under /tmp.");
 
 async function bootstrap() {
   const tenant = await db.tenant.findUnique({ where: { slug: "swcu" } });
@@ -33,42 +27,60 @@ async function bootstrap() {
     throw new Error("Run the SWCU tenant seed before bootstrapping an Administrator");
   }
 
-  const existingAdministrators = await db.staffMembership.count({
-    where: { tenantId: tenant.id, role: "ADMINISTRATOR", isActive: true },
-  });
+  const email = process.env.BOOTSTRAP_ADMIN_EMAIL!.trim().toLowerCase();
+  const name = process.env.BOOTSTRAP_ADMIN_NAME!.trim();
+  if (!email || !name) throw new Error("Administrator name and email are required.");
+  const context = await auth.$context;
+  const existingUser = await db.user.findFirst({ where: { email: { equals: email, mode: "insensitive" } } });
+  const user = existingUser ?? await context.internalAdapter.createUser({ name, email, emailVerified: false }, { method: "email" });
+  const userId = user.id;
+  const userCreated = !existingUser;
 
-  if (existingAdministrators > 0) {
-    throw new Error("Administrator bootstrap refused: an active Administrator already exists");
+  const existingCredential = await db.account.findFirst({ where: { userId, providerId: "credential" } });
+  if (!existingCredential) {
+    await context.internalAdapter.createAccount({ userId, providerId: "credential", accountId: userId });
   }
 
-  const result = await bootstrapAuth.api.signUpEmail({
-    body: {
-      email: process.env.BOOTSTRAP_ADMIN_EMAIL!,
-      name: process.env.BOOTSTRAP_ADMIN_NAME!,
-      password: process.env.BOOTSTRAP_ADMIN_PASSWORD!,
-    },
+  const membership = await db.$transaction(async (tx) => {
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${tenant.id}, 0))`;
+    const existing = await tx.staffMembership.findUnique({ where: { tenantId_userId: { tenantId: tenant.id, userId } } });
+    if (existing?.role === "EDITOR") {
+      const openDrafts = await tx.cmsDraft.count({
+        where: {
+          tenantId: tenant.id,
+          OR: [{ createdBy: userId }, { assignedTo: userId }],
+          status: { in: ["DRAFT", "WAITING_FOR_APPROVAL", "RETURNED_FOR_CHANGES"] },
+        },
+      });
+      if (openDrafts > 0) throw new Error("Existing Editor has open drafts. Resolve them through the Administrator staff workflow before changing the role.");
+    }
+    const membership = existing
+      ? await tx.staffMembership.update({ where: { id: existing.id }, data: { role: "ADMINISTRATOR", isActive: true } })
+      : await tx.staffMembership.create({ data: { tenantId: tenant.id, userId, role: "ADMINISTRATOR", isActive: true } });
+    await tx.auditLog.create({
+      data: {
+        tenantId: tenant.id,
+        actorUserId: userId,
+        action: existing ? "OWNER_ADMINISTRATOR_ACTIVATED" : "OWNER_ADMINISTRATOR_PROVISIONED",
+        targetType: "StaffMembership",
+        targetId: membership.id,
+        changeMetadata: { role: "ADMINISTRATOR", userCreated, credentialCreated: !existingCredential },
+      },
+    });
+    return membership;
   });
 
-  await db.$transaction([
-    db.staffMembership.create({
-      data: {
-        tenantId: tenant.id,
-        userId: result.user.id,
-        role: "ADMINISTRATOR",
-      },
-    }),
-    db.auditLog.create({
-      data: {
-        tenantId: tenant.id,
-        actorUserId: result.user.id,
-        action: "ADMINISTRATOR_BOOTSTRAPPED",
-        targetType: "User",
-        targetId: result.user.id,
-      },
-    }),
-  ]);
-
-  console.info("The first SWCU Administrator was created.");
+  const handle = await open(outputFile, "wx", 0o600);
+  try {
+    const result = await initiateStaffPasswordReset({ tenant, actorUserId: userId, membershipId: membership.id, baseUrl });
+    await handle.writeFile(`${result.resetLink}\n`, { encoding: "utf8" });
+  } catch (error) {
+    await handle.close();
+    await unlink(outputFile).catch(() => undefined);
+    throw error;
+  }
+  await handle.close();
+  console.info("Administrator access is ready. The one-time setup link was written to the protected temporary output file.");
 }
 
 bootstrap()

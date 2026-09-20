@@ -3,15 +3,20 @@ import { headers } from "next/headers";
 import { db } from "@/lib/db";
 import { requireStaffMembership } from "@/lib/authorise";
 import { requireTenant } from "@/lib/tenant";
+import { CmsDraftKind } from "@/generated/prisma/client";
+import { isUtilityPageSlot } from "@/lib/utility-pages";
 import { submitCmsDraft, withdrawCmsDraft } from "@/app/admin/actions";
 import { AdminShell, kindLabels, operationLabels, StatusBadge } from "@/app/admin/admin-shell";
 
 export default async function DraftsPage() {
   const tenant = await requireTenant((await headers()).get("host") ?? "");
   const { membership } = await requireStaffMembership(tenant);
-  const drafts = membership.role === "EDITOR"
+  const allDrafts = membership.role === "EDITOR"
     ? await db.cmsDraft.findMany({ where: { tenantId: tenant.id, OR: [{ createdBy: membership.userId }, { assignedTo: membership.userId }] }, orderBy: { updatedAt: "desc" } })
     : await db.cmsDraft.findMany({ where: { tenantId: tenant.id }, include: { creator: { select: { name: true, email: true } } }, orderBy: { updatedAt: "desc" } });
+  const drafts = membership.role === "EDITOR"
+    ? allDrafts.filter((draft) => !(draft.kind === CmsDraftKind.PAGE_CONTENT && isUtilityPageSlot(typeof draft.payload === "object" && draft.payload && !Array.isArray(draft.payload) && typeof draft.payload.slot === "string" ? draft.payload.slot : draft.targetId?.split(":page:")[1] ?? "")))
+    : allDrafts;
   return <AdminShell role={membership.role} title={membership.role === "EDITOR" ? "My drafts" : "Drafts"} intro={membership.role === "EDITOR" ? "Keep your work here until it is ready for an Administrator to approve." : "Inspect open submissions across the publishing desk."}>
     {drafts.length === 0 ? <div className="mt-8 rounded-card border border-dashed border-deep-navy/20 bg-white p-10 text-center"><h2 className="font-heading text-xl font-bold text-deep-navy">No drafts yet</h2><p className="mt-2 text-charcoal/65">Start a change from one of the content modules.</p></div> : <div className="mt-8 overflow-hidden rounded-card border border-deep-navy/10 bg-white shadow-card"><ul className="divide-y divide-deep-navy/10">{drafts.map((draft) => {
       const creator = membership.role === "ADMINISTRATOR" && "creator" in draft ? (draft as typeof draft & { creator: { name: string | null; email: string } }).creator : null;

@@ -52,7 +52,34 @@ async function main() {
   assert(footer.includes('href="/important-information"'), "footer Important Information link exists");
   assert(utility.includes('isPublished: true') || publicData.includes('isPublished: true'), "utility publication is published-only");
   assert(!utility.includes("isPublished: false"), "utility does not expose drafts");
-  assert(footer.includes('published.privacy') && footer.includes('published.terms') && footer.includes('published.accessibility'), "legal footer links are publication-gated");
+  assert(footer.includes('published.privacy') && footer.includes('published.terms') && footer.includes('published.accessibility') && footer.includes("published.importantInformation"), "all utility footer links are publication-gated");
+
+  const adminPageContent = await source("src/app/admin/page-content/page.tsx");
+  const utilityIndex = await source("src/app/admin/utility-pages/page.tsx");
+  const utilityDetail = await source("src/app/admin/utility-pages/[slug]/page.tsx");
+  const utilityDefinitions = await source("src/lib/utility-pages.ts");
+  const adminDrafts = await source("src/app/admin/drafts/page.tsx");
+  const cmsWorkflow = await source("src/lib/cms-workflow.ts");
+  const bootstrapAdmin = await source("scripts/bootstrap-admin.ts");
+  const proxy = await source("src/proxy.ts");
+  const staffResetForm = await source("src/components/staff-reset-form.tsx");
+  assert(adminPageContent.includes("PAGE_CONTENT_SLOTS.filter((slot) => !isUtilityPageSlot(slot))"), "generic page content excludes utility slots");
+  assert(adminActions.includes("isUtilityPageSlot(slot)") && adminActions.includes("Only Administrators may manage utility pages."), "utility draft action is Administrator-only");
+  assert(cmsWorkflow.includes("Only Administrators may manage utility pages."), "CMS workflow blocks Editor utility drafts");
+  assert(utilityIndex.includes('requireStaffMembership(tenant, ["ADMINISTRATOR"])'), "utility page index is Administrator-only");
+  assert(utilityDetail.includes('requireStaffMembership(tenant, ["ADMINISTRATOR"])'), "utility page editor is Administrator-only");
+  for (const label of ["Privacy", "Terms of Use", "Accessibility", "Important Information"]) {
+    assert(utilityDefinitions.includes(label), `utility admin area supports ${label}`);
+  }
+  assert(utilityDetail.includes("definition.label"), "utility detail route renders each fixed page definition");
+  assert(utilityDetail.includes("Current published content") && utilityDetail.includes("Saved draft"), "utility admin area previews published and draft content");
+  assert(utilityDetail.includes("submitCmsDraft") && utilityDetail.includes("withdrawCmsDraft"), "utility admin area uses existing draft workflow");
+  assert(utilityDetail.includes("const footerVisible = Boolean(published?.isPublished)"), "utility admin footer state follows publication state");
+  assert(adminDrafts.includes("isUtilityPageSlot") && adminDrafts.includes("allDrafts.filter"), "Editor draft list excludes utility pages");
+  assert(!bootstrapAdmin.includes("BOOTSTRAP_ADMIN_PASSWORD"), "Administrator bootstrap does not accept a plaintext setup password");
+  assert(bootstrapAdmin.includes("initiateStaffPasswordReset") && bootstrapAdmin.includes("BOOTSTRAP_ADMIN_OUTPUT_FILE"), "Administrator bootstrap uses the one-time reset flow and protected output");
+  assert(proxy.includes('request.nextUrl.pathname !== "/admin/reset-password"'), "one-time password setup route remains available without an existing session");
+  assert(staffResetForm.includes('useRef(\"\")') && staffResetForm.includes("retainedToken.current = fragmentToken") && staffResetForm.includes("history.replaceState"), "password setup retains the URL fragment across strict-mode effect replay");
 
   const quickActions = footer.slice(footer.indexOf("export function MobileQuickActions"), footer.indexOf("export function InnerHero"));
   assert(quickActions.indexOf("<span>Join</span>") < quickActions.indexOf("<span>Login</span>") && quickActions.indexOf("<span>Login</span>") < quickActions.indexOf("<span>Call</span>"), "mobile actions order is Join, Login, Call");

@@ -15,6 +15,7 @@ const modules = [
   ["Contact details", "/admin/contact", "The public contact source"],
   ["Media library", "/admin/media", "Images and documents"],
   ["Page content", "/admin/page-content", "Approved fixed content slots"],
+  ["Utility pages", "/admin/utility-pages", "Administrator-only institutional pages"],
   ["Leadership & committees", "/admin/leadership", "Approved committee records"],
   ["Rates & fees", "/admin/rates", "Published values only when approved"],
   ["Calculator settings", "/admin/calculator", "Inactive until SWCU confirms method"],

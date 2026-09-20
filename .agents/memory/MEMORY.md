@@ -1,1 +1,2 @@
 - [Next.js tenant fail-closed boundary](nextjs-tenant-fail-closed.md) — reject unknown hosts before route rendering; layout-level notFound may still serialize child RSC content.
+- [Reset-link fragment hydration](reset-link-fragment-hydration.md) — retain fragment tokens across React Strict Mode effect replay before removing them from the address bar.

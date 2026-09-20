@@ -8,6 +8,7 @@ import {
   CmsDraftStatus,
   Prisma,
 } from "@/generated/prisma/client";
+import { isUtilityPageSlot } from "@/lib/utility-pages";
 
 export type DraftPayload = Record<string, unknown>;
 
@@ -169,6 +170,9 @@ export async function createCmsDraft(input: DraftInput) {
     }
   }
   const role = await roleFor(input.tenant.id, input.actorUserId);
+  if (role === "EDITOR" && input.kind === CmsDraftKind.PAGE_CONTENT && isUtilityPageSlot(stringValue(input.payload, "slot") ?? input.targetId?.split(":page:")[1] ?? "")) {
+    throw new Error("Only Administrators may manage utility pages.");
+  }
   return db.$transaction(async (tx) => {
     await lockCmsTenant(tx, input.tenant.id);
     const effectiveTargetId = input.kind === CmsDraftKind.SITE_NOTICE

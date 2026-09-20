@@ -7,8 +7,9 @@ import { savePageContentDraft } from "../actions";
 import { getCmsDraftRevision } from "@/lib/cms-workflow";
 import { CmsDraftKind } from "@/generated/prisma/client";
 import { PAGE_CONTENT_SLOTS } from "@/lib/cms-workflow";
+import { isUtilityPageSlot } from "@/lib/utility-pages";
 
-const slots = PAGE_CONTENT_SLOTS;
+const slots = PAGE_CONTENT_SLOTS.filter((slot) => !isUtilityPageSlot(slot));
 
 export default async function PageContentAdminPage() {
   const tenant = await requireTenant((await headers()).get("host") ?? "");
