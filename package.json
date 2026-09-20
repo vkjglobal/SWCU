@@ -29,6 +29,7 @@
     "check:seed-safety": "NODE_OPTIONS=--conditions=react-server tsx scripts/check-seed-safety.ts",
     "check:qa-residue": "NODE_OPTIONS=--conditions=react-server tsx scripts/check-qa-residue.ts",
     "check:rich-text": "NODE_OPTIONS=--conditions=react-server tsx scripts/check-rich-text.ts",
+    "check:prompt4b": "NODE_OPTIONS=--conditions=react-server tsx scripts/check-prompt4b.ts",
     "check:migrations": "tsx scripts/check-migrations.ts",
     "check:tenant": "tsx scripts/check-tenant.ts",
     "bootstrap:admin": "NODE_OPTIONS=--conditions=react-server tsx scripts/bootstrap-admin.ts"

@@ -15,6 +15,7 @@ async function main() {
     { email: { startsWith: "p3a-admin-" } }, { email: { startsWith: "p3a-editor-" } },
     { email: { startsWith: "provisioned-" } }, { email: { startsWith: "admin-two-" } }, { email: { startsWith: "admin-three-" } },
     { email: { startsWith: "prompt3b-qa-admin-" } }, { email: { startsWith: "prompt3b-qa-editor-" } }, { email: { startsWith: "prompt3b-http-admin-" } },
+    { email: { startsWith: "prompt4b-browser-" } },
   ] }, select: { id: true } });
   const qaUserIds = qaUsers.map((user) => user.id);
   const tenantResidue = await db.tenant.count({ where: { OR: [
@@ -42,6 +43,7 @@ async function main() {
     { key: { contains: "direct-blocked-" } }, { key: { contains: "p3a-admin-" } },
     { key: { contains: "p3a-editor-" } }, { key: { contains: "provisioned-" } },
     { key: { contains: "admin-two-" } }, { key: { contains: "admin-three-" } },
+    { key: { contains: "prompt4b-browser-" } },
   ] }, select: { id: true, key: true } });
   const loginAttemptResidue = loginRows.length;
   const auditResidue = await db.auditLog.count({ where: { OR: [{ actorUserId: { in: qaUserIds } }, { targetId: { in: [...drafts.map((draft) => draft.id), ...drafts.flatMap((draft) => draft.targetId ? [draft.targetId] : []), ...media.map((row) => row.id)] } }] } });

@@ -27,7 +27,8 @@ async function main() {
   assert(adminContact.includes('name="expectedMediaId"'), "dedicated Contact Map forms carry generation");
   assert(adminActions.includes("expectedMediaId") && adminActions.includes("removeContactMapGeneration({ tenant, actorUserId: userId, expectedMediaId })"), "dedicated actions validate generation");
   const adminMedia = await source("src/app/admin/media/page.tsx");
-  assert(adminMedia.includes('purpose: { not: "contact-map" }'), "generic media library excludes Contact Map assets");
+  assert(adminMedia.includes('mimeType: { in: ["image/jpeg", "image/png", "image/webp"] }'), "Website Images lists supported image media only");
+  assert(!adminMedia.includes("application/pdf"), "Website Images does not present PDF documents");
   const publicData = await source("src/lib/public-data.ts");
   const mediaRoute = await source("src/app/api/media/[id]/route.ts");
   const mediaDownload = await source("src/lib/media-download.ts");
