@@ -8,6 +8,16 @@ export function normaliseHostname(hostname: string): string {
   return hostname.toLowerCase().split(":")[0]?.trim() ?? "";
 }
 
+export function selectTenantLookupHostname(hostname: string): string {
+  const normalisedHostname = normaliseHostname(hostname);
+
+  if (normalisedHostname === "nodejs-1672988-6683714.cloudwaysnodeapps.com") {
+    return "www.swcu.finance";
+  }
+
+  return normalisedHostname;
+}
+
 export function selectDevelopmentTenantSlug(
   input: TenantResolutionInput,
 ): string | undefined {

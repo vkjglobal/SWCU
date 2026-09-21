@@ -4,8 +4,8 @@ import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { getServerEnvironment } from "@/lib/env";
 import {
-  normaliseHostname,
   selectDevelopmentTenantSlug,
+  selectTenantLookupHostname,
 } from "@/lib/tenant-core";
 
 export type ResolvedTenant = {
@@ -16,7 +16,7 @@ export type ResolvedTenant = {
 
 export async function resolveTenant(hostname: string, options?: { allowDevelopmentFallback?: boolean }): Promise<ResolvedTenant | null> {
   const environment = getServerEnvironment();
-  const normalisedHostname = normaliseHostname(hostname);
+  const normalisedHostname = selectTenantLookupHostname(hostname);
 
   const domain = await db.tenantDomain.findFirst({
     where: {
