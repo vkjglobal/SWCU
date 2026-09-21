@@ -15,6 +15,20 @@ async function audit(tenantId: string, actorUserId: string, action: string, targ
   await db.auditLog.create({ data: { tenantId, actorUserId, action, targetType: "StaffMembership", targetId, changeMetadata } });
 }
 
+export function prepareStaffPasswordReset(membershipId: string, baseUrl: string, now = new Date()) {
+  if (!/^https?:\/\/[^/]+$/i.test(baseUrl)) throw new Error("A validated tenant origin is required.");
+  const identifier = `staff-password-reset:${membershipId}`;
+  const rawToken = randomBytes(32).toString("hex");
+  const value = createHash("sha256").update(rawToken).digest("hex");
+  const expiresAt = new Date(now.getTime() + 60 * 60 * 1000);
+  return {
+    identifier,
+    value,
+    expiresAt,
+    resetLink: `${baseUrl}/admin/reset-password?membership=${encodeURIComponent(membershipId)}#token=${encodeURIComponent(rawToken)}`,
+  };
+}
+
 export async function createStaffAccount(input: {
   tenant: ResolvedTenant; actorUserId: string; name: string; email: string; password: string; role: StaffRole;
 }) {
@@ -170,21 +184,18 @@ export async function disableEditorWithReassignment(input: {
 export async function initiateStaffPasswordReset(input: {
   tenant: ResolvedTenant; actorUserId: string; membershipId: string; baseUrl: string;
 }) {
-  if (!/^https?:\/\/[^/]+$/i.test(input.baseUrl)) throw new Error("A validated tenant origin is required.");
   await assertAdministrator(input.tenant.id, input.actorUserId);
   const membership = await db.staffMembership.findFirst({ where: { id: input.membershipId, tenantId: input.tenant.id }, select: { id: true, userId: true } });
   if (!membership) throw new Error("Staff membership not found.");
-  const identifier = `staff-password-reset:${membership.id}`;
-  const rawToken = randomBytes(32).toString("hex");
-  const value = createHash("sha256").update(rawToken).digest("hex");
+  const prepared = prepareStaffPasswordReset(membership.id, input.baseUrl);
   const context = await auth.$context;
-  await context.internalAdapter.deleteVerificationByIdentifier(identifier);
-  await context.internalAdapter.createVerificationValue({ identifier, value, expiresAt: new Date(Date.now() + 60 * 60 * 1000) });
+  await context.internalAdapter.deleteVerificationByIdentifier(prepared.identifier);
+  await context.internalAdapter.createVerificationValue({ identifier: prepared.identifier, value: prepared.value, expiresAt: prepared.expiresAt });
   await audit(input.tenant.id, input.actorUserId, "STAFF_PASSWORD_RESET_INITIATED", membership.id, { expiresInMinutes: 60, deliveryReady: false });
   return {
     initiated: true,
     deliveryReady: true,
-    resetLink: `${input.baseUrl}/admin/reset-password?membership=${encodeURIComponent(membership.id)}#token=${encodeURIComponent(rawToken)}`,
+    resetLink: prepared.resetLink,
   };
 }
 
