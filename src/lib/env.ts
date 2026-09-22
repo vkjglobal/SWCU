@@ -7,11 +7,6 @@ const optionalUrl = z.preprocess(
   z.url().optional(),
 );
 
-const optionalActivationSecret = z.preprocess(
-  (value) => (value === "" ? undefined : value),
-  z.string().min(32).optional(),
-);
-
 const serverSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   DATABASE_URL: z.string().min(1),
@@ -24,7 +19,6 @@ const serverSchema = z.object({
   R2_BUCKET_NAME: z.string().min(1),
   R2_ENDPOINT: z.url(),
   R2_PUBLIC_BASE_URL: optionalUrl,
-  SWCU_PRODUCTION_ADMIN_ACTIVATION_SECRET: optionalActivationSecret,
 });
 
 export type ServerEnvironment = z.infer<typeof serverSchema>;
@@ -44,7 +38,6 @@ export function getServerEnvironment(): ServerEnvironment {
     R2_BUCKET_NAME: process.env.R2_BUCKET_NAME,
     R2_ENDPOINT: process.env.R2_ENDPOINT,
     R2_PUBLIC_BASE_URL: process.env.R2_PUBLIC_BASE_URL,
-    SWCU_PRODUCTION_ADMIN_ACTIVATION_SECRET: process.env.SWCU_PRODUCTION_ADMIN_ACTIVATION_SECRET,
   });
 
   return cachedEnvironment;
