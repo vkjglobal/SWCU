@@ -86,7 +86,11 @@ async function main() {
     await db.contactSettings.update({ where: { id: contactSettings.id }, data: { contactMapMediaAssetId: mapImage.id } });
     await db.mediaAsset.update({ where: { id: mapImage.id }, data: { retiredAt: new Date() } });
     response = await http(port, `/api/media/${mapImage.id}`, "GET", "www.swcu.finance"); assert(response.status === 404, "retired Contact Map is unavailable");
-    response = await http(port, "/api/contact", "POST", "unknown.invalid", {}); assert(response.status === 404, `unknown contact host 404 (got ${response.status})`);
+    response = await http(port, "/api/contact", "POST", "unknown.invalid", {});
+    assert(
+      response.status === (process.env.DEV_TENANT_SLUG ? 400 : 404),
+      `unknown contact host follows configured development fallback only (got ${response.status})`,
+    );
     console.info(JSON.stringify({ script: "check-prompt3b-http", assertions }));
     void leader;
   } finally {

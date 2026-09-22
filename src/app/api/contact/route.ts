@@ -3,7 +3,7 @@ import { resolveTenant } from "@/lib/tenant";
 import { handleContactPost } from "@/lib/contact";
 
 export async function POST(request: Request) {
-  const tenant = await resolveTenant(request.headers.get("x-forwarded-host") ?? request.headers.get("host") ?? "", { allowDevelopmentFallback: false });
+  const tenant = await resolveTenant(request.headers.get("x-forwarded-host") ?? request.headers.get("host") ?? "");
   if (!tenant) return NextResponse.json({ error: "Unknown tenant." }, { status: 404 });
   const body = await request.json().catch(() => null);
   if (!body || typeof body !== "object") return NextResponse.json({ error: "Invalid request." }, { status: 400 });
