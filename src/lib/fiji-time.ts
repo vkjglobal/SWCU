@@ -4,3 +4,16 @@ export function formatFijiDateTime(value: Date | null | undefined) {
   const get = (type: string) => parts.find((part) => part.type === type)?.value ?? "";
   return `${get("year")}-${get("month")}-${get("day")}T${get("hour")}:${get("minute")}`;
 }
+
+export function formatFijiDisplayDateTime(value: Date) {
+  return new Intl.DateTimeFormat("en-US", {
+    timeZone: "Pacific/Fiji",
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true,
+  }).format(value);
+}

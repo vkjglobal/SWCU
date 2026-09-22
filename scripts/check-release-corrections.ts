@@ -1,5 +1,6 @@
 import { readFile } from "node:fs/promises";
 import { db } from "../src/lib/db";
+import { formatFijiDisplayDateTime } from "../src/lib/fiji-time";
 
 let assertions = 0;
 function assert(condition: boolean, message: string) {
@@ -72,6 +73,7 @@ async function main() {
   const adminActionForm = await source("src/components/admin-action-form.tsx");
   const adminHomepage = await source("src/app/admin/homepage/page.tsx");
   const enquiryDetail = await source("src/app/admin/contact-enquiries/[id]/page.tsx");
+  const enquiryIndex = await source("src/app/admin/contact-enquiries/page.tsx");
   assert(adminPageContent.includes("PAGE_CONTENT_SLOTS.filter((slot) => !isUtilityPageSlot(slot))"), "generic page content excludes utility slots");
   assert(adminActions.includes("isUtilityPageSlot(slot)") && adminActions.includes("Only Administrators may manage utility pages."), "utility draft action is Administrator-only");
   assert(cmsWorkflow.includes("Only Administrators may manage utility pages."), "CMS workflow blocks Editor utility drafts");
@@ -92,6 +94,8 @@ async function main() {
   assert(staffResetForm.includes("noValidate") && staffResetForm.includes("validateSubmission") && staffResetForm.includes('name="confirmPassword"'), "password setup surfaces client validation instead of silently relying on native validation");
   assert(staffResetForm.includes("Password set successfully.") && staffResetForm.includes('router.replace("/admin/login?password-set=1")'), "password setup confirms success before redirecting to sign-in");
   assert(adminLogin.includes("Password set successfully.") && adminLogin.includes('"password-set"'), "sign-in page preserves the successful password setup confirmation");
+  assert(enquiryIndex.includes("formatFijiDisplayDateTime(item.submittedAt)"), "Contact enquiry list formats received times in Fiji");
+  assert(formatFijiDisplayDateTime(new Date("2026-09-22T08:46:19.892Z")) === "9/22/2026, 8:46:19 PM", "Contact enquiry received time uses Pacific/Fiji with AM/PM");
 
   const quickActions = footer.slice(footer.indexOf("export function MobileQuickActions"), footer.indexOf("export function InnerHero"));
   assert(quickActions.indexOf("<span>Join</span>") < quickActions.indexOf("<span>Login</span>") && quickActions.indexOf("<span>Login</span>") < quickActions.indexOf("<span>Call</span>"), "mobile actions order is Join, Login, Call");
