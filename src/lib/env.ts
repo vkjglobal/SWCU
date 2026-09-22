@@ -7,6 +7,16 @@ const optionalUrl = z.preprocess(
   z.url().optional(),
 );
 
+const optionalEmail = z.preprocess(
+  (value) => (value === "" ? undefined : value),
+  z.email().optional(),
+);
+
+const optionalSendGridName = z.preprocess(
+  (value) => (value === "" ? undefined : value),
+  z.string().trim().min(1).max(100).default("SWCU Website"),
+);
+
 const serverSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   DATABASE_URL: z.string().min(1),
@@ -19,6 +29,12 @@ const serverSchema = z.object({
   R2_BUCKET_NAME: z.string().min(1),
   R2_ENDPOINT: z.url(),
   R2_PUBLIC_BASE_URL: optionalUrl,
+  SENDGRID_API_KEY: z.preprocess(
+    (value) => (value === "" ? undefined : value),
+    z.string().min(1).optional(),
+  ),
+  SENDGRID_FROM_EMAIL: optionalEmail,
+  SENDGRID_FROM_NAME: optionalSendGridName,
 });
 
 export type ServerEnvironment = z.infer<typeof serverSchema>;
@@ -38,6 +54,9 @@ export function getServerEnvironment(): ServerEnvironment {
     R2_BUCKET_NAME: process.env.R2_BUCKET_NAME,
     R2_ENDPOINT: process.env.R2_ENDPOINT,
     R2_PUBLIC_BASE_URL: process.env.R2_PUBLIC_BASE_URL,
+    SENDGRID_API_KEY: process.env.SENDGRID_API_KEY,
+    SENDGRID_FROM_EMAIL: process.env.SENDGRID_FROM_EMAIL,
+    SENDGRID_FROM_NAME: process.env.SENDGRID_FROM_NAME,
   });
 
   return cachedEnvironment;

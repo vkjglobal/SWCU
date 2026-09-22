@@ -6,12 +6,14 @@ import { requireTenant } from "@/lib/tenant";
 import { saveContactSettings, replaceContactMap, removeContactMap } from "../actions";
 import { AdminMediaUpload, ConfirmSubmitButton } from "@/components/admin-media-upload";
 import { AdminActionForm, AdminSubmitButton } from "@/components/admin-action-form";
+import { getServerEnvironment } from "@/lib/env";
 
 export default async function ContactAdminPage() {
   const tenant = await requireTenant((await headers()).get("host") ?? "");
   await requireStaffMembership(tenant, ["ADMINISTRATOR"]);
   const contact = await db.contactSettings.findUnique({ where: { tenantId: tenant.id } });
-  const notificationReady = Boolean(contact?.notificationRecipients && process.env.RESEND_API_KEY && process.env.CONTACT_EMAIL_FROM);
+  const environment = getServerEnvironment();
+  const notificationReady = Boolean(contact?.notificationRecipients && environment.SENDGRID_API_KEY && environment.SENDGRID_FROM_EMAIL);
   const fields = [["organisationName", "Organisation name"], ["streetAddress", "Street address"], ["postalAddress", "Postal address"], ["telephone", "Telephone"], ["publicEmail", "Public email"], ["officeHours", "Office hours (optional)"], ["notificationRecipients", "Notification recipients (comma-separated Administrator emails)"]];
   return <main className="min-h-screen bg-soft-blue-grey"><div className="site-container py-12">
     <Link href="/admin" className="text-sm font-semibold text-swcu-blue">← Dashboard</Link>

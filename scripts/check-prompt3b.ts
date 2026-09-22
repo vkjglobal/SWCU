@@ -100,21 +100,51 @@ async function runAssertions() {
   const callbackIp = `prompt3b-callback-${Date.now()}`; qaRateKeys.add(`${tenant.id}:${callbackIp}`); const callback = await handleContactPost(tenant, { name: "QA Callback", email: "callback@example.com", phone: "6797000000", subject: "Request a Call Back", message: "", privacyAcknowledged: true, website: "" }, callbackIp); qaContactReferences.add(callback.reference);
   assert(Boolean(callback.reference), "API boundary accepts empty callback message");
   await db.contactSubmission.deleteMany({ where: { tenantId: tenant.id, reference: callback.reference } });
-  const originalFetch = globalThis.fetch;
-  const originalKey = process.env.RESEND_API_KEY;
-  const originalFrom = process.env.CONTACT_EMAIL_FROM;
-  process.env.RESEND_API_KEY = "qa-provider-key";
-  process.env.CONTACT_EMAIL_FROM = "qa@example.invalid";
+  const configuration = { apiKey: "qa-provider-key", fromEmail: "website@swcu.finance", fromName: "SWCU Website" };
+  let providerUrl = "";
+  let providerAuthorization = "";
   let providerPayload = "";
-  globalThis.fetch = (async (_url, init) => { providerPayload = String(init?.body ?? ""); return new Response("{}", { status: 200 }); }) as typeof fetch;
-  assert((await notifyContact({ recipients: ["admin@example.com"], reference: "SWCU-C-TEST", subject: "Membership" })).status === "SENT", "provider success boundary");
-  assert(providerPayload.includes("SWCU-C-TEST") && providerPayload.includes("Membership") && !providerPayload.includes("message"), "provider sends only reference and subject");
-  globalThis.fetch = (async () => new Response("failure", { status: 500 })) as typeof fetch;
-  assert((await notifyContact({ recipients: ["admin@example.com"], reference: "SWCU-C-FAIL", subject: "Loans" })).status === "FAILED", "provider failure boundary");
-  globalThis.fetch = originalFetch;
-  if (originalKey === undefined) delete process.env.RESEND_API_KEY; else process.env.RESEND_API_KEY = originalKey;
-  if (originalFrom === undefined) delete process.env.CONTACT_EMAIL_FROM; else process.env.CONTACT_EMAIL_FROM = originalFrom;
-  const successIp = `prompt3b-success-${Date.now()}`; qaRateKeys.add(`${tenant.id}:${successIp}`); const contactResult = await submitContactEnquiry({ tenant, ipAddress: successIp, value: { name: "QA Member", email: "qa@example.com", phone: "6797000000", subject: "Membership", message: "A safe enquiry for the QA inbox.", privacyAcknowledged: true, website: "" } }); qaContactReferences.add(contactResult.reference);
+  const successfulFetch = (async (url, init) => {
+    providerUrl = String(url);
+    providerAuthorization = new Headers(init?.headers).get("authorization") ?? "";
+    providerPayload = String(init?.body ?? "");
+    return new Response(null, { status: 202 });
+  }) as typeof fetch;
+  assert((await notifyContact({ recipients: ["admin@example.com", "second@example.com"], reference: "SWCU-C-TEST", subject: "Membership" }, { configuration, fetch: successfulFetch })).status === "SENT", "SendGrid 2xx response reports sent");
+  const parsedProviderPayload = JSON.parse(providerPayload) as {
+    personalizations: Array<{ to: Array<{ email: string }> }>;
+    from: { email: string; name: string };
+    subject: string;
+    content: Array<{ type: string; value: string }>;
+    reply_to?: unknown;
+  };
+  const providerText = parsedProviderPayload.content[0]?.value ?? "";
+  assert(providerUrl === "https://api.sendgrid.com/v3/mail/send" && providerAuthorization === "Bearer qa-provider-key", "SendGrid endpoint and authorization");
+  assert(parsedProviderPayload.personalizations[0]?.to.map((recipient) => recipient.email).join(",") === "admin@example.com,second@example.com", "SendGrid recipients use supplied notification recipients");
+  assert(parsedProviderPayload.from.email === "website@swcu.finance" && parsedProviderPayload.from.name === "SWCU Website", "SendGrid sender identity");
+  assert(parsedProviderPayload.subject === "SWCU enquiry SWCU-C-TEST" && providerText.includes("Reference: SWCU-C-TEST") && providerText.includes("Subject: Membership"), "provider notification contains reference and subject");
+  assert(!("reply_to" in parsedProviderPayload), "provider notification has no member reply-to");
+  for (const sensitive of ["QA Member", "member@example.com", "6797000000", "private message", "192.0.2.10", "privacyAcknowledged"]) {
+    assert(!providerPayload.includes(sensitive), `provider notification excludes ${sensitive}`);
+  }
+  let skippedFetchCalled = false;
+  const skippedFetch = (async () => { skippedFetchCalled = true; return new Response(null, { status: 202 }); }) as typeof fetch;
+  assert((await notifyContact({ recipients: [], reference: "SWCU-C-NONE", subject: "Other" }, { configuration, fetch: skippedFetch })).status === "SKIPPED_NO_RECIPIENT" && !skippedFetchCalled, "no recipients skips provider");
+  assert((await notifyContact({ recipients: ["admin@example.com"], reference: "SWCU-C-NOCONFIG", subject: "Other" }, { configuration: {}, fetch: skippedFetch })).status === "SKIPPED_NO_PROVIDER" && !skippedFetchCalled, "missing SendGrid configuration skips provider");
+  assert((await notifyContact({ recipients: ["admin@example.com"], reference: "SWCU-C-FAIL", subject: "Loans" }, { configuration, fetch: (async () => new Response("failure", { status: 500 })) as typeof fetch })).status === "FAILED", "SendGrid non-2xx response reports failed");
+  assert((await notifyContact({ recipients: ["admin@example.com"], reference: "SWCU-C-ERROR", subject: "Savings" }, { configuration, fetch: (async () => { throw new Error("provider unavailable"); }) as typeof fetch })).status === "FAILED", "SendGrid network error reports failed");
+  const successIp = `prompt3b-success-${Date.now()}`; qaRateKeys.add(`${tenant.id}:${successIp}`); const contactResult = await submitContactEnquiry(
+    { tenant, ipAddress: successIp, value: { name: "QA Member", email: "qa@example.com", phone: "6797000000", subject: "Membership", message: "A safe enquiry for the QA inbox.", privacyAcknowledged: true, website: "" } },
+    { notify: async ({ recipients, reference, subject }) => {
+      const [persisted, audit] = await Promise.all([
+        db.contactSubmission.findFirst({ where: { tenantId: tenant.id, reference } }),
+        db.auditLog.findFirst({ where: { tenantId: tenant.id, targetId: reference, action: "CONTACT_ENQUIRY_RECEIVED" } }),
+      ]);
+      assert(Boolean(persisted && audit), "enquiry and audit persist before notification attempt");
+      assert(recipients.length === 0, "notification recipients come from fixture contact settings");
+      return { status: "SENT", message: `Reference: ${reference} Subject: ${subject}` };
+    } },
+  ); qaContactReferences.add(contactResult.reference);
   assert(/^SWCU-C-\d{4}$/.test(contactResult.reference), "contact reference format");
   assert(["SKIPPED_NO_RECIPIENT", "SKIPPED_NO_PROVIDER", "SENT", "FAILED"].includes(contactResult.notification.status), "truthful notification readiness");
   const stored = await db.contactSubmission.findFirstOrThrow({ where: { tenantId: tenant.id, reference: contactResult.reference } });
@@ -147,9 +177,6 @@ async function assertRejects(fn: () => Promise<unknown>, message: string) {
 
 async function main() {
   assertQaExecutionSafe();
-  const originalFetch = globalThis.fetch;
-  const originalResendKey = process.env.RESEND_API_KEY;
-  const originalContactFrom = process.env.CONTACT_EMAIL_FROM;
   let failure: unknown;
   const cleanupErrors: string[] = [];
   try {
@@ -158,9 +185,6 @@ async function main() {
     failure = error;
   } finally {
     const attempt = async (label: string, fn: () => Promise<unknown>) => { try { await fn(); } catch (error) { cleanupErrors.push(`${label}: ${error instanceof Error ? error.message : String(error)}`); } };
-    globalThis.fetch = originalFetch;
-    if (originalResendKey === undefined) delete process.env.RESEND_API_KEY; else process.env.RESEND_API_KEY = originalResendKey;
-    if (originalContactFrom === undefined) delete process.env.CONTACT_EMAIL_FROM; else process.env.CONTACT_EMAIL_FROM = originalContactFrom;
     await attempt("contacts", () => db.contactSubmission.deleteMany({ where: { id: { in: [...qaContactIds] } } }));
     await attempt("rate limits", () => db.contactRateLimit.deleteMany({ where: { key: { in: [...qaRateKeys] } } }));
     if (fixtureTenantId) {

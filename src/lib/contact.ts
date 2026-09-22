@@ -4,6 +4,7 @@ import { z } from "zod";
 import { db } from "@/lib/db";
 import type { ResolvedTenant } from "@/lib/tenant";
 import { hasPublishedPrivacy } from "@/lib/public-data";
+import { getServerEnvironment } from "@/lib/env";
 
 export const CONTACT_SUBJECTS = [
   "Membership", "Loans", "Savings", "Forms & Documents",
@@ -25,6 +26,21 @@ const contactSchema = z.object({
 export type ContactInput = z.input<typeof contactSchema>;
 
 export type ContactNotificationStatus = "SKIPPED_NO_RECIPIENT" | "SKIPPED_NO_PROVIDER" | "SENT" | "FAILED";
+type ContactNotificationResult = { status: ContactNotificationStatus; message: string };
+type ContactNotifier = (input: { recipients: string[]; reference: string; subject: string }) => Promise<ContactNotificationResult>;
+type SendGridConfiguration = {
+  apiKey?: string;
+  fromEmail?: string;
+  fromName?: string;
+};
+type NotificationDependencies = {
+  configuration?: SendGridConfiguration;
+  fetch?: typeof fetch;
+};
+
+function contactNotificationMessage(reference: string, subject: string) {
+  return `New SWCU website enquiry received.\nReference: ${reference}\nSubject: ${subject}\nLog in to the SWCU Admin portal to review.`;
+}
 export const contactRecipientsSchema = z.preprocess(
   (raw) => Array.isArray(raw) ? raw : String(raw ?? "").split(",").map((email) => email.trim().toLowerCase()).filter(Boolean),
   z.array(z.string().email().max(160)),
@@ -91,7 +107,7 @@ export async function submitContactEnquiry(input: {
   tenant: ResolvedTenant;
   value: ContactInput;
   ipAddress?: string;
-}) {
+}, dependencies: { notify?: ContactNotifier } = {}) {
   const parsed = contactSchema.safeParse(input.value);
   if (!parsed.success) throw new Error("Please check the highlighted contact form fields.");
   if (parsed.data.subject === "Request a Call Back" && !parsed.data.phone.trim()) {
@@ -133,28 +149,51 @@ export async function submitContactEnquiry(input: {
   });
 
   const settings = await db.contactSettings.findUnique({ where: { tenantId: input.tenant.id }, select: { notificationRecipients: true } });
-  const notification = await notifyContact({
-    recipients: Array.isArray(settings?.notificationRecipients) ? settings.notificationRecipients.filter((item): item is string => typeof item === "string") : [],
-    reference: submission.reference,
-    subject: submission.subject,
-  });
+  let notification: ContactNotificationResult;
+  try {
+    notification = await (dependencies.notify ?? notifyContact)({
+      recipients: Array.isArray(settings?.notificationRecipients) ? settings.notificationRecipients.filter((item): item is string => typeof item === "string") : [],
+      reference: submission.reference,
+      subject: submission.subject,
+    });
+  } catch {
+    notification = {
+      status: "FAILED",
+      message: contactNotificationMessage(submission.reference, submission.subject),
+    };
+  }
   return {
     reference: submission.reference,
     notification,
   };
 }
 
-export async function notifyContact(input: { recipients: string[]; reference: string; subject: string }): Promise<{ status: ContactNotificationStatus; message: string }> {
-  const message = `New SWCU website enquiry received. Reference: ${input.reference} Subject: ${input.subject} Log in to the SWCU Admin portal to review.`;
+export async function notifyContact(
+  input: { recipients: string[]; reference: string; subject: string },
+  dependencies: NotificationDependencies = {},
+): Promise<ContactNotificationResult> {
+  const message = contactNotificationMessage(input.reference, input.subject);
   if (input.recipients.length === 0) return { status: "SKIPPED_NO_RECIPIENT", message };
-  const apiKey = process.env.RESEND_API_KEY;
-  const from = process.env.CONTACT_EMAIL_FROM;
-  if (!apiKey || !from) return { status: "SKIPPED_NO_PROVIDER", message };
   try {
-    const response = await fetch("https://api.resend.com/emails", {
+    const environment = dependencies.configuration ?? (() => {
+      const serverEnvironment = getServerEnvironment();
+      return {
+        apiKey: serverEnvironment.SENDGRID_API_KEY,
+        fromEmail: serverEnvironment.SENDGRID_FROM_EMAIL,
+        fromName: serverEnvironment.SENDGRID_FROM_NAME,
+      };
+    })();
+    if (!environment.apiKey || !environment.fromEmail) return { status: "SKIPPED_NO_PROVIDER", message };
+    const send = dependencies.fetch ?? fetch;
+    const response = await send("https://api.sendgrid.com/v3/mail/send", {
       method: "POST",
-      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ from, to: input.recipients, subject: `SWCU enquiry ${input.reference}`, text: message }),
+      headers: { Authorization: `Bearer ${environment.apiKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        personalizations: [{ to: input.recipients.map((email) => ({ email })) }],
+        from: { email: environment.fromEmail, name: environment.fromName || "SWCU Website" },
+        subject: `SWCU enquiry ${input.reference}`,
+        content: [{ type: "text/plain", value: message }],
+      }),
     });
     if (!response.ok) return { status: "FAILED", message };
     return { status: "SENT", message };
