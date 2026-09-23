@@ -29,7 +29,7 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
         take: 1,
       },
       formDocuments: {
-        where: { tenantId: tenant.id, isEnabled: true, OR: [{ isAnnualReport: false }, { isAnnualReport: true, publicApprovedAt: { not: null } }] },
+        where: { tenantId: tenant.id, isEnabled: true, isAnnualReport: false },
         select: { id: true, isAnnualReport: true, publicApprovedAt: true },
         take: 1,
       },

@@ -14,7 +14,7 @@ export default async function ContactAdminPage() {
   const contact = await db.contactSettings.findUnique({ where: { tenantId: tenant.id } });
   const environment = getServerEnvironment();
   const notificationReady = Boolean(contact?.notificationRecipients && environment.SENDGRID_API_KEY && environment.SENDGRID_FROM_EMAIL);
-  const fields = [["organisationName", "Organisation name"], ["streetAddress", "Street address"], ["postalAddress", "Postal address"], ["telephone", "Telephone"], ["publicEmail", "Public email"], ["officeHours", "Office hours (optional)"], ["notificationRecipients", "Notification recipients (comma-separated Administrator emails)"]];
+  const fields = [["organisationName", "Organisation name"], ["streetAddress", "Street address"], ["postalAddress", "Postal address"], ["telephone", "Digicel telephone (primary)"], ["secondaryTelephone", "Vodafone telephone (secondary, optional)"], ["publicEmail", "Public email"], ["officeHours", "Office hours (optional)"], ["notificationRecipients", "Notification recipients (comma-separated staff emails)"]];
   return <main className="min-h-screen bg-soft-blue-grey"><div className="site-container py-12">
     <Link href="/admin" className="text-sm font-semibold text-swcu-blue">← Dashboard</Link>
     <h1 className="mt-8 font-heading text-4xl font-bold text-deep-navy">Contact Details</h1>

@@ -32,7 +32,7 @@ export async function getHomeData(tenant: ResolvedTenant) {
           tenantId: tenant.id,
           isEnabled: true,
           mediaAsset: { retiredAt: null },
-          OR: [{ isAnnualReport: false }, { isAnnualReport: true, publicApprovedAt: { not: null } }],
+           isAnnualReport: false,
         },
         include: { mediaAsset: { select: { id: true, originalFilename: true, retiredAt: true } } },
         orderBy: { sortOrder: "asc" },

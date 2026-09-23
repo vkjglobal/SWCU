@@ -24,7 +24,7 @@ const approvedPages = [
   {
     slot: "ABOUT_STORY",
     heading: "Our Story",
-    body: "Service Worker Credit Union began on 23 August 2000, when a group of Fiji Public Service Association members met in Suva to establish a credit union for members. Today, SWCU serves its members from 300 Waimanu Road, Suva.",
+    body: "Service Worker Credit Union was established on 14 September 2000. Today, SWCU serves its members from 300 Waimanu Road, Suva.",
   },
   {
     slot: "ABOUT_VISION",
@@ -139,9 +139,12 @@ async function seed() {
         organisationName: "Service Worker Credit Union",
         streetAddress: "300 Waimanu Road, Suva",
         postalAddress: "GPO Box 1405, Suva",
-        telephone: "(679) 7730445",
+        telephone: "(679) 7777345",
+        secondaryTelephone: "(679) 8936901",
         publicEmail: "swcu2016@gmail.com",
+        officeHours: "Monday–Thursday: 8.30 am to 4.30 pm\nFriday: 8.30 am to 4.00 pm",
         directionsUrl: "https://www.google.com/maps/search/?api=1&query=300+Waimanu+Road+Suva+Fiji",
+        notificationRecipients: ["swcu@gmail.com", "devika_s@fpsa.org.fj"],
       },
     }),
   );

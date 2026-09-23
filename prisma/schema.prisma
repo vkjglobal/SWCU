@@ -344,6 +344,7 @@ model ContactSettings {
   streetAddress  String   @db.VarChar(240)
   postalAddress  String   @db.VarChar(240)
   telephone      String   @db.VarChar(80)
+  secondaryTelephone String? @db.VarChar(80)
   publicEmail    String   @db.VarChar(160)
   officeHours    String?  @db.VarChar(300)
   directionsUrl  String?  @db.VarChar(500)

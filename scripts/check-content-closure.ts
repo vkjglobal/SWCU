@@ -64,7 +64,7 @@ async function main() {
   }
 
   check(about.includes('title="About SWCU"'), "About uses the approved page title");
-  check(about.includes("Our Leadership") && about.includes("Annual Reports"), "About conditional headings are simplified");
+  check(about.includes("Our Leadership") && !about.includes("Annual Reports"), "About conditional headings are simplified");
   for (const removed of ["People of SWCU", ">Leadership<", "SWCU leadership", ">Reports<", "Annual reports"]) {
     check(!about.includes(removed), `About removed duplicate label: ${removed}`);
   }
@@ -75,9 +75,10 @@ async function main() {
   }
 
   check(resources.includes('title="Forms & Resources"'), "Resources uses locked page title");
-  for (const heading of ["Forms", "News &amp; Notices", "Annual Reports", "Common Questions"]) {
+  for (const heading of ["Forms", "News &amp; Notices", "Common Questions"]) {
     check(resources.includes(heading), `Resources includes locked heading: ${heading}`);
   }
+  check(!resources.includes("Annual Reports"), "Resources excludes Annual Reports");
   for (const removed of ["Forms and helpful resources", "Approved information, documents and answers", "Forms for members", "News from SWCU", "Answers for members"]) {
     check(!resources.includes(removed), `Resources removed duplicate label: ${removed}`);
   }

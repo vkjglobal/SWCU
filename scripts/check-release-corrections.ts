@@ -15,7 +15,7 @@ async function main() {
   for (const forbidden of ["<iframe", "google.com", "maps.google", "Mapbox", "mapbox", "OpenStreetMap", "openstreetmap", "tile.openstreetmap", "mapboxgl", "leaflet", "Get Directions", "directionsUrl"]) {
     assert(!contact.includes(forbidden), `Contact source must not contain ${forbidden}`);
   }
-  assert(contact.includes("300 Waimanu Road, Suva, Fiji"), "placeholder has exact address");
+  assert(contact.includes("{contact.streetAddress}, Fiji"), "map placeholder uses the central street address");
   assert(contact.includes("/api/media/") && contact.includes('alt="Map showing the SWCU office at 300 Waimanu Road, Suva"'), "map image uses media route and exact alt");
 
   const adminContact = await source("src/app/admin/contact/page.tsx");

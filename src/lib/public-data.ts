@@ -45,7 +45,7 @@ export async function getCalculatorSettings(tenant: ResolvedTenant) {
 export async function getPublicContactSettings(tenant: ResolvedTenant) {
   return db.contactSettings.findUnique({
     where: { tenantId: tenant.id },
-    select: { organisationName: true, streetAddress: true, postalAddress: true, telephone: true, publicEmail: true, officeHours: true, contactMapMediaAsset: { select: { id: true, altText: true, mimeType: true } } },
+    select: { organisationName: true, streetAddress: true, postalAddress: true, telephone: true, secondaryTelephone: true, publicEmail: true, officeHours: true, contactMapMediaAsset: { select: { id: true, altText: true, mimeType: true } } },
   });
 }
 
@@ -64,7 +64,7 @@ export async function getPublishedResources(tenant: ResolvedTenant) {
         tenantId: tenant.id,
         isEnabled: true,
         mediaAsset: { retiredAt: null },
-        OR: [{ isAnnualReport: false }, { isAnnualReport: true, publicApprovedAt: { not: null } }],
+         isAnnualReport: false,
       },
       orderBy: { sortOrder: "asc" },
       select: { id: true, title: true, description: true, category: true, isAnnualReport: true, mediaAssetId: true },

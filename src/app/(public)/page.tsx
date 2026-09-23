@@ -45,6 +45,7 @@ export default async function HomePage() {
         streetAddress: data.contact.streetAddress,
         postalAddress: data.contact.postalAddress,
         telephone: data.contact.telephone,
+         secondaryTelephone: data.contact.secondaryTelephone,
         publicEmail: data.contact.publicEmail,
       } : undefined}
     />

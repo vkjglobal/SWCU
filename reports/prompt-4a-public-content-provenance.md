@@ -110,7 +110,7 @@ Source: `src/app/(public)/about-swcu/page.tsx`.
 
 `prisma/seed.ts:23-43` introduced the current CMS slots:
 
-- `Our Story` — `Service Worker Credit Union began on 23 August 2000, when a group of Fiji Public Service Association members met in Suva to establish a credit union for members. Today, SWCU serves its members from 300 Waimanu Road, Suva.`
+- `Our Story` — `Service Worker Credit Union began on 14 September 2000, when a group of Fiji Public Service Association members met in Suva to establish a credit union for members. Today, SWCU serves its members from 300 Waimanu Road, Suva.`
 - `Our Vision` — `To be a leading credit union providing financial services for our members.`
 - `Our Mission` — `To encourage members to save and provide financial assistance that helps improve the wellbeing of members and their families.`
 - `Our Purpose` — `To help members build savings, access financial assistance for provident and productive needs, and strengthen their financial wellbeing.`
@@ -159,9 +159,9 @@ Source: `src/app/(public)/forms-resources/page.tsx`.
 **Build-written code**
 
 - Metadata title: `Forms & Resources | SWCU`.
-- Metadata description: `Find approved SWCU forms, notices, annual reports and common questions.`
+- Metadata description: `Find approved SWCU forms, news and notices, and common questions.`
 - Hero: `Forms & Resources`; `Forms and helpful resources`; `Approved information, documents and answers for members.`
-- Sections: `Forms`; `Forms for members`; `News & Notices`; `News from SWCU`; `Annual Reports`; `Reports`; `Common Questions`; `Answers for members`.
+- Sections: `Forms`; `News & Notices`; `Common Questions`.
 - Empty states: `Approved forms will appear here when published.`; `News and notices will appear here when published.`; `Common questions will appear here when published.`
 - Resource action: `Download`.
 
@@ -189,7 +189,7 @@ Seed contact settings at `prisma/seed.ts:134-147` introduced:
 - Organisation: `Service Worker Credit Union`
 - Street: `300 Waimanu Road, Suva`
 - Postal: `GPO Box 1405, Suva`
-- Telephone: `(679) 7730445`
+- Digicel telephone: `(679) 7777345`; Vodafone telephone: `(679) 8936901`
 - Email: `swcu2016@gmail.com`
 - Historical seed `directionsUrl`: `https://www.google.com/maps/search/?api=1&query=300+Waimanu+Road+Suva+Fiji`
 
@@ -305,17 +305,17 @@ Centralization is complete for the active public shell. Preserve `/member-login`
 
 ## 5. Telephone/call appendix
 
-The current stored contact number is `(679) 7730445`. The final centralized helpers in `src/lib/public-links.ts:10-18` produce canonical display `+679 773 0445` and href `tel:+6797730445`.
+The current stored contact numbers are Digicel `(679) 7777345` and Vodafone `(679) 8936901`. The final centralized helpers in `src/lib/public-links.ts:10-18` produce canonical display and `tel:+679` hrefs.
 
 | Location | Display/current href | Centralization status | Recommended file(s) |
 |---|---|---|---|
-| Home contact panel | `+679 773 0445` / `tel:+6797730445` | Centralized `formatTelephone()` / `telephoneHref()`; source number remains ContactSettings | `src/components/home-experience.tsx:120`; `src/lib/public-links.ts:10-18` |
-| Public Contact page | `+679 773 0445` / `tel:+6797730445` | Same centralized helpers | `src/app/(public)/contact/page.tsx:9,16`; `src/lib/public-links.ts:10-18` |
-| Public footer | `+679 773 0445` / `tel:+6797730445` | Same centralized helpers | `src/app/(public)/_components.tsx:10,61`; `src/lib/public-links.ts:10-18` |
-| Mobile sticky quick actions | `<span>Call</span>`; aria `Call SWCU at +679 773 0445`; `tel:+6797730445` | Same centralized helpers; ContactSettings value is passed by layout | `src/app/(public)/_components.tsx:10,32`; `src/app/(public)/layout.tsx:19` |
+| Home contact panel | `Digicel: 777 7345`; `Vodafone: 893 6901` | Both links read from ContactSettings and use centralized formatting/href helpers | `src/components/home-experience.tsx:120`; `src/lib/public-links.ts:10-24` |
+| Public Contact page | `Digicel: 777 7345`; `Vodafone: 893 6901` | Same centralized helpers | `src/app/(public)/contact/page.tsx:9,16`; `src/lib/public-links.ts:10-24` |
+| Public footer | `Digicel: 777 7345`; `Vodafone: 893 6901` | Same centralized helpers | `src/app/(public)/_components.tsx:10,61`; `src/lib/public-links.ts:10-24` |
+| Mobile sticky quick actions | `<span>Call</span>`; primary Digicel `tel:+6797777345` | Single direct Call action uses the primary ContactSettings telephone | `src/app/(public)/_components.tsx:10,32`; `src/app/(public)/layout.tsx:19` |
 | Contact form | Subject `Request a Call Back`; phone field required for that subject | Functional callback workflow; no direct call href | `src/lib/contact.ts:9,22,97`; `src/app/(public)/_components.tsx:64-66` |
 
-`src/components/site-header.tsx` contains the legacy duplicate Member Login header but no telephone action; it is not used by the active `(public)` layout. No independent hard-coded `7730445` telephone link was found outside seed ContactSettings. Footer contact behavior is final: it uses the central telephone helpers and continues to render legal links only for published CMS records.
+`src/components/site-header.tsx` contains the legacy duplicate Member Login header but no telephone action; it is not used by the active `(public)` layout. Contact numbers remain centrally editable in ContactSettings. Footer contact behavior uses the central telephone helpers and continues to render legal links only for published CMS records.
 
 ## 6. Audit limitations and approval boundary
 

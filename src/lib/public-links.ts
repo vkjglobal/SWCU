@@ -13,6 +13,12 @@ export function formatTelephone(value: string) {
   return local.length === 7 ? `+679 ${local.slice(0, 3)} ${local.slice(3)}` : value;
 }
 
+export function formatLocalTelephone(value: string) {
+  const digits = value.replace(/\D/g, "");
+  const local = digits.startsWith("679") ? digits.slice(3) : digits;
+  return local.length === 7 ? `${local.slice(0, 3)} ${local.slice(3)}` : value;
+}
+
 export function telephoneHref(value: string) {
   const digits = value.replace(/\D/g, "");
   return `tel:+${digits.startsWith("679") ? digits : `679${digits}`}`;

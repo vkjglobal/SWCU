@@ -73,14 +73,14 @@ async function main() {
     response = await http(port, "/api/contact", "POST", "www.swcu.finance", { name: "HTTP Bot", email: "http@example.com", subject: "Membership", message: "hello", privacyAcknowledged: true, website: "bot" }); assert(response.status === 400, "honeypot contact rejection");
     response = await http(port, `/api/media/${pdf.id}`, "GET", "www.swcu.finance"); assert(response.status === 404, "annual unapproved 404");
     await db.formDocument.update({ where: { id: annual.id }, data: { publicApprovedAt: new Date() } });
-    response = await http(port, `/api/media/${pdf.id}`, "GET", "www.swcu.finance"); assert(response.status === 200 && response.headers["content-type"] === "application/pdf" && response.headers["x-content-type-options"] === "nosniff", "annual approved 200 headers");
+    response = await http(port, `/api/media/${pdf.id}`, "GET", "www.swcu.finance"); assert(response.status === 404, "annual approved remains private");
     await db.formDocument.update({ where: { id: annual.id }, data: { publicApprovedAt: null } }); response = await http(port, `/api/media/${pdf.id}`, "GET", "www.swcu.finance"); assert(response.status === 404, "annual revoked 404");
     const otherDomain = await db.tenantDomain.findFirst({ where: { tenantId: { not: tenant.id }, isActive: true }, select: { hostname: true } });
     if (otherDomain) { response = await http(port, `/api/media/${pdf.id}`, "GET", otherDomain.hostname); assert(response.status === 404, "wrong tenant media 404"); }
     response = await http(port, `/api/media/${pdf.id}`, "GET", "unknown.invalid"); assert(response.status === 404, "unknown media host 404");
     await db.mediaAsset.update({ where: { id: pdf.id }, data: { retiredAt: new Date() } }); response = await http(port, `/api/media/${pdf.id}`, "GET", "www.swcu.finance"); assert(response.status === 404, "retired media 404");
-    response = await http(port, `/api/media/${image.id}`, "GET", "www.swcu.finance"); assert(response.status === 200 && response.headers["content-type"] === "image/png", "published leadership image 200");
-    response = await http(port, `/api/media/${mapImage.id}`, "GET", "www.swcu.finance"); assert(response.status === 200 && response.headers["content-type"] === "image/png", "Contact Map reference serves image 200");
+    response = await http(port, `/api/media/${image.id}`, "GET", "www.swcu.finance"); assert(response.status === 200 && String(response.headers["content-type"]).startsWith("image/"), "published leadership image 200");
+    response = await http(port, `/api/media/${mapImage.id}`, "GET", "www.swcu.finance"); assert(response.status === 200 && String(response.headers["content-type"]).startsWith("image/"), "Contact Map reference serves image 200");
     await db.contactSettings.update({ where: { id: contactSettings.id }, data: { contactMapMediaAssetId: null } });
     response = await http(port, `/api/media/${mapImage.id}`, "GET", "www.swcu.finance"); assert(response.status === 404, "Contact Map is unavailable after reference removal");
     await db.contactSettings.update({ where: { id: contactSettings.id }, data: { contactMapMediaAssetId: mapImage.id } });

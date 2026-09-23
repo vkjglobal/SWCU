@@ -1,0 +1,1 @@
+ALTER TABLE "contact_settings" ADD COLUMN "secondaryTelephone" VARCHAR(80);
