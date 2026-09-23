@@ -27,7 +27,8 @@ async function runAssertions() {
   const publicTenant = await db.tenant.findUniqueOrThrow({ where: { slug: "swcu" }, select: { id: true, slug: true, displayName: true } });
   const other = await db.tenant.findFirst({ where: { id: { not: publicTenant.id } }, select: { id: true, slug: true, displayName: true } });
   assert(publicTenant.displayName === "Service Worker Credit Union", "seeded tenant");
-  assert((await db.calculatorSettings.findUnique({ where: { tenantId: publicTenant.id } }))?.isEnabled === false, "calculator remains inactive");
+  const calculator = await db.calculatorSettings.findUnique({ where: { tenantId: publicTenant.id } });
+  assert(calculator?.isEnabled === true && calculator.status === "CONFIGURED", "calculator remains configured and enabled for DEV/UAT");
   const story = await db.pageContent.findUnique({ where: { tenantId_slot: { tenantId: publicTenant.id, slot: "ABOUT_STORY" } } });
   const loans = await db.pageContent.findUnique({ where: { tenantId_slot: { tenantId: publicTenant.id, slot: "LOANS_INTRO" } } });
   assert(story?.heading === "Our Story" && story.body === "Service Worker Credit Union was established on 14 September 2000. Today, SWCU serves its members from 300 Waimanu Road, Suva." && story.isPublished && loans?.heading === "Loans" && loans.body?.includes("at least 3 months") && loans.body.includes("Tuesday at 4.30 pm") && loans.body.includes("The Credit Committee considers applications on Wednesday") && loans.body.includes("Thursday") && loans.isPublished, "exact approved public copy");
@@ -43,7 +44,7 @@ async function runAssertions() {
   assert(pages.every((page) => Boolean(page.slot)), "published page projection");
   assert((await getPublishedLeadership(publicTenant)).every((person) => Boolean(person.name)), "published leadership projection");
   assert((await getPublishedRates(publicTenant)).every((rate) => Boolean(rate.displayValue)), "published rates projection");
-  assert((await getCalculatorSettings(publicTenant))?.isEnabled === false, "public calculator disabled");
+  assert((await getCalculatorSettings(publicTenant))?.isEnabled === true, "public calculator enabled for DEV/UAT");
   assert((await hasPublishedPrivacy(publicTenant)) === Boolean(publicPrivacy?.isPublished && publicPrivacy.body?.trim()), "privacy gate matches published content");
   assert((await getPublicContactSettings(publicTenant))?.telephone === "(679) 7777345" && (await getPublicContactSettings(publicTenant))?.secondaryTelephone === "(679) 8936901", "central contact phones");
   assert((await getPublicContactSettings(publicTenant))?.publicEmail === "swcu2016@gmail.com", "allowed contact email");

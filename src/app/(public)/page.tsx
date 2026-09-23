@@ -23,6 +23,14 @@ export default async function HomePage() {
         label: data.homeSettings?.memberAppLabel ?? "Member App — Coming Soon",
         href: getMemberAppHref(data.tenantSettings),
       }}
+      calculator={{
+        enabled: data.calculatorSettings?.isEnabled ?? false,
+        periods: [
+          data.calculatorSettings?.weeklyEnabled ? "weekly" as const : null,
+          data.calculatorSettings?.fortnightlyEnabled ? "fortnightly" as const : null,
+          data.calculatorSettings?.monthlyEnabled ? "monthly" as const : null,
+        ].filter((period): period is "weekly" | "fortnightly" | "monthly" => period !== null),
+      }}
       highlights={data.highlights.map((item) => ({ value: item.value, label: item.label }))}
       services={data.services.map((item) => ({
         title: item.title,

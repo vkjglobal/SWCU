@@ -5,7 +5,7 @@ import type { ResolvedTenant } from "@/lib/tenant";
 
 export async function getHomeData(tenant: ResolvedTenant) {
   const now = new Date();
-  const [siteNotice, heroSlides, highlights, homeSettings, tenantSettings, services, forms, news, faqs, contact] =
+  const [siteNotice, heroSlides, highlights, homeSettings, tenantSettings, services, forms, news, faqs, contact, calculatorSettings] =
     await Promise.all([
       db.siteNotice.findFirst({
         where: {
@@ -45,9 +45,13 @@ export async function getHomeData(tenant: ResolvedTenant) {
       }),
       db.fAQ.findMany({ where: { tenantId: tenant.id, isEnabled: true }, orderBy: { sortOrder: "asc" } }),
       db.contactSettings.findUnique({ where: { tenantId: tenant.id } }),
+      db.calculatorSettings.findUnique({
+        where: { tenantId: tenant.id },
+        select: { isEnabled: true, weeklyEnabled: true, fortnightlyEnabled: true, monthlyEnabled: true },
+      }),
     ]);
 
-  return { tenant, siteNotice, heroSlides, highlights, homeSettings, tenantSettings, services, forms, news, faqs, contact };
+  return { tenant, siteNotice, heroSlides, highlights, homeSettings, tenantSettings, services, forms, news, faqs, contact, calculatorSettings };
 }
 
 export async function getActiveSiteNotice(tenant: ResolvedTenant) {

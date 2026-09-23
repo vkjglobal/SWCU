@@ -36,6 +36,8 @@
     "check:member-services": "NODE_OPTIONS=--conditions=react-server tsx scripts/check-member-services.ts",
     "check:migrations": "tsx scripts/check-migrations.ts",
     "check:tenant": "tsx scripts/check-tenant.ts",
+    "check:loan-calculator": "NODE_OPTIONS=--conditions=react-server tsx scripts/check-loan-calculator.ts",
+    "check:loan-calculator-integration": "tsx scripts/check-loan-calculator-integration.ts",
     "bootstrap:admin": "NODE_OPTIONS=--conditions=react-server tsx scripts/bootstrap-admin.ts"
   },
   "dependencies": {

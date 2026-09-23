@@ -58,8 +58,12 @@ async function main() {
   });
   check(settings.retirementMinimumContribution === null, "Retirement minimum contribution remains blank");
 
-  const calculator = await db.calculatorSettings.findUnique({ where: { tenantId: tenant.id }, select: { isEnabled: true, status: true } });
-  check(calculator?.isEnabled === false && calculator.status === "AWAITING_SWCU_CONFIGURATION", "Calculator remains off");
+  const calculator = await db.calculatorSettings.findUnique({
+    where: { tenantId: tenant.id },
+    select: { isEnabled: true, status: true, weeklyEnabled: true, fortnightlyEnabled: true, monthlyEnabled: true },
+  });
+  check(calculator?.isEnabled === true && calculator.status === "CONFIGURED", "Calculator remains configured and enabled for DEV/UAT");
+  check(Boolean(calculator?.weeklyEnabled && calculator.fortnightlyEnabled && calculator.monthlyEnabled), "Calculator retains all confirmed payroll periods");
 
   const forms = await db.formDocument.findMany({
     where: { tenantId: tenant.id, isEnabled: true, isAnnualReport: false, mediaAsset: { retiredAt: null } },

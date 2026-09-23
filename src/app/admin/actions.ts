@@ -764,15 +764,89 @@ export async function saveRateFeeAction(form: FormData) {
   revalidatePath("/admin/rates");
 }
 
-export async function saveCalculatorSettingsAction() {
+export async function saveCalculatorSettingsAction(form: FormData) {
   const { tenant, userId } = await staff(["ADMINISTRATOR"]);
-  const record = await db.calculatorSettings.upsert({
-    where: { tenantId: tenant.id },
-    update: { status: "AWAITING_SWCU_CONFIGURATION", isEnabled: false },
-    create: { tenantId: tenant.id, status: "AWAITING_SWCU_CONFIGURATION", isEnabled: false },
+  const optionalNumber = (key: string) => value(form, key) === "" ? null : Number(value(form, key));
+  const optionalInteger = (key: string) => value(form, key) === "" ? null : Number(value(form, key));
+  const input = z.object({
+    isEnabled: z.boolean(),
+    monthlyInterestRate: z.number().positive().max(100),
+    weeklyEnabled: z.boolean(),
+    fortnightlyEnabled: z.boolean(),
+    monthlyEnabled: z.boolean(),
+    takeHomePayPercentage: z.number().positive().max(100),
+    establishmentFeeType: z.enum(["NONE", "FIXED", "PERCENTAGE"]),
+    establishmentFeeValue: z.number().positive().max(1_000_000_000).nullable(),
+    establishmentFeeFinanced: z.boolean(),
+    minimumLoanAmount: z.number().positive().max(1_000_000_000).nullable(),
+    maximumLoanAmount: z.number().positive().max(1_000_000_000).nullable(),
+    minimumRepayments: z.number().int().positive().max(1200).nullable(),
+    maximumRepayments: z.number().int().positive().max(1200).nullable(),
+  }).parse({
+    isEnabled: checkbox(form, "isEnabled"),
+    monthlyInterestRate: Number(value(form, "monthlyInterestRate")),
+    weeklyEnabled: checkbox(form, "weeklyEnabled"),
+    fortnightlyEnabled: checkbox(form, "fortnightlyEnabled"),
+    monthlyEnabled: checkbox(form, "monthlyEnabled"),
+    takeHomePayPercentage: Number(value(form, "takeHomePayPercentage")),
+    establishmentFeeType: value(form, "establishmentFeeType"),
+    establishmentFeeValue: optionalNumber("establishmentFeeValue"),
+    establishmentFeeFinanced: checkbox(form, "establishmentFeeFinanced"),
+    minimumLoanAmount: optionalNumber("minimumLoanAmount"),
+    maximumLoanAmount: optionalNumber("maximumLoanAmount"),
+    minimumRepayments: optionalInteger("minimumRepayments"),
+    maximumRepayments: optionalInteger("maximumRepayments"),
   });
-  await db.auditLog.create({ data: { tenantId: tenant.id, actorUserId: userId, action: "CALCULATOR_SETTINGS_UPDATED", targetType: "CalculatorSettings", targetId: record.id, changeMetadata: { enabled: false } } });
+  if (!input.weeklyEnabled && !input.fortnightlyEnabled && !input.monthlyEnabled) throw new Error("Enable at least one payroll period.");
+  if (input.establishmentFeeType !== "NONE" && input.establishmentFeeValue == null) throw new Error("Enter the establishment fee value.");
+  if (input.establishmentFeeType === "PERCENTAGE" && input.establishmentFeeValue != null && input.establishmentFeeValue > 100) throw new Error("Fee percentage cannot be greater than 100%.");
+  if (input.minimumLoanAmount != null && input.maximumLoanAmount != null && input.minimumLoanAmount > input.maximumLoanAmount) throw new Error("Minimum loan amount cannot be greater than maximum loan amount.");
+  if (input.minimumRepayments != null && input.maximumRepayments != null && input.minimumRepayments > input.maximumRepayments) throw new Error("Minimum repayments cannot be greater than maximum repayments.");
+  const normalized = {
+    ...input,
+    status: "CONFIGURED",
+    establishmentFeeValue: input.establishmentFeeType === "NONE" ? null : input.establishmentFeeValue,
+    establishmentFeeFinanced: input.establishmentFeeType === "NONE" ? false : input.establishmentFeeFinanced,
+  };
+  const record = await db.$transaction(async (tx) => {
+    const before = await tx.calculatorSettings.findUnique({ where: { tenantId: tenant.id } });
+    const updated = await tx.calculatorSettings.upsert({
+      where: { tenantId: tenant.id },
+      update: normalized,
+      create: { tenantId: tenant.id, ...normalized },
+    });
+    await tx.auditLog.create({
+      data: {
+        tenantId: tenant.id,
+        actorUserId: userId,
+        action: "CALCULATOR_SETTINGS_UPDATED",
+        targetType: "CalculatorSettings",
+        targetId: updated.id,
+        changeMetadata: {
+          before: before ? {
+            enabled: before.isEnabled,
+            monthlyInterestRate: before.monthlyInterestRate.toString(),
+            periods: { weekly: before.weeklyEnabled, fortnightly: before.fortnightlyEnabled, monthly: before.monthlyEnabled },
+            takeHomePayPercentage: before.takeHomePayPercentage.toString(),
+            establishmentFee: { type: before.establishmentFeeType, value: before.establishmentFeeValue?.toString() ?? null, financed: before.establishmentFeeFinanced },
+            limits: { minimumLoanAmount: before.minimumLoanAmount?.toString() ?? null, maximumLoanAmount: before.maximumLoanAmount?.toString() ?? null, minimumRepayments: before.minimumRepayments, maximumRepayments: before.maximumRepayments },
+          } : null,
+          after: {
+            enabled: updated.isEnabled,
+            monthlyInterestRate: updated.monthlyInterestRate.toString(),
+            periods: { weekly: updated.weeklyEnabled, fortnightly: updated.fortnightlyEnabled, monthly: updated.monthlyEnabled },
+            takeHomePayPercentage: updated.takeHomePayPercentage.toString(),
+            establishmentFee: { type: updated.establishmentFeeType, value: updated.establishmentFeeValue?.toString() ?? null, financed: updated.establishmentFeeFinanced },
+            limits: { minimumLoanAmount: updated.minimumLoanAmount?.toString() ?? null, maximumLoanAmount: updated.maximumLoanAmount?.toString() ?? null, minimumRepayments: updated.minimumRepayments, maximumRepayments: updated.maximumRepayments },
+          },
+        },
+      },
+    });
+    return updated;
+  });
   revalidatePath("/admin/calculator");
+  revalidatePath("/");
+  return record.id;
 }
 
 export async function saveLeadershipAction(form: FormData) {

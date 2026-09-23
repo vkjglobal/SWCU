@@ -495,6 +495,18 @@ model CalculatorSettings {
   disclaimer String @default("Repayment figures are estimates only. Actual repayments, terms and loan approval are subject to SWCU requirements and approval.") @db.VarChar(300)
   securityReminder String @default("SWCU will never ask you to disclose your password, PIN or security/verification code by email, phone, chat or through an unsolicited link. If you are unsure, contact SWCU using the contact details published on this website.") @db.VarChar(500)
   isEnabled Boolean @default(false)
+  monthlyInterestRate Decimal @default(1.00) @db.Decimal(7, 4)
+  weeklyEnabled Boolean @default(true)
+  fortnightlyEnabled Boolean @default(true)
+  monthlyEnabled Boolean @default(true)
+  takeHomePayPercentage Decimal @default(50.00) @db.Decimal(5, 2)
+  establishmentFeeType String @default("NONE") @db.VarChar(20)
+  establishmentFeeValue Decimal? @db.Decimal(12, 2)
+  establishmentFeeFinanced Boolean @default(false)
+  minimumLoanAmount Decimal? @db.Decimal(12, 2)
+  maximumLoanAmount Decimal? @db.Decimal(12, 2)
+  minimumRepayments Int?
+  maximumRepayments Int?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Restrict)
