@@ -707,6 +707,31 @@ export async function savePageContentDraft(form: FormData) {
   revalidatePath("/admin");
 }
 
+export async function saveRetirementMinimumContributionAction(form: FormData) {
+  const { tenant, userId } = await staff(["ADMINISTRATOR"]);
+  const input = z.string().trim().max(120).parse(value(form, "retirementMinimumContribution"));
+  await db.$transaction(async (tx) => {
+    const before = await tx.tenantSettings.findUnique({ where: { tenantId: tenant.id }, select: { id: true, retirementMinimumContribution: true } });
+    const settings = await tx.tenantSettings.upsert({
+      where: { tenantId: tenant.id },
+      update: { retirementMinimumContribution: input || null },
+      create: { tenantId: tenant.id, organisationName: tenant.displayName, retirementMinimumContribution: input || null },
+    });
+    await tx.auditLog.create({
+      data: {
+        tenantId: tenant.id,
+        actorUserId: userId,
+        action: "RETIREMENT_MINIMUM_CONTRIBUTION_UPDATED",
+        targetType: "TenantSettings",
+        targetId: settings.id,
+        changeMetadata: { before: before?.retirementMinimumContribution ?? null, after: input || null },
+      },
+    });
+  });
+  revalidatePath("/admin/page-content");
+  revalidatePath("/membership-services");
+}
+
 export async function updateContactEnquiryAction(form: FormData) {
   const { tenant, userId } = await staff(["ADMINISTRATOR"]);
   const id = idSchema.parse(value(form, "id"));

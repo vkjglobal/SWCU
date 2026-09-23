@@ -20,7 +20,7 @@ The owner’s final content decisions supersede the original review classificati
 **OWNER APPROVED**
 
 - About: the currently published Our Story, Vision, Mission, and Purpose bodies.
-- Membership & Services: the currently published Savings, Loans, Retirement Savings, and Death Benefit Scheme bodies.
+- Membership & Services: the confirmed Membership, Savings, Loans, Retirement Savings, and Death Benefit Scheme bodies published on 23 September 2026.
 - Home service cards: `Build a steady savings habit with SWCU.`; `Access member loan support when you need it.`; `Plan with a long-term savings mindset.`; `Member support for families when it matters.`
 - Contact: the operational subject choices and `I acknowledge the published Privacy information.`
 - Member Login: `The SWCU Member App is coming soon. Until then, you can use this website for SWCU information, forms and contact details.`
@@ -36,7 +36,7 @@ The owner’s final content decisions supersede the original review classificati
 
 **PENDING SWCU**
 
-- Detailed membership eligibility, joining requirements, contribution values, calculator rules, detailed loan terms, withdrawal rules, Retirement Savings terms, Death Benefit Scheme rules, final FAQs, leadership details, and Annual Report publication approval.
+- Exact common-bond eligibility, membership-application email destination, calculator rules, unconfirmed loan rates/fees/limits/term, withdrawal restrictions, Retirement Savings minimum contribution, and final FAQs.
 
 The three seeded FAQ records remain stored but are disabled from public output pending SWCU approval. They are not owner-approved and were not deleted.
 
@@ -142,15 +142,13 @@ Source: `src/app/(public)/membership-services/page.tsx`.
 
 **Build-written CMS/seed**
 
-Seed slots `MEMBERSHIP_INTRO`, `SAVINGS_INTRO`, `LOANS_INTRO`, `RETIREMENT_INTRO`, and `DEATH_BENEFIT_INTRO` were introduced at `prisma/seed.ts:45-68`:
+Seed slots `MEMBERSHIP_INTRO`, `SAVINGS_INTRO`, `LOANS_INTRO`, `RETIREMENT_INTRO`, and `DEATH_BENEFIT_INTRO` now contain the SWCU-confirmed rules supplied on 23 September 2026. The same values are applied to existing tenants by the forward migration.
 
-- `Membership` — `SWCU provides savings, loans and member benefit services to eligible members. Members and people interested in joining can use the Membership Application and contact SWCU for current membership requirements.`
-- `Savings` — `Regular savings help members build funds for future needs and difficult times. SWCU provides members with a practical way to build their savings over time.`
-- `Loans` — `SWCU provides member loans for provident or productive purposes. Applications are considered against repayment ability, income or salary, and the member’s account position.`
-- `Retirement Savings` — `SWCU’s Retirement Savings Fund helps members build additional savings and strengthen their financial position for the future.`
-- `Death Benefit Scheme` — `SWCU’s Special Death Benefit Scheme is designed to provide support to the families and beneficiaries of members who pass away. Claims are handled under the Scheme’s approved rules.`
-
-The current database `MEMBERSHIP_INTRO` record is instead headed `Membership & Member Services` with body `Everything you need to know about joining SWCU, saving, borrowing and your member benefits.`. Its origin is not traceable to the current seed and is classified UNRESOLVED CMS PROVENANCE. The other current slots match the seed values.
+- `Membership` — confirmed entrance fee, regular-savings amounts, salary deduction, document/witness requirements, lodgement branches, and neutral eligibility/email guidance.
+- `Savings` — confirmed core-service wording with no invented balance, notice, withdrawal restriction, or website fee.
+- `Loans` — confirmed three-month participation requirement, provident/productive purpose, Tuesday/Wednesday/Thursday timetable, and approved repayment wording.
+- `Retirement Savings` — confirmed availability and payment events; the optional minimum contribution remains blank and unpublished.
+- `Death Benefit Scheme` — confirmed maximum benefits, no separate contribution or fee, and SWCU rules/claim qualifier.
 
 ### Forms & Resources — `/forms-resources`
 

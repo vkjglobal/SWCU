@@ -44,27 +44,27 @@ const approvedPages = [
   {
     slot: "MEMBERSHIP_INTRO",
     heading: "Membership",
-    body: "SWCU provides savings, loans and member benefit services to eligible members. Members and people interested in joining can use the Membership Application and contact SWCU for current membership requirements.",
+    body: "<p>SWCU provides savings, loans and member benefit services to eligible members.</p><p>Please contact SWCU to confirm your eligibility before applying.</p><h3>Before You Apply</h3><ul><li>Entrance fee: $1 for a new member.</li><li>Minimum regular savings: $8 per week or $16 per fortnight.</li><li>Salary deduction is compulsory for new members.</li><li>Bring a recent salary slip, photo identification, TIN/FNPF details and an employer confirmation letter.</li><li>A witness signature is required.</li></ul><p>Applications may be lodged at the FPSA branch in Lautoka, the FPSA branch in Labasa, or by email. Please contact SWCU for the current email destination.</p>",
   },
   {
     slot: "SAVINGS_INTRO",
     heading: "Savings",
-    body: "Regular savings help members build funds for future needs and difficult times. SWCU provides members with a practical way to build their savings over time.",
+    body: "<p>Regular savings are a core SWCU member service and help members build funds over time for future needs.</p>",
   },
   {
     slot: "LOANS_INTRO",
     heading: "Loans",
-    body: "SWCU provides member loans for provident or productive purposes. Applications are considered against repayment ability, income or salary, and the member’s account position.",
+    body: "<p>Members must have saved or contributed for at least 3 months before applying. Loans may be for provident or productive purposes.</p><ul><li>Applications should be received by Tuesday at 4.30 pm.</li><li>The Credit Committee considers applications on Wednesday.</li><li>Approved collection or payment follows on Thursday according to the current process.</li></ul><p>Applications are subject to SWCU approval and repayment eligibility, including repayment ability, income or salary, and the member’s account position.</p>",
   },
   {
     slot: "RETIREMENT_INTRO",
     heading: "Retirement Savings",
-    body: "SWCU’s Retirement Savings Fund helps members build additional savings and strengthen their financial position for the future.",
+    body: "<p>Retirement Savings is available to all registered SWCU members. Funds may be payable on retirement, resignation or leaving, or death. A member may continue SWCU membership after retirement.</p>",
   },
   {
     slot: "DEATH_BENEFIT_INTRO",
     heading: "Death Benefit Scheme",
-    body: "SWCU’s Special Death Benefit Scheme is designed to provide support to the families and beneficiaries of members who pass away. Claims are handled under the Scheme’s approved rules.",
+    body: "<p>The Special Death Benefit Scheme is available under normal SWCU membership conditions.</p><ul><li>On the death of a member, the member’s savings may be doubled up to a maximum of $5,000.</li><li>An outstanding loan may be cleared or written off up to a maximum of $5,000, subject to SWCU requirements.</li><li>There is no separate contribution or fee for the scheme.</li></ul><p>Subject to SWCU rules and claim requirements.</p>",
   },
   {
     slot: "IMPORTANT_INFORMATION",
@@ -128,7 +128,7 @@ async function seed() {
 
   await createIfMissing(
     () => db.tenantSettings.findUnique({ where: { tenantId: tenant.id } }),
-    () => db.tenantSettings.create({ data: { tenantId: tenant.id, organisationName: "Service Worker Credit Union" } }),
+    () => db.tenantSettings.create({ data: { tenantId: tenant.id, organisationName: "Service Worker Credit Union", retirementMinimumContribution: null } }),
   );
 
   await createIfMissing(

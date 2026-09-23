@@ -94,6 +94,7 @@ model TenantSettings {
   organisationName String
   memberAppStatus String   @default("COMING_SOON")
   memberAppUrl    String?
+  retirementMinimumContribution String?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
   tenant          Tenant   @relation(fields: [tenantId], references: [id], onDelete: Restrict)

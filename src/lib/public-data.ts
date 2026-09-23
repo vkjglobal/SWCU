@@ -42,6 +42,14 @@ export async function getCalculatorSettings(tenant: ResolvedTenant) {
   });
 }
 
+export async function getRetirementMinimumContribution(tenant: ResolvedTenant) {
+  const settings = await db.tenantSettings.findUnique({
+    where: { tenantId: tenant.id },
+    select: { retirementMinimumContribution: true },
+  });
+  return settings?.retirementMinimumContribution?.trim() || null;
+}
+
 export async function getPublicContactSettings(tenant: ResolvedTenant) {
   return db.contactSettings.findUnique({
     where: { tenantId: tenant.id },
