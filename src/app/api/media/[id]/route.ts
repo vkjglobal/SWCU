@@ -20,6 +20,9 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
       objectKey: true,
       originalFilename: true,
       mimeType: true,
+      stagedAt: true,
+      claimedAt: true,
+      createdBy: true,
       heroSlides: {
         where: { tenantId: tenant.id, isEnabled: true },
         select: { id: true },
@@ -47,6 +50,13 @@ export async function GET(request: Request, context: { params: Promise<{ id: str
   });
   if (!asset) return NextResponse.json({ error: "Media not found" }, { status: 404 });
   const isPublished = asset.heroSlides.length > 0 || asset.formDocuments.length > 0 || asset.pageContent.length > 0 || asset.leadershipRecords.length > 0 || Boolean(asset.contactMapSettings);
+  if (asset.stagedAt && !asset.claimedAt) {
+    const { auth } = await import("@/lib/auth");
+    const session = await auth.api.getSession({ headers: request.headers });
+    if (!session?.user || session.user.id !== asset.createdBy) return NextResponse.json({ error: "Media not found" }, { status: 404 });
+    const membership = await db.staffMembership.findUnique({ where: { tenantId_userId: { tenantId: tenant.id, userId: session.user.id } } });
+    if (!membership?.isActive) return NextResponse.json({ error: "Media not found" }, { status: 404 });
+  }
   if (!isPublished) {
     if (!request.headers.get("cookie")) return NextResponse.json({ error: "Media not found" }, { status: 404 });
     const { auth } = await import("@/lib/auth");

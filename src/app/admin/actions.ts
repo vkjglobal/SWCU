@@ -6,7 +6,7 @@ import { z } from "zod";
 import { db } from "@/lib/db";
 import { requireStaffMembership } from "@/lib/authorise";
 import { requireTenant } from "@/lib/tenant";
-import { uploadMedia, uploadDocument, replaceMedia, retireMedia, attachContactMapGeneration, removeContactMapGeneration } from "@/lib/media-service";
+import { replaceUploadedMedia, retireMedia, attachContactMapGeneration, removeContactMapGeneration, getUploadedMedia, discardUploadedMedia, finalizeUploadedMedia } from "@/lib/media-service";
 import {
   createCmsDraft as createCmsDraftWorkflow,
   archiveCmsDraft as archiveCmsDraftWorkflow,
@@ -191,20 +191,19 @@ export async function toggleHeroSlide(form: FormData) {
 
 export async function uploadHeroSlide(form: FormData) {
   const { tenant, userId, role } = await staff();
-  const file = form.get("file");
-  if (!(file instanceof File)) throw new Error("Choose an image to upload.");
   const altText = text(200).parse(value(form, "altText"));
   if (role === "EDITOR") {
-    const media = await uploadMedia({ tenant, actorUserId: userId, file, purpose: "hero", altText });
+    const media = await getUploadedMedia({ tenant, actorUserId: userId, mediaId: value(form, "uploadedMediaId"), purpose: "hero", uploadClass: "hero" });
     try {
       await createCmsDraft({ tenant, actorUserId: userId, kind: CmsDraftKind.HERO, operation: CmsDraftOperation.CREATE, mediaAssetId: media.id, payload: { mediaAssetId: media.id, altText, sortOrder: 0, isEnabled: true } });
     } catch (error) {
-      await db.mediaAsset.update({ where: { id: media.id }, data: { retiredAt: new Date() } });
+      await discardUploadedMedia({ tenant, actorUserId: userId, mediaId: media.id });
       throw error;
     }
+      await finalizeUploadedMedia({ tenant, actorUserId: userId, mediaId: media.id });
     return;
   }
-  const media = await uploadMedia({ tenant, actorUserId: userId, file, purpose: "hero", altText });
+  const media = await getUploadedMedia({ tenant, actorUserId: userId, mediaId: value(form, "uploadedMediaId"), purpose: "hero", uploadClass: "hero" });
   try {
     await db.$transaction(async (tx) => {
       await lockCmsTenant(tx, tenant.id);
@@ -217,28 +216,28 @@ export async function uploadHeroSlide(form: FormData) {
       await tx.auditLog.create({ data: { tenantId: tenant.id, actorUserId: userId, action: "HERO_CREATE", targetType: "HomeHeroSlide", targetId: created.id, changeMetadata: { before: null, after: { mediaAssetId: media.id, altText, isEnabled: created.isEnabled, sortOrder: created.sortOrder } } } });
     });
   } catch (error) {
-    await db.mediaAsset.update({ where: { id: media.id }, data: { retiredAt: new Date() } });
+    await discardUploadedMedia({ tenant, actorUserId: userId, mediaId: media.id });
     throw error;
   }
+  await finalizeUploadedMedia({ tenant, actorUserId: userId, mediaId: media.id });
   revalidatePath("/");
 }
 
 export async function replaceHeroSlide(form: FormData) {
   const { tenant, userId, role } = await staff();
   const slideId = idSchema.parse(value(form, "slideId"));
-  const file = form.get("file");
-  if (!(file instanceof File)) throw new Error("Choose an image to upload.");
   const altText = text(200).parse(value(form, "altText"));
   const slide = await db.homeHeroSlide.findFirst({ where: { id: slideId, tenantId: tenant.id }, include: { mediaAsset: true } });
   if (!slide) throw new Error("Hero slide not found.");
-  const media = await uploadMedia({ tenant, actorUserId: userId, file, purpose: "hero", altText });
+  const media = await getUploadedMedia({ tenant, actorUserId: userId, mediaId: value(form, "uploadedMediaId"), purpose: "hero", uploadClass: "hero" });
   if (role === "EDITOR") {
     try {
       await createCmsDraft({ tenant, actorUserId: userId, kind: CmsDraftKind.HERO, operation: CmsDraftOperation.REPLACE, targetId: slideId, expectedRevision: form.get("revision") ? Number(form.get("revision")) : undefined, mediaAssetId: media.id, payload: { mediaAssetId: media.id, altText } });
     } catch (error) {
-      await db.mediaAsset.update({ where: { id: media.id }, data: { retiredAt: new Date() } });
+      await discardUploadedMedia({ tenant, actorUserId: userId, mediaId: media.id });
       throw error;
     }
+      await finalizeUploadedMedia({ tenant, actorUserId: userId, mediaId: media.id });
     return;
   }
   try {
@@ -249,9 +248,10 @@ export async function replaceHeroSlide(form: FormData) {
       await tx.auditLog.create({ data: { tenantId: tenant.id, actorUserId: userId, action: "HERO_REPLACE", targetType: "HomeHeroSlide", targetId: slide.id, changeMetadata: { before: { mediaAssetId: slide.mediaAssetId, altText: slide.altText }, after: { mediaAssetId: media.id, altText } } } });
     });
   } catch (error) {
-    await db.mediaAsset.update({ where: { id: media.id }, data: { retiredAt: new Date() } });
+    await discardUploadedMedia({ tenant, actorUserId: userId, mediaId: media.id });
     throw error;
   }
+  await finalizeUploadedMedia({ tenant, actorUserId: userId, mediaId: media.id });
   revalidatePath("/");
 }
 
@@ -346,8 +346,6 @@ export async function saveFormDocument(form: FormData) {
 
 export async function uploadFormDocument(form: FormData) {
   const { tenant, userId, role } = await staff();
-  const file = form.get("file");
-  if (!(file instanceof File)) throw new Error("Choose a PDF document.");
   const input = z.object({
     title: text(160),
     description: z.string().trim().max(500).optional(),
@@ -361,14 +359,15 @@ export async function uploadFormDocument(form: FormData) {
     category: value(form, "category"), isAnnualReport: form.get("isAnnualReport") === "on",
   });
   if (role === "EDITOR" && input.isAnnualReport) throw new Error("Editors cannot release annual reports.");
-  const media = await uploadDocument({ tenant, actorUserId: userId, file, altText: input.title });
+  const media = await getUploadedMedia({ tenant, actorUserId: userId, mediaId: value(form, "uploadedMediaId"), document: true, uploadClass: "document" });
   if (role === "EDITOR") {
     try {
       await createCmsDraft({ tenant, actorUserId: userId, kind: CmsDraftKind.FORM_DOCUMENT, operation: CmsDraftOperation.CREATE, mediaAssetId: media.id, payload: { ...input, mediaAssetId: media.id } });
     } catch (error) {
-      await db.mediaAsset.update({ where: { id: media.id }, data: { retiredAt: new Date() } });
+      await discardUploadedMedia({ tenant, actorUserId: userId, mediaId: media.id });
       throw error;
     }
+    await finalizeUploadedMedia({ tenant, actorUserId: userId, mediaId: media.id });
     return;
   }
   try {
@@ -378,9 +377,10 @@ export async function uploadFormDocument(form: FormData) {
       await tx.auditLog.create({ data: { tenantId: tenant.id, actorUserId: userId, action: "FORM_DOCUMENT_CREATE", targetType: "FormDocument", targetId: created.id, changeMetadata: { before: null, after: { title: input.title, description: input.description, sortOrder: input.sortOrder, isEnabled: input.isEnabled, mediaAssetId: media.id } } } });
     });
   } catch (error) {
-    await db.mediaAsset.update({ where: { id: media.id }, data: { retiredAt: new Date() } });
+    await discardUploadedMedia({ tenant, actorUserId: userId, mediaId: media.id });
     throw error;
   }
+  await finalizeUploadedMedia({ tenant, actorUserId: userId, mediaId: media.id });
   revalidatePath("/");
 }
 
@@ -394,8 +394,12 @@ export async function removeFormDocument(form: FormData) {
     return;
   }
   await db.$transaction(async (tx) => {
+    await lockCmsTenant(tx, tenant.id);
+    const current = await tx.formDocument.findFirst({ where: { id, tenantId: tenant.id } });
+    if (!current) throw new Error("Document not found.");
     await tx.formDocument.update({ where: { id }, data: { isEnabled: false, mediaAssetId: null } });
-    await tx.auditLog.create({ data: { tenantId: tenant.id, actorUserId: userId, action: "FORM_DOCUMENT_REMOVE", targetType: "FormDocument", targetId: id, changeMetadata: { before: { title: existing.title, mediaAssetId: existing.mediaAssetId }, after: { removed: true } } } });
+    if (current.mediaAssetId) await retireIfUnreferenced(tx, tenant.id, current.mediaAssetId);
+    await tx.auditLog.create({ data: { tenantId: tenant.id, actorUserId: userId, action: "FORM_DOCUMENT_REMOVE", targetType: "FormDocument", targetId: id, changeMetadata: { before: { title: current.title, mediaAssetId: current.mediaAssetId }, after: { removed: true } } } });
   });
   revalidatePath("/");
 }
@@ -491,22 +495,18 @@ export async function saveContactSettings(form: FormData) {
 
 export async function uploadContactMap(form: FormData) {
   const { tenant, userId } = await staff(["ADMINISTRATOR"]);
-  const file = form.get("file");
-  if (!(file instanceof File)) throw new Error("Choose an image to upload.");
   const expectedRaw = value(form, "expectedMediaId");
   const expectedMediaId = expectedRaw ? idSchema.parse(expectedRaw) : null;
-  const media = await uploadMedia({ tenant, actorUserId: userId, file, purpose: "contact-map", altText: "Map showing the SWCU office at 300 Waimanu Road, Suva" });
+  const media = await getUploadedMedia({ tenant, actorUserId: userId, mediaId: value(form, "uploadedMediaId"), purpose: "contact-map", uploadClass: "contact-map" });
   await attachContactMapGeneration({ tenant, actorUserId: userId, uploadedMediaId: media.id, expectedMediaId, operation: expectedMediaId ? "REPLACE" : "UPLOAD" });
   revalidatePath("/contact");
 }
 
 export async function replaceContactMap(form: FormData) {
   const { tenant, userId } = await staff(["ADMINISTRATOR"]);
-  const file = form.get("file");
-  if (!(file instanceof File)) throw new Error("Choose an image to upload.");
   const expectedRaw = value(form, "expectedMediaId");
   const expectedMediaId = expectedRaw ? idSchema.parse(expectedRaw) : null;
-  const media = await uploadMedia({ tenant, actorUserId: userId, file, purpose: "contact-map", altText: "Map showing the SWCU office at 300 Waimanu Road, Suva" });
+  const media = await getUploadedMedia({ tenant, actorUserId: userId, mediaId: value(form, "uploadedMediaId"), purpose: "contact-map", uploadClass: "contact-map" });
   await attachContactMapGeneration({ tenant, actorUserId: userId, uploadedMediaId: media.id, expectedMediaId, operation: expectedMediaId ? "REPLACE" : "UPLOAD" });
   revalidatePath("/contact");
 }
@@ -520,36 +520,45 @@ export async function removeContactMap(form: FormData) {
 
 export async function uploadImage(form: FormData) {
   const { tenant, userId, role } = await staff();
-  const file = form.get("file");
-  if (!(file instanceof File)) throw new Error("Choose an image to upload.");
   const purpose = z.enum(["hero", "news", "general"]).parse(value(form, "purpose"));
-  const media = await uploadMedia({ tenant, actorUserId: userId, file, purpose, altText: value(form, "altText") || undefined });
+  const media = await getUploadedMedia({ tenant, actorUserId: userId, mediaId: value(form, "uploadedMediaId"), purpose, uploadClass: purpose });
   if (role === "EDITOR") {
     try {
       await createCmsDraft({ tenant, actorUserId: userId, kind: CmsDraftKind.MEDIA, operation: CmsDraftOperation.UPLOAD, mediaAssetId: media.id, payload: { mediaAssetId: media.id, purpose } });
     } catch (error) {
-      await db.mediaAsset.update({ where: { id: media.id }, data: { retiredAt: new Date() } });
+      await discardUploadedMedia({ tenant, actorUserId: userId, mediaId: media.id });
       throw error;
     }
   }
+  await finalizeUploadedMedia({ tenant, actorUserId: userId, mediaId: media.id });
 }
 
 export async function replaceImage(form: FormData) {
   const { tenant, userId, role } = await staff();
-  const file = form.get("file");
-  if (!(file instanceof File)) throw new Error("Choose an image to upload.");
-  const mediaId = idSchema.parse(value(form, "mediaId"));
-  if (role === "EDITOR") {
-    const media = await uploadMedia({ tenant, actorUserId: userId, file, purpose: "general", altText: value(form, "altText") || undefined });
-    try {
+  const uploadedMediaId = value(form, "uploadedMediaId");
+  const rawTargetId = value(form, "mediaId");
+  try {
+    const mediaId = idSchema.parse(value(form, "mediaId"));
+    const purpose = z.enum(["hero", "news", "general"]).parse(value(form, "purpose"));
+    const target = await db.mediaAsset.findFirst({ where: { id: mediaId, tenantId: tenant.id, retiredAt: null }, select: { purpose: true, mimeType: true, uploadClass: true } });
+    if (!target) throw new Error("Media asset not found.");
+    if (target.uploadClass === "profile") throw new Error("Profile assets must use their dedicated replacement workflow.");
+    if (target.purpose !== purpose) throw new Error("Replacement purpose does not match the existing asset.");
+    const expectedClass = target.uploadClass ?? purpose;
+    if (role === "EDITOR") {
+      const media = await getUploadedMedia({ tenant, actorUserId: userId, mediaId: uploadedMediaId, purpose, uploadClass: expectedClass });
       await createCmsDraft({ tenant, actorUserId: userId, kind: CmsDraftKind.MEDIA, operation: CmsDraftOperation.REPLACE, targetId: mediaId, expectedRevision: form.get("revision") ? Number(form.get("revision")) : undefined, mediaAssetId: media.id, payload: { mediaAssetId: media.id } });
-    } catch (error) {
-      await db.mediaAsset.update({ where: { id: media.id }, data: { retiredAt: new Date() } });
-      throw error;
+      await finalizeUploadedMedia({ tenant, actorUserId: userId, mediaId: media.id });
+      return;
     }
-    return;
+    await replaceUploadedMedia({ tenant, actorUserId: userId, mediaId, replacementId: uploadedMediaId, expectedPurpose: purpose, expectedUploadClass: expectedClass });
+  } catch (error) {
+    if (uploadedMediaId && uploadedMediaId !== rawTargetId) {
+      try { await discardUploadedMedia({ tenant, actorUserId: userId, mediaId: uploadedMediaId }); }
+      catch (cleanupError) { throw new Error(`${error instanceof Error ? error.message : "Replacement failed."} Cleanup failed: ${cleanupError instanceof Error ? cleanupError.message : String(cleanupError)}`); }
+    }
+    throw error;
   }
-  await replaceMedia({ tenant, actorUserId: userId, mediaId, file, altText: value(form, "altText") || undefined });
 }
 
 export async function retireImage(form: FormData) {
@@ -566,11 +575,9 @@ export async function retireImage(form: FormData) {
 export async function replaceFormDocument(form: FormData) {
   const { tenant, userId, role } = await staff();
   const documentId = idSchema.parse(value(form, "id"));
-  const file = form.get("file");
-  if (!(file instanceof File)) throw new Error("Choose a PDF document.");
   const existing = await db.formDocument.findFirst({ where: { id: documentId, tenantId: tenant.id }, include: { mediaAsset: true } });
   if (!existing) throw new Error("Document not found.");
-  const media = await uploadDocument({ tenant, actorUserId: userId, file, altText: existing.title });
+  const media = await getUploadedMedia({ tenant, actorUserId: userId, mediaId: value(form, "uploadedMediaId"), document: true, uploadClass: "document" });
   if (role === "EDITOR") {
     try {
       await createCmsDraft({
@@ -585,8 +592,9 @@ export async function replaceFormDocument(form: FormData) {
         isEnabled: existing.isEnabled,
       },
       });
+      await finalizeUploadedMedia({ tenant, actorUserId: userId, mediaId: media.id });
     } catch (error) {
-      await db.mediaAsset.update({ where: { id: media.id }, data: { retiredAt: new Date() } });
+      await discardUploadedMedia({ tenant, actorUserId: userId, mediaId: media.id });
       throw error;
     }
     return;
@@ -597,9 +605,10 @@ export async function replaceFormDocument(form: FormData) {
       await tx.formDocument.update({ where: { id: documentId }, data: { mediaAssetId: media.id } });
       if (existing.mediaAssetId) await retireIfUnreferenced(tx, tenant.id, existing.mediaAssetId, media.id);
       await tx.auditLog.create({ data: { tenantId: tenant.id, actorUserId: userId, action: "FORM_DOCUMENT_REPLACE", targetType: "FormDocument", targetId: documentId, changeMetadata: { before: { mediaAssetId: existing.mediaAssetId }, after: { mediaAssetId: media.id, role } } } });
+      await tx.mediaAsset.updateMany({ where: { id: media.id, tenantId: tenant.id, claimedAt: { not: null }, stagedAt: { not: null } }, data: { stagedAt: null } });
     });
   } catch (error) {
-    await db.mediaAsset.update({ where: { id: media.id }, data: { retiredAt: new Date() } });
+    await discardUploadedMedia({ tenant, actorUserId: userId, mediaId: media.id });
     throw error;
   }
   revalidatePath("/");
@@ -747,15 +756,15 @@ export async function saveCalculatorSettingsAction() {
 export async function saveLeadershipAction(form: FormData) {
   const { tenant, userId } = await staff(["ADMINISTRATOR"]);
   const input = z.object({ name: text(160), title: text(160), group: z.enum(["Board", "Credit Committee", "Supervisory Committee"]), profile: z.string().trim().max(1000).optional(), sortOrder: z.coerce.number().int().min(0).max(999) }).parse({ name: value(form, "name"), title: value(form, "title"), group: value(form, "group"), profile: value(form, "profile") || undefined, sortOrder: value(form, "sortOrder") || 0 });
-  const photo = form.get("photo");
-  const media = photo instanceof File && photo.size > 0 ? await uploadMedia({ tenant, actorUserId: userId, file: photo, purpose: "general", altText: input.name }) : null;
+  const media = value(form, "uploadedMediaId") ? await getUploadedMedia({ tenant, actorUserId: userId, mediaId: value(form, "uploadedMediaId"), purpose: "general", uploadClass: "profile" }) : null;
   let record;
   try {
     record = await db.$transaction(async (tx) => { await lockCmsTenant(tx, tenant.id); return tx.leadershipRecord.create({ data: { tenantId: tenant.id, ...input, mediaAssetId: media?.id ?? null } }); });
   } catch (error) {
-    if (media) await db.mediaAsset.update({ where: { id: media.id }, data: { retiredAt: new Date() } });
+    if (media) await discardUploadedMedia({ tenant, actorUserId: userId, mediaId: media.id });
     throw error;
   }
+  if (media) await finalizeUploadedMedia({ tenant, actorUserId: userId, mediaId: media.id });
   await db.auditLog.create({ data: { tenantId: tenant.id, actorUserId: userId, action: "LEADERSHIP_RECORD_CREATED", targetType: "LeadershipRecord", targetId: record.id, changeMetadata: { group: record.group } } });
   revalidatePath("/admin/leadership");
   revalidatePath("/about-swcu");
@@ -768,14 +777,14 @@ export async function updateLeadershipAction(form: FormData) {
   if (!existing) throw new Error("Leadership record not found.");
   const removePhoto = checkbox(form, "removePhoto");
   const data = z.object({ name: text(160), title: text(160), group: text(80), profile: z.string().trim().max(1000).optional(), sortOrder: z.coerce.number().int().min(0).max(999), isEnabled: z.boolean(), isPublished: z.boolean() }).parse({ name: value(form, "name"), title: value(form, "title"), group: value(form, "group"), profile: value(form, "profile") || undefined, sortOrder: value(form, "sortOrder") || 0, isEnabled: checkbox(form, "isEnabled"), isPublished: checkbox(form, "isPublished") });
-  const photo = form.get("photo");
-  const media = photo instanceof File && photo.size > 0 ? await uploadMedia({ tenant, actorUserId: userId, file: photo, purpose: "general", altText: data.name }) : null;
+  const media = value(form, "uploadedMediaId") ? await getUploadedMedia({ tenant, actorUserId: userId, mediaId: value(form, "uploadedMediaId"), purpose: "general", uploadClass: "profile" }) : null;
   try {
     await db.$transaction(async (tx) => { await lockCmsTenant(tx, tenant.id); const before = await tx.leadershipRecord.findUniqueOrThrow({ where: { id } }); const updated = await tx.leadershipRecord.update({ where: { id }, data: { ...data, mediaAssetId: media?.id ?? (removePhoto ? null : before.mediaAssetId) } }); if (before.mediaAssetId && (media || removePhoto)) await retireIfUnreferenced(tx, tenant.id, before.mediaAssetId, media?.id); await tx.auditLog.create({ data: { tenantId: tenant.id, actorUserId: userId, action: "LEADERSHIP_RECORD_UPDATED", targetType: "LeadershipRecord", targetId: id, changeMetadata: { before: { group: before.group, sortOrder: before.sortOrder, isEnabled: before.isEnabled, isPublished: before.isPublished }, after: { group: updated.group, sortOrder: updated.sortOrder, isEnabled: updated.isEnabled, isPublished: updated.isPublished, photoChanged: Boolean(media) || removePhoto } } } }); });
   } catch (error) {
-    if (media) await db.mediaAsset.update({ where: { id: media.id }, data: { retiredAt: new Date() } });
+    if (media) await discardUploadedMedia({ tenant, actorUserId: userId, mediaId: media.id });
     throw error;
   }
+  if (media) await finalizeUploadedMedia({ tenant, actorUserId: userId, mediaId: media.id });
   revalidatePath("/admin/leadership");
   revalidatePath("/about-swcu");
 }

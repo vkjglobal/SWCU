@@ -1,7 +1,7 @@
 "use client";
 /* eslint-disable @next/next/no-img-element -- local file previews use object URLs */
 
-import { useActionState, useEffect, useId, useRef, useState, type ReactNode } from "react";
+import { useActionState, useEffect, useId, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { useFormStatus } from "react-dom";
 
 type MediaAction = (formData: FormData) => Promise<unknown>;
@@ -71,11 +71,13 @@ export function AdminMediaUpload({
   action,
   buttonLabel,
   inputLabel = "Choose image",
+  purpose,
   children,
 }: {
   action: MediaAction;
   buttonLabel: string;
   inputLabel?: string;
+  purpose?: "hero" | "news" | "general" | "contact-map";
   children?: ReactNode;
 }) {
   const [selection, setSelection] = useState<{ name: string; type: string; size: string; url: string } | null>(null);
@@ -86,8 +88,38 @@ export function AdminMediaUpload({
       return { status: "success", message: "Image uploaded successfully." };
     } catch (error) {
       return { status: "error", message: error instanceof Error ? error.message : "The image could not be saved. Please try again." };
+    } finally {
+      setUploading(false);
     }
   }, { status: "idle" });
+  const [uploadError, setUploadError] = useState<string>();
+  const [uploading, setUploading] = useState(false);
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (pending || uploading) return;
+    setUploading(true);
+    setUploadError(undefined);
+    const form = event.currentTarget;
+    const file = inputRef.current?.files?.[0];
+    if (!file) return;
+    const upload = new FormData();
+    upload.set("file", file);
+    upload.set("document", "false");
+    upload.set("purpose", purpose || (form.querySelector('[name="expectedMediaId"]') ? "contact-map" : form.querySelector('[name="slideId"]') ? "hero" : "general"));
+    upload.set("profile", "false");
+    try {
+      const response = await fetch("/api/admin/media/upload", { method: "POST", body: upload });
+      const result = await response.json() as { mediaAssetId?: string; error?: string };
+      if (!response.ok || !result.mediaAssetId) throw new Error(result.error || "The upload could not be processed.");
+      const actionData = new FormData(form);
+      form.querySelectorAll<HTMLInputElement>('input[type="file"]').forEach((input) => actionData.delete(input.name));
+      actionData.set("uploadedMediaId", result.mediaAssetId);
+      formAction(actionData);
+    } catch (error) {
+      setUploading(false);
+      setUploadError(error instanceof Error ? error.message : "The upload could not be processed.");
+    }
+  }
 
   useEffect(() => () => {
     if (selection?.url) URL.revokeObjectURL(selection.url);
@@ -108,8 +140,8 @@ export function AdminMediaUpload({
     if (inputRef.current) inputRef.current.value = "";
   }
 
-  return <form action={formAction} className="space-y-4">
-    <div><span className="block text-sm font-semibold">{inputLabel}</span><input ref={inputRef} name="file" type="file" accept="image/jpeg,image/png,image/webp" required aria-label={inputLabel} onChange={(event) => chooseFile(event.target.files?.[0])} className="sr-only" /><button type="button" disabled={pending} onClick={() => inputRef.current?.click()} className="admin-file-control mt-2 rounded-lg border border-swcu-blue/25 bg-soft-blue-grey px-3 py-2 text-sm font-semibold text-swcu-blue disabled:cursor-not-allowed disabled:opacity-55">{pending ? "Uploading…" : selection ? "Change image" : "Choose image"}</button></div>
+  return <form action={formAction} onSubmit={(event) => { void submit(event); }} className="space-y-4">
+    <div><span className="block text-sm font-semibold">{inputLabel}</span><input ref={inputRef} name="file" type="file" accept="image/jpeg,image/png,image/webp" required aria-label={inputLabel} onChange={(event) => chooseFile(event.target.files?.[0])} className="sr-only" /><button type="button" disabled={pending || uploading} onClick={() => inputRef.current?.click()} className="admin-file-control mt-2 rounded-lg border border-swcu-blue/25 bg-soft-blue-grey px-3 py-2 text-sm font-semibold text-swcu-blue disabled:cursor-not-allowed disabled:opacity-55">{pending || uploading ? "Uploading…" : selection ? "Change image" : "Choose image"}</button></div>
     {selection && <div className="grid gap-3 rounded-xl border border-swcu-blue/20 bg-soft-blue-grey p-3 sm:grid-cols-[7rem_1fr_auto] sm:items-center">
       <img src={selection.url} alt="" className="h-20 w-28 rounded-lg object-cover" />
       <div className="text-sm"><p className="font-semibold text-deep-navy">{selection.name}</p><p className="text-charcoal/65">{selection.type} · {selection.size}</p></div>
@@ -117,7 +149,8 @@ export function AdminMediaUpload({
     </div>}
     {children}
     <button type="submit" disabled={pending || !selection} className="button-primary disabled:cursor-not-allowed disabled:opacity-55">{pending ? "Uploading…" : buttonLabel}</button>
-    {state.status !== "idle" && <p role={state.status === "error" ? "alert" : "status"} aria-live="polite" className={state.status === "error" ? "text-sm font-semibold text-swcu-red" : "text-sm font-semibold text-green-700"}>{state.message}</p>}
+     {state.status !== "idle" && <p role={state.status === "error" ? "alert" : "status"} aria-live="polite" className={state.status === "error" ? "text-sm font-semibold text-swcu-red" : "text-sm font-semibold text-green-700"}>{state.message}</p>}
+     {uploadError && <p role="alert" aria-live="polite" className="text-sm font-semibold text-swcu-red">{uploadError}</p>}
   </form>;
 }
 

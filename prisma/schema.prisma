@@ -369,6 +369,9 @@ model MediaAsset {
   height           Int
   altText          String?   @db.VarChar(200)
   createdBy        String?
+  stagedAt         DateTime?
+  claimedAt        DateTime?
+  uploadClass      String?
   retiredAt        DateTime?
   replacedById     String?
   createdAt        DateTime  @default(now())
@@ -386,6 +389,7 @@ model MediaAsset {
   @@index([tenantId, purpose, retiredAt])
   @@index([tenantId, createdAt])
   @@index([createdBy])
+  @@index([tenantId, createdBy, stagedAt, claimedAt])
   @@map("media_assets")
 }
 

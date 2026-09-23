@@ -140,12 +140,15 @@ export async function retireIfUnreferenced(
   replacedById?: string,
 ) {
   await lockCmsTenant(tx, tenantId);
-  const [heroRefs, formRefs, draftRefs] = await Promise.all([
+  const [heroRefs, formRefs, pageRefs, leadershipRefs, contactRefs, draftRefs] = await Promise.all([
     tx.homeHeroSlide.count({ where: { tenantId, mediaAssetId } }),
     tx.formDocument.count({ where: { tenantId, mediaAssetId } }),
+    tx.pageContent.count({ where: { tenantId, mediaAssetId } }),
+    tx.leadershipRecord.count({ where: { tenantId, mediaAssetId } }),
+    tx.contactSettings.count({ where: { tenantId, contactMapMediaAssetId: mediaAssetId } }),
     tx.cmsDraft.count({ where: { tenantId, mediaAssetId, status: { in: [...OPEN_DRAFT_STATUSES] } } }),
   ]);
-  if (heroRefs + formRefs + draftRefs === 0) {
+  if (heroRefs + formRefs + pageRefs + leadershipRefs + contactRefs + draftRefs === 0) {
     await tx.mediaAsset.update({
       where: { id: mediaAssetId },
       data: { retiredAt: new Date(), ...(replacedById ? { replacedById } : {}) },
@@ -230,15 +233,18 @@ export async function createCmsDraft(input: DraftInput) {
     if (input.mediaAssetId) {
       const media = await tx.mediaAsset.findFirst({
         where: { id: input.mediaAssetId, tenantId: input.tenant.id, retiredAt: null },
-        select: { id: true, mimeType: true },
+        select: { id: true, mimeType: true, purpose: true, uploadClass: true, retiredAt: true },
       });
       const expectedMime = input.kind === CmsDraftKind.FORM_DOCUMENT ? "application/pdf" : input.kind === CmsDraftKind.HERO ? ["image/jpeg", "image/png", "image/webp"] : null;
       if (!media || (expectedMime && !expectedMime.includes(media.mimeType))) {
         throw new Error("Draft media asset does not belong to this tenant or has an invalid type.");
       }
       if (input.kind === CmsDraftKind.MEDIA && input.targetId) {
-        const target = await tx.mediaAsset.findFirst({ where: { id: input.targetId, tenantId: input.tenant.id }, select: { mimeType: true } });
-        if (!target || target.mimeType !== media.mimeType) throw new Error("Replacement media type does not match the tenant asset.");
+        const target = await tx.mediaAsset.findFirst({ where: { id: input.targetId, tenantId: input.tenant.id, retiredAt: null }, select: { id: true, mimeType: true, purpose: true, uploadClass: true } });
+        const compatible = target?.mimeType.startsWith("image/")
+          ? media.mimeType === "image/webp"
+          : target?.mimeType === "application/pdf" && media.mimeType === "application/pdf";
+        if (!target || target.id === media.id || target.purpose !== media.purpose || (target.uploadClass ?? target.purpose) !== media.uploadClass || !compatible) throw new Error("Replacement media does not match the tenant asset.");
       }
     }
     const target = await targetRecord(tx, input.tenant.id, input.kind, effectiveTargetId);
@@ -567,6 +573,7 @@ export async function publishCmsDraft(input: {
           where: { id: existing.id },
           data: { isEnabled: false, mediaAssetId: null },
         });
+        if (existing.mediaAssetId) await retireIfUnreferenced(tx, input.tenant.id, existing.mediaAssetId);
       } else {
         const data = {
           title: stringValue(payload, "title") ?? "",
@@ -655,6 +662,13 @@ export async function publishCmsDraft(input: {
           where: { id: draft.mediaAssetId, tenantId: input.tenant.id, retiredAt: null },
         });
         if (!replacement) throw new Error("Replacement media asset not found.");
+        const compatibleMime = existing.mimeType.startsWith("image/")
+          ? replacement.mimeType === "image/webp"
+          : replacement.mimeType === existing.mimeType;
+        const expectedClass = existing.uploadClass ?? existing.purpose;
+        if (replacement.id === existing.id || replacement.purpose !== existing.purpose || replacement.uploadClass !== expectedClass || !compatibleMime) {
+          throw new Error("Replacement media does not match the target asset.");
+        }
         await tx.homeHeroSlide.updateMany({
           where: { tenantId: input.tenant.id, mediaAssetId: existing.id },
           data: { mediaAssetId: replacement.id },
@@ -663,10 +677,10 @@ export async function publishCmsDraft(input: {
           where: { tenantId: input.tenant.id, mediaAssetId: existing.id },
           data: { mediaAssetId: replacement.id },
         });
-        await tx.mediaAsset.update({
-          where: { id: existing.id },
-          data: { retiredAt: new Date(), replacedById: replacement.id },
-        });
+        await tx.pageContent.updateMany({ where: { tenantId: input.tenant.id, mediaAssetId: existing.id }, data: { mediaAssetId: replacement.id } });
+        await tx.leadershipRecord.updateMany({ where: { tenantId: input.tenant.id, mediaAssetId: existing.id }, data: { mediaAssetId: replacement.id } });
+        await tx.contactSettings.updateMany({ where: { tenantId: input.tenant.id, contactMapMediaAssetId: existing.id }, data: { contactMapMediaAssetId: replacement.id } });
+        await retireIfUnreferenced(tx, input.tenant.id, existing.id, replacement.id);
       } else if (draft.operation === CmsDraftOperation.RETIRE) {
         await lockCmsTenant(tx, input.tenant.id);
         const activeHeroRefs = await tx.homeHeroSlide.count({ where: { tenantId: input.tenant.id, mediaAssetId: existing.id, isEnabled: true } });
@@ -681,10 +695,10 @@ export async function publishCmsDraft(input: {
           where: { tenantId: input.tenant.id, mediaAssetId: existing.id },
           data: { mediaAssetId: null },
         });
-        await tx.mediaAsset.update({
-          where: { id: existing.id },
-          data: { retiredAt: new Date() },
-        });
+        await tx.pageContent.updateMany({ where: { tenantId: input.tenant.id, mediaAssetId: existing.id }, data: { mediaAssetId: null } });
+        await tx.leadershipRecord.updateMany({ where: { tenantId: input.tenant.id, mediaAssetId: existing.id }, data: { mediaAssetId: null } });
+        await tx.contactSettings.updateMany({ where: { tenantId: input.tenant.id, contactMapMediaAssetId: existing.id }, data: { contactMapMediaAssetId: null } });
+        await retireIfUnreferenced(tx, input.tenant.id, existing.id);
       }
     }
 

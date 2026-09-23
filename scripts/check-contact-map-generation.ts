@@ -24,7 +24,7 @@ async function main() {
     const makeAsset = (name: string) => {
       const objectKey = `qa/${tenant.id}/${name}-${suffix}.webp`;
       objectKeys.push(objectKey);
-      return db.mediaAsset.create({ data: { tenantId: tenant.id, objectKey, originalFilename: `${name}.webp`, mimeType: "image/webp", purpose: "contact-map", byteSize: 1, width: 1, height: 1, createdBy: actorId } });
+      return db.mediaAsset.create({ data: { tenantId: tenant.id, objectKey, originalFilename: `${name}.webp`, mimeType: "image/webp", purpose: "contact-map", byteSize: 1, width: 1, height: 1, createdBy: actorId, stagedAt: new Date(), claimedAt: new Date(), uploadClass: "contact-map" } });
     };
     const first = await makeAsset("first");
     const second = await makeAsset("second");

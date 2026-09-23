@@ -1,9 +1,12 @@
 import { File as NodeFile } from "node:buffer";
+import { randomBytes } from "node:crypto";
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 import sharp from "sharp";
 import { db } from "../src/lib/db";
 import {
   replaceMedia,
+  retireMedia,
+  getUploadedMedia,
   uploadDocument,
   uploadMedia,
 } from "../src/lib/media-service";
@@ -67,27 +70,72 @@ async function main() {
   });
   tenantDomainIds.push(crossTenantDomain.id);
 
-  const firstBuffer = await sharp({
-    create: {
-      width: 2400,
-      height: 1400,
-      channels: 3,
-      background: "#176DB3",
-    },
+  async function expectImageRejection(file: File, message: string) {
+    try {
+      await uploadMedia({ tenant, actorUserId: user.id, purpose: "general", file });
+      throw new Error(`${message}: upload unexpectedly succeeded`);
+    } catch (error) {
+      if (!(error instanceof Error) || !error.message.includes(message)) throw error;
+    }
+  }
+  await expectImageRejection(new NodeFile([Buffer.alloc(10 * 1024 * 1024 + 1)], "large.jpg", { type: "image/jpeg" }) as unknown as File, "This image is too large. Please choose an image smaller than 10 MB.");
+  await expectImageRejection(new NodeFile([Buffer.from("<svg/>")], "vector.svg", { type: "image/svg+xml" }) as unknown as File, "Only JPEG, PNG, and WebP images are supported.");
+  await expectImageRejection(new NodeFile([Buffer.from("GIF89a")], "animation.gif", { type: "image/gif" }) as unknown as File, "Only JPEG, PNG, and WebP images are supported.");
+  await expectImageRejection(new NodeFile([Buffer.from("not an image")], "renamed.jpg", { type: "image/jpeg" }) as unknown as File, "valid JPEG, PNG, or WebP image");
+
+  const leadershipWidth = 2300;
+  const leadershipHeight = 1700;
+  const firstBuffer = await sharp(randomBytes(leadershipWidth * leadershipHeight * 3), {
+    raw: { width: leadershipWidth, height: leadershipHeight, channels: 3 },
   })
     .jpeg({ quality: 90 })
     .toBuffer();
+  if (firstBuffer.byteLength < 3 * 1024 * 1024 || firstBuffer.byteLength > 3.2 * 1024 * 1024) {
+    throw new Error(`Leadership JPEG fixture was not approximately 3.1 MB (${firstBuffer.byteLength} bytes).`);
+  }
   const first = await uploadMedia({
     tenant,
     actorUserId: user.id,
     purpose: "general",
     altText: "Prompt 2 media validation image",
+    profile: true,
     file: new NodeFile([firstBuffer], "prompt2-media-qa.jpg", {
       type: "image/jpeg",
     }) as unknown as File,
   });
   mediaIds.push(first.id);
   objectKeys.push(first.objectKey);
+  const stagedFixture = await uploadMedia({
+    tenant,
+    actorUserId: user.id,
+    purpose: "general",
+    staged: true,
+    file: new NodeFile([firstBuffer], "staged.jpg", { type: "image/jpeg" }) as unknown as File,
+  });
+  mediaIds.push(stagedFixture.id); objectKeys.push(stagedFixture.objectKey);
+  try {
+    await getUploadedMedia({ tenant, actorUserId: "different-actor", mediaId: stagedFixture.id, purpose: "general" });
+    throw new Error("Staged media was transferable to another actor.");
+  } catch (error) {
+    if (!(error instanceof Error) || !error.message.includes("unavailable")) throw error;
+  }
+  const claimedFixture = await getUploadedMedia({ tenant, actorUserId: user.id, mediaId: stagedFixture.id, purpose: "general" });
+  if (!claimedFixture.claimedAt || !claimedFixture.stagedAt) throw new Error("Staged media was not claimed.");
+  try {
+    await getUploadedMedia({ tenant, actorUserId: user.id, mediaId: stagedFixture.id, purpose: "general" });
+    throw new Error("Staged media was reusable after claim.");
+  } catch (error) {
+    if (!(error instanceof Error) || !error.message.includes("unavailable")) throw error;
+  }
+  if (first.mimeType !== "image/webp" || !first.objectKey.endsWith(".webp") || first.width > 1400 || first.height > 1400) throw new Error("The approximately 3.1 MB Leadership JPEG was not standardized to bounded WebP.");
+  const profileBuffer = await sharp({ create: { width: 2200, height: 1800, channels: 3, background: "#176DB3" } }).png().toBuffer();
+  const profile = await uploadMedia({ tenant, actorUserId: user.id, purpose: "general", profile: true, file: new NodeFile([profileBuffer], "profile.png", { type: "image/png" }) as unknown as File });
+  mediaIds.push(profile.id); objectKeys.push(profile.objectKey);
+  if (profile.mimeType !== "image/webp" || !profile.objectKey.endsWith(".webp") || profile.width > 1400 || profile.height > 1400) throw new Error("Profile image exceeded 1400px WebP limit.");
+  const webpBuffer = await sharp({ create: { width: 600, height: 400, channels: 3, background: "#176DB3" } }).webp().toBuffer();
+  const webp = await uploadMedia({ tenant, actorUserId: user.id, purpose: "general", file: new NodeFile([webpBuffer], "source.webp", { type: "image/webp" }) as unknown as File });
+  mediaIds.push(webp.id); objectKeys.push(webp.objectKey);
+  if (webp.mimeType !== "image/webp" || !webp.objectKey.endsWith(".webp")) throw new Error("WebP input was not standardized to WebP.");
   const heroSlide = await db.homeHeroSlide.create({
     data: {
       tenantId: tenant.id,
@@ -215,15 +263,24 @@ async function main() {
   if (!oldObject.Body || !newObject.Body || !pdfObject.Body) {
     throw new Error("Original, replacement, and PDF objects must remain readable.");
   }
+  await Promise.all([
+    oldObject.Body.transformToByteArray(),
+    newObject.Body.transformToByteArray(),
+    pdfObject.Body.transformToByteArray(),
+  ]);
   if (
-    first.width > 2000 ||
-    first.height > 2000 ||
+    first.width > 1400 ||
+    first.height > 1400 ||
     first.mimeType !== "image/webp"
   ) {
     throw new Error("JPEG processing did not produce the expected web image.");
   }
-  if (replacement.mimeType !== "image/png") {
-    throw new Error("Transparent PNG processing did not preserve transparency.");
+  if (first.byteSize >= firstBuffer.byteLength) throw new Error("The source JPEG was not materially reduced by WebP processing.");
+  const replacementObject = await readMediaObject(replacement.objectKey);
+  const replacementBytes = replacementObject.Body ? Buffer.from(await replacementObject.Body.transformToByteArray()) : Buffer.alloc(0);
+  const replacementMetadata = await sharp(replacementBytes).metadata();
+  if (replacement.mimeType !== "image/webp" || !replacement.objectKey.endsWith(".webp") || !replacementMetadata.hasAlpha) {
+    throw new Error("Transparent PNG processing did not produce WebP.");
   }
   if (
     document.mimeType !== "application/pdf" ||
@@ -281,6 +338,10 @@ async function main() {
 
     routeMatrix = "passed (published, disabled, retired, wrong-tenant, missing-media, missing-object, replacement)";
   }
+
+  await retireMedia(tenant, user.id, replacement.id);
+  const retiredReplacement = await db.mediaAsset.findUniqueOrThrow({ where: { id: replacement.id } });
+  if (!retiredReplacement.retiredAt) throw new Error("Media removal did not retire the active replacement.");
 
   console.info(
     JSON.stringify({

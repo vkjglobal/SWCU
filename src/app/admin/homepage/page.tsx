@@ -42,7 +42,7 @@ export default async function HomepageAdminPage() {
           <div className="mt-5 rounded-xl border border-dashed border-deep-navy/20 p-4">
             <p className="font-semibold text-deep-navy">Add a hero image</p>
             {!slides.length && <p className="mt-1 text-sm text-charcoal/65">No image uploaded.</p>}
-            <AdminMediaUpload action={uploadHeroSlide} buttonLabel={editor ? "Save draft" : "Upload image"}>
+            <AdminMediaUpload action={uploadHeroSlide} purpose="hero" buttonLabel={editor ? "Save draft" : "Upload image"}>
               <label className="block text-sm font-semibold">Image description<input name="altText" required maxLength={200} className="mt-1 w-full rounded border p-2" placeholder="Describe the image for members using assistive technology" /></label>
             </AdminMediaUpload>
           </div>
@@ -57,7 +57,7 @@ export default async function HomepageAdminPage() {
                     <AdminActionForm action={removeHeroSlide} className="contents" successMessage="Hero image removed."><input type="hidden" name="id" value={slide.id} /><input type="hidden" name="revision" value={heroRevision(slide.id)} /><ConfirmSubmitButton label={editor ? "Propose removal" : "Remove image"} message="Remove this hero image?" className="text-xs font-semibold text-swcu-red" /></AdminActionForm>
                   </div>
                 </div>
-                <div className="mt-4 border-t border-deep-navy/10 pt-4"><AdminMediaUpload action={replaceHeroSlide} buttonLabel={editor ? "Propose replacement" : "Replace image"}><input type="hidden" name="slideId" value={slide.id} /><input type="hidden" name="revision" value={heroRevision(slide.id)} /><label className="block text-sm font-semibold">Image description<input name="altText" defaultValue={slide.altText} required maxLength={200} className="mt-1 w-full rounded border p-2" /></label></AdminMediaUpload></div>
+                <div className="mt-4 border-t border-deep-navy/10 pt-4"><AdminMediaUpload action={replaceHeroSlide} purpose="hero" buttonLabel={editor ? "Propose replacement" : "Replace image"}><input type="hidden" name="slideId" value={slide.id} /><input type="hidden" name="revision" value={heroRevision(slide.id)} /><label className="block text-sm font-semibold">Image description<input name="altText" defaultValue={slide.altText} required maxLength={200} className="mt-1 w-full rounded border p-2" /></label></AdminMediaUpload></div>
               </div>
             ))}
           </div>
