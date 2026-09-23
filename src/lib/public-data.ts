@@ -3,6 +3,7 @@ import "server-only";
 import { db } from "@/lib/db";
 import type { ResolvedTenant } from "@/lib/tenant";
 import { PAGE_CONTENT_SLOTS } from "@/lib/cms-workflow";
+import { LEADERSHIP_GROUPS, leadershipGroupRank } from "@/lib/leadership";
 
 export const PUBLIC_PAGE_SLOTS = PAGE_CONTENT_SLOTS;
 
@@ -20,10 +21,10 @@ export async function getPublishedPageContent(tenant: ResolvedTenant, slots?: re
 
 export async function getPublishedLeadership(tenant: ResolvedTenant) {
   return db.leadershipRecord.findMany({
-    where: { tenantId: tenant.id, isPublished: true, isEnabled: true, OR: [{ mediaAssetId: null }, { mediaAsset: { retiredAt: null } }] },
-    orderBy: [{ group: "asc" }, { sortOrder: "asc" }],
-    select: { id: true, name: true, title: true, profile: true, group: true, mediaAssetId: true },
-  });
+    where: { tenantId: tenant.id, group: { in: [...LEADERSHIP_GROUPS] }, isPublished: true, isEnabled: true, OR: [{ mediaAssetId: null }, { mediaAsset: { retiredAt: null } }] },
+    orderBy: [{ sortOrder: "asc" }],
+    select: { id: true, name: true, title: true, profile: true, group: true, mediaAssetId: true, sortOrder: true },
+  }).then((people) => people.sort((a, b) => leadershipGroupRank(a.group) - leadershipGroupRank(b.group) || a.sortOrder - b.sortOrder));
 }
 
 export async function getPublishedRates(tenant: ResolvedTenant) {

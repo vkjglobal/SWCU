@@ -15,6 +15,9 @@ const homePage = source("src/app/(public)/page.tsx");
 const resources = source("src/app/(public)/forms-resources/page.tsx");
 const media = source("src/app/admin/media/page.tsx");
 const leadership = source("src/app/admin/leadership/page.tsx");
+const leadershipGroups = source("src/lib/leadership.ts");
+const about = source("src/app/(public)/about-swcu/page.tsx");
+const publicData = source("src/lib/public-data.ts");
 const forms = source("src/app/admin/forms/page.tsx");
 const selector = source("src/components/admin-media-upload.tsx");
 const adminActions = source("src/app/admin/actions.ts");
@@ -42,9 +45,18 @@ for (const label of ["Name", "Role / Title", "Committee", "Profile / Short Biogr
   check(leadership.includes(label), `Leadership includes ${label}`);
 }
 check(!leadership.includes('name="mediaAssetId"'), "Leadership does not expose a media ID input");
-check(leadership.includes("<option>Board</option>") && leadership.includes("<option>Credit Committee</option>") && leadership.includes("<option>Supervisory Committee</option>"), "Leadership uses the approved committee dropdown");
+for (const group of ["General Manager", "Board", "Credit Committee", "Supervisory Committee"]) {
+  check(leadershipGroups.includes(`"${group}"`), `Leadership supports the ${group} group`);
+}
+check(leadership.includes("LEADERSHIP_GROUPS.map") && leadership.includes("leadershipGroupLabel"), "Leadership uses the canonical grouped dropdown");
 check(leadership.includes("Current photo") && leadership.includes("Remove current photo"), "Leadership supports photo preview and removal");
-check(adminActions.includes('purpose: "general"') && adminActions.includes("retireIfUnreferenced"), "Leadership photo management uses the protected media lifecycle");
+check(adminActions.includes('purpose: "general", uploadClass: "profile"') && adminActions.includes("retireIfUnreferenced"), "Leadership photo management uses the protected PROFILE media lifecycle");
+check(about.includes('["ABOUT_STORY","ABOUT_VISION","ABOUT_MISSION","ABOUT_PURPOSE"]'), "About content uses the approved vertical order");
+check(!about.includes("lg:grid-cols-[1.1fr_.9fr]") && !about.includes("<aside>"), "About no longer renders Leadership in a narrow sidebar");
+check(about.includes("leadershipGroupLabel(group)") && leadershipGroups.includes('group === "Board" ? "Board of Directors"'), "Public Leadership uses the approved Board of Directors label");
+check(publicData.includes("group: { in: [...LEADERSHIP_GROUPS] }") && publicData.includes("leadershipGroupRank"), "Public Leadership filters and orders canonical groups");
+check(styles.includes("height: 9.375rem") && styles.includes("height: 10.625rem"), "Leadership portraits have bounded compact heights");
+check(styles.includes("@media (min-width: 640px)") && styles.includes("@media (min-width: 960px)") && styles.includes("@media (min-width: 1200px)"), "Leadership grid has mobile, tablet and desktop breakpoints");
 
 check(!forms.includes('name="mediaAssetId"'), "Forms & Documents does not expose PDF media IDs");
 check(forms.includes('accept="application/pdf,.pdf"'), "Forms & Documents retains PDF upload and replacement");

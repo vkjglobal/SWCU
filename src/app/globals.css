@@ -321,6 +321,34 @@ a {
   line-height: 1.06;
 }
 
+.about-page { background: #fbfcfd; }
+.about-story { padding-block: clamp(3.5rem, 8vw, 7rem); }
+.about-content { display: grid; gap: 2.5rem; max-width: 48rem; }
+.about-content .prose h2 { font-size: clamp(1.65rem, 3vw, 2.25rem); }
+.leadership-section { border-top: 1px solid rgba(22,59,92,.1); background: #eef5f8; padding-block: clamp(3.5rem, 7vw, 6.5rem); }
+.leadership-heading { display: flex; align-items: end; justify-content: space-between; gap: 2rem; border-bottom: 1px solid rgba(22,59,92,.14); padding-bottom: 2rem; }
+.leadership-heading h2 { margin-top: .45rem; color: #163b5c; font-size: clamp(2.4rem, 5vw, 4rem); line-height: 1; }
+.leadership-heading > p { max-width: 25rem; color: rgba(38,55,70,.7); }
+.leadership-group { padding-top: 2.8rem; }
+.leadership-group-title { display: flex; align-items: center; gap: 1rem; }
+.leadership-group-title h3 { color: #163b5c; font-family: var(--font-poppins), sans-serif; font-size: 1.25rem; }
+.leadership-group-title span { height: 1px; flex: 1; background: rgba(22,59,92,.17); }
+.leadership-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; margin-top: 1.15rem; }
+.leader-card { display: flex; min-width: 0; overflow: hidden; border: 1px solid rgba(22,59,92,.12); border-radius: .85rem; background: #fff; box-shadow: 0 8px 25px rgba(22,59,92,.06); transition: transform 160ms ease, box-shadow 160ms ease; }
+.leader-card:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(22,59,92,.11); }
+.leader-portrait { position: relative; flex: 0 0 7.5rem; height: 9.375rem; align-self: flex-start; overflow: hidden; background: #d9e9ef; color: #176db3; display: grid; place-items: center; font-family: var(--font-poppins), sans-serif; font-size: 1.25rem; font-weight: 700; letter-spacing: .08em; }
+.leader-info { min-width: 0; padding: 1rem 1rem .9rem; }
+.leader-info h4 { color: #163b5c; font-family: var(--font-poppins), sans-serif; font-size: 1rem; line-height: 1.25; }
+.leader-title { margin-top: .25rem; color: #176db3; font-size: .8rem; font-weight: 700; line-height: 1.35; }
+.leader-profile { margin-top: .65rem; color: rgba(38,55,70,.72); font-size: .8rem; line-height: 1.5; }
+.leader-card-manager { border-top: 3px solid #c83f45; }
+.leader-card-manager .leader-portrait { flex-basis: 8.5rem; height: 10.625rem; }
+.about-reports { padding-block: 4rem 6rem; }
+@media (min-width: 640px) { .leadership-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .leadership-grid-manager { grid-template-columns: minmax(0, 28rem); } }
+@media (min-width: 960px) { .leadership-grid:not(.leadership-grid-manager) { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 1200px) { .leadership-grid:not(.leadership-grid-manager) { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (max-width: 520px) { .leadership-heading { display: grid; gap: 1rem; } .leadership-grid { grid-template-columns: 1fr; } .leader-card { max-width: 30rem; } }
+
 @keyframes swcu-notice-ticker {
   from { transform: translateX(0); }
   to { transform: translateX(calc(var(--notice-distance) * -1)); }

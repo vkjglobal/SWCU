@@ -29,6 +29,7 @@ import { createStaffAccount, changeStaffRole, setStaffAccountActive, initiateSta
 import { reassignCmsDraft } from "@/lib/cms-workflow";
 import { updateContactStatus, openContactEnquiry, contactRecipientsSchema, parseContactRecipientsForm } from "@/lib/contact";
 import { sanitizeRichText } from "@/lib/rich-text";
+import { LEADERSHIP_GROUPS } from "@/lib/leadership";
 
 const idSchema = z.string().cuid();
 const text = (max: number) => z.string().trim().min(1).max(max);
@@ -755,7 +756,7 @@ export async function saveCalculatorSettingsAction() {
 
 export async function saveLeadershipAction(form: FormData) {
   const { tenant, userId } = await staff(["ADMINISTRATOR"]);
-  const input = z.object({ name: text(160), title: text(160), group: z.enum(["Board", "Credit Committee", "Supervisory Committee"]), profile: z.string().trim().max(1000).optional(), sortOrder: z.coerce.number().int().min(0).max(999) }).parse({ name: value(form, "name"), title: value(form, "title"), group: value(form, "group"), profile: value(form, "profile") || undefined, sortOrder: value(form, "sortOrder") || 0 });
+  const input = z.object({ name: text(160), title: text(160), group: z.enum(LEADERSHIP_GROUPS), profile: z.string().trim().max(1000).optional(), sortOrder: z.coerce.number().int().min(0).max(999) }).parse({ name: value(form, "name"), title: value(form, "title"), group: value(form, "group"), profile: value(form, "profile") || undefined, sortOrder: value(form, "sortOrder") || 0 });
   const media = value(form, "uploadedMediaId") ? await getUploadedMedia({ tenant, actorUserId: userId, mediaId: value(form, "uploadedMediaId"), purpose: "general", uploadClass: "profile" }) : null;
   let record;
   try {
@@ -776,7 +777,7 @@ export async function updateLeadershipAction(form: FormData) {
   const existing = await db.leadershipRecord.findFirst({ where: { id, tenantId: tenant.id } });
   if (!existing) throw new Error("Leadership record not found.");
   const removePhoto = checkbox(form, "removePhoto");
-  const data = z.object({ name: text(160), title: text(160), group: text(80), profile: z.string().trim().max(1000).optional(), sortOrder: z.coerce.number().int().min(0).max(999), isEnabled: z.boolean(), isPublished: z.boolean() }).parse({ name: value(form, "name"), title: value(form, "title"), group: value(form, "group"), profile: value(form, "profile") || undefined, sortOrder: value(form, "sortOrder") || 0, isEnabled: checkbox(form, "isEnabled"), isPublished: checkbox(form, "isPublished") });
+  const data = z.object({ name: text(160), title: text(160), group: z.enum(LEADERSHIP_GROUPS), profile: z.string().trim().max(1000).optional(), sortOrder: z.coerce.number().int().min(0).max(999), isEnabled: z.boolean(), isPublished: z.boolean() }).parse({ name: value(form, "name"), title: value(form, "title"), group: value(form, "group"), profile: value(form, "profile") || undefined, sortOrder: value(form, "sortOrder") || 0, isEnabled: checkbox(form, "isEnabled"), isPublished: checkbox(form, "isPublished") });
   const media = value(form, "uploadedMediaId") ? await getUploadedMedia({ tenant, actorUserId: userId, mediaId: value(form, "uploadedMediaId"), purpose: "general", uploadClass: "profile" }) : null;
   try {
     await db.$transaction(async (tx) => { await lockCmsTenant(tx, tenant.id); const before = await tx.leadershipRecord.findUniqueOrThrow({ where: { id } }); const updated = await tx.leadershipRecord.update({ where: { id }, data: { ...data, mediaAssetId: media?.id ?? (removePhoto ? null : before.mediaAssetId) } }); if (before.mediaAssetId && (media || removePhoto)) await retireIfUnreferenced(tx, tenant.id, before.mediaAssetId, media?.id); await tx.auditLog.create({ data: { tenantId: tenant.id, actorUserId: userId, action: "LEADERSHIP_RECORD_UPDATED", targetType: "LeadershipRecord", targetId: id, changeMetadata: { before: { group: before.group, sortOrder: before.sortOrder, isEnabled: before.isEnabled, isPublished: before.isPublished }, after: { group: updated.group, sortOrder: updated.sortOrder, isEnabled: updated.isEnabled, isPublished: updated.isPublished, photoChanged: Boolean(media) || removePhoto } } } }); });
