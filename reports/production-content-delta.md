@@ -2,6 +2,10 @@
 
 **Not applied to production.** DEV CMS changes do not travel with Git. When SWCU separately authorizes a production content update, review the current production records first and apply these changes through the existing tenant-scoped CMS approval process. Do not overwrite later production edits. If the older content bootstrap is ever used, apply this approved delta after it; that bootstrap predates this refinement.
 
+## Site notice and News & Notices cleanup
+
+SWCU DEV's instructional site notice (“This is an OPTIONAL scrolling message feature…”) was disabled, and its premature published news item (“New SWCU Website is now live! [www.swcu.finance]”) and unpublished “Test News” record were deleted. **Final production content must not include these demo/test records or equivalent placeholder notices and premature launch announcements.** During a separately authorised production reconciliation, inspect the `swcu` tenant's site notice and News & Notices records and remove or disable any equivalent demo/test content without touching genuine approved records. Do not create replacement launch news without SWCU approval. No production records were accessed or changed here.
+
 ## Content refinement — About and Loans
 
 Tenant: `swcu`. Both records already exist and are published; do not create new slots, modify another tenant, or change Vision, Mission, Purpose, membership rules, or calculator settings.
