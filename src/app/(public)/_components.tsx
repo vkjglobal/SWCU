@@ -54,7 +54,7 @@ export function ResourceCard({ title, description, href, label = "Download" }: {
 }
 
 export function FAQList({ faqs }: { faqs: { id: string; question: string; answer: string }[] }) {
-  return <div className="divide-y divide-deep-navy/10 rounded-2xl border border-deep-navy/10 bg-white">{faqs.map((faq) => <details key={faq.id} className="group p-5"><summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold text-deep-navy [&::-webkit-details-marker]:hidden">{faq.question}<ChevronDown className="shrink-0 transition-transform group-open:rotate-180"/></summary><p className="max-w-3xl pt-4 text-charcoal/75">{faq.answer}</p></details>)}</div>;
+  return <div className="divide-y divide-deep-navy/10 rounded-2xl border border-deep-navy/10 bg-white">{faqs.map((faq) => <details key={faq.id} name="common-questions" className="group p-5"><summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 font-semibold text-deep-navy [&::-webkit-details-marker]:hidden">{faq.question}<ChevronDown className="shrink-0 transition-transform group-open:rotate-180"/></summary><p className="max-w-3xl whitespace-pre-line pt-4 leading-6 text-charcoal/75">{faq.answer}</p></details>)}</div>;
 }
 
 export function PublicFooter({ contact, published }: { contact: { organisationName: string; streetAddress: string; postalAddress: string; telephone: string; secondaryTelephone?: string | null; publicEmail: string } | null; published: { privacy: boolean; terms: boolean; accessibility: boolean; importantInformation: boolean } }) {

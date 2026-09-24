@@ -97,12 +97,12 @@ async function main() {
     "How can I learn about joining SWCU?",
     "How do I contact SWCU?",
   ];
+  const tenant = await db.tenant.findUniqueOrThrow({ where: { slug: "swcu" }, select: { id: true } });
   const records = await db.fAQ.findMany({
-    where: { question: { in: seedQuestions } },
+    where: { tenantId: tenant.id, question: { in: seedQuestions } },
     select: { question: true, isEnabled: true },
   });
-  check(records.length === 3, "All three seeded FAQ records remain stored");
-  check(records.every((record) => !record.isEnabled), "All three seeded FAQ records are publicly disabled");
+  check(records.length === 0, "Superseded seed FAQ records were removed");
 
   console.info(JSON.stringify({ script: "check-content-closure", assertions }));
 }

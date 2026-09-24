@@ -84,7 +84,7 @@ export async function getPublishedResources(tenant: ResolvedTenant) {
     }),
     db.fAQ.findMany({
       where: { tenantId: tenant.id, isEnabled: true },
-      orderBy: { sortOrder: "asc" },
+      orderBy: [{ sortOrder: "asc" }, { id: "asc" }],
       select: { id: true, question: true, answer: true },
     }),
   ]);

@@ -43,7 +43,7 @@ export async function getHomeData(tenant: ResolvedTenant) {
         orderBy: { publishedAt: "desc" },
         take: 3,
       }),
-      db.fAQ.findMany({ where: { tenantId: tenant.id, isEnabled: true }, orderBy: { sortOrder: "asc" } }),
+      db.fAQ.findMany({ where: { tenantId: tenant.id, isEnabled: true }, orderBy: [{ sortOrder: "asc" }, { id: "asc" }], take: 6 }),
       db.contactSettings.findUnique({ where: { tenantId: tenant.id } }),
       db.calculatorSettings.findUnique({
         where: { tenantId: tenant.id },
