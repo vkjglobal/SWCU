@@ -69,7 +69,16 @@ async function main() {
     where: { tenantId: tenant.id, isEnabled: true, isAnnualReport: false, mediaAsset: { retiredAt: null } },
     select: { title: true, mediaAssetId: true },
   });
-  for (const title of Object.values(MEMBER_SERVICE_FORM_TITLES)) {
+  const approvedMembershipTitle = "Application for Membership Form";
+  const membershipRecords = await db.formDocument.findMany({
+    where: { tenantId: tenant.id, isAnnualReport: false, title: { contains: "Membership", mode: "insensitive" } },
+    select: { title: true },
+  });
+  check(membershipRecords.length === 1 && membershipRecords[0].title === approvedMembershipTitle, "No duplicate or superseded membership form record exists");
+  check(forms.filter((form) => form.title === approvedMembershipTitle).length === 1, "Exactly one approved membership form is enabled and available");
+  const approvedMembership = findExactMemberServiceForm(forms, approvedMembershipTitle);
+  check(Boolean(approvedMembership?.mediaAssetId), "Approved membership form has a downloadable media asset");
+  for (const title of Object.values(MEMBER_SERVICE_FORM_TITLES).filter((title) => title !== MEMBER_SERVICE_FORM_TITLES.membership)) {
     const expected = forms.find((form) => form.title === title);
     const selected = findExactMemberServiceForm(forms, title);
     check(Boolean(expected?.mediaAssetId), `${title} remains downloadable`);
@@ -82,11 +91,14 @@ async function main() {
     { title: "Membership Enquiry", mediaAssetId: "other-membership" },
   ];
   check(findExactMemberServiceForm(collisionForms, MEMBER_SERVICE_FORM_TITLES.loan)?.mediaAssetId === "exact-loan", "Similar titles cannot replace the exact loan form");
-  check(findExactMemberServiceForm(collisionForms, MEMBER_SERVICE_FORM_TITLES.membership) === null, "Similar titles cannot replace the exact membership form");
+  check(findExactMemberServiceForm(collisionForms, approvedMembershipTitle) === null, "Similar titles cannot replace the exact membership form");
+  check(findExactMemberServiceForm([...forms, { title: approvedMembershipTitle, mediaAssetId: "duplicate-membership" }], approvedMembershipTitle) === null, "Duplicate approved membership forms fail closed");
   check(findExactMemberServiceForm([...collisionForms, { title: MEMBER_SERVICE_FORM_TITLES.loan, mediaAssetId: "duplicate-loan" }], MEMBER_SERVICE_FORM_TITLES.loan) === null, "Duplicate exact titles fail closed");
 
   const pageSource = readFileSync("src/app/(public)/membership-services/page.tsx", "utf8");
+  const resourcesSource = readFileSync("src/app/(public)/forms-resources/page.tsx", "utf8");
   const adminSource = readFileSync("src/app/admin/page-content/page.tsx", "utf8");
+  check(resourcesSource.includes("title={f.title}") && resourcesSource.includes("href={`/api/media/${f.mediaAssetId}`}"), "Forms & Resources exposes the approved form title and its download");
   check(pageSource.includes("retirementMinimum &&"), "Blank minimum contribution is omitted publicly");
   check(adminSource.includes("Leave blank until SWCU confirms the current minimum contribution."), "Admin explains the optional minimum");
   for (const key of ["membership", "fullWithdrawal", "partialWithdrawal", "loan", "deathBenefit"]) {
