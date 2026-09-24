@@ -1,3 +1,4 @@
 - [Next.js tenant fail-closed boundary](nextjs-tenant-fail-closed.md) — reject unknown hosts before route rendering; layout-level notFound may still serialize child RSC content.
 - [Reset-link setup reliability](reset-link-fragment-hydration.md) — retain fragment tokens across Strict Mode replay and surface pre-submit validation errors inline.
 - [Two-stage CMS media uploads](cms-media-upload-staging.md) — binary routes must use actor-bound claim/finalize states and lock cleanup against reference creation.
+- [Headless Chromium responsive checks](headless-chromium-responsive.md) — create a fresh CDP page and wait for navigation before reading layout; the first target can be a background page.
