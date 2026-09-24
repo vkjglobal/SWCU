@@ -46,7 +46,7 @@ export function LoanCalculatorForm({ endpoint, periods, buttonLabel, admin = fal
   }
 
   return <form onSubmit={calculate}>
-    <div className="grid gap-4 sm:grid-cols-2">
+    <div className={`grid gap-4 sm:grid-cols-2 ${admin ? "lg:grid-cols-3" : ""}`}>
       <label className="grid gap-2 text-sm font-semibold">Loan amount
         <span className="relative"><span className="pointer-events-none absolute inset-y-0 left-4 flex items-center text-charcoal/55">FJD $</span><input required inputMode="decimal" autoComplete="off" value={amount} onChange={(event) => setAmount(event.target.value.replace(/[^0-9.]/g, ""))} placeholder="0.00" className="min-h-12 w-full rounded-xl border border-deep-navy/15 bg-white pl-[4.6rem] pr-4 outline-none focus:border-swcu-blue" /></span>
       </label>
@@ -55,12 +55,12 @@ export function LoanCalculatorForm({ endpoint, periods, buttonLabel, admin = fal
           {periods.map((period) => <option key={period} value={period}>{labels[period]}</option>)}
         </select>
       </label>
-    </div>
-    <label className="mt-4 grid gap-2 text-sm font-semibold">Number of repayments
+    <label className={`grid gap-2 text-sm font-semibold ${admin ? "" : "sm:col-span-2"}`}>Number of repayments
       <input required inputMode="numeric" autoComplete="off" value={repayments} onChange={(event) => setRepayments(event.target.value.replace(/\D/g, ""))} placeholder="Enter number" className="min-h-12 rounded-xl border border-deep-navy/15 bg-white px-4 outline-none focus:border-swcu-blue" />
-      <span className={`font-normal ${admin ? "text-charcoal/65" : "text-charcoal/65"}`}>Enter the number of payroll deductions you expect to make.</span>
+      <span className="font-normal text-charcoal/65">Enter the number of payroll deductions you expect to make.</span>
     </label>
-    <button type="submit" disabled={pending || periods.length === 0} className="mt-5 min-h-12 w-full rounded-xl bg-swcu-blue px-5 font-bold text-white transition hover:bg-deep-navy disabled:cursor-not-allowed disabled:opacity-60">{pending ? "Calculating…" : buttonLabel}</button>
+    </div>
+    <button type="submit" disabled={pending || periods.length === 0} className={`mt-4 min-h-12 rounded-xl bg-swcu-blue px-5 font-bold text-white transition hover:bg-deep-navy disabled:cursor-not-allowed disabled:opacity-60 ${admin ? "w-full sm:w-auto" : "w-full"}`}>{pending ? "Calculating…" : buttonLabel}</button>
     {error && <p role="alert" className="mt-4 rounded-xl bg-swcu-red/10 p-4 text-sm font-semibold text-swcu-red">{error}</p>}
     {result && <div role="status" className={`mt-5 rounded-xl p-5 ${admin ? "bg-soft-blue-grey" : "bg-soft-blue-grey"}`}>
       <p className="text-sm font-bold uppercase tracking-[.06em] text-swcu-blue">Estimated repayment</p>

@@ -764,12 +764,45 @@ export async function saveRateFeeAction(form: FormData) {
   revalidatePath("/admin/rates");
 }
 
+export async function setCalculatorAvailabilityAction(desired: boolean): Promise<{ enabled: boolean; saved: boolean }> {
+  const { tenant, userId } = await staff(["ADMINISTRATOR"]);
+  const enabled = z.boolean().parse(desired);
+  try {
+    const updated = await db.$transaction(async (tx) => {
+      const before = await tx.calculatorSettings.findUnique({ where: { tenantId: tenant.id } });
+      if (before?.isEnabled === enabled || (!before && !enabled)) return before;
+      const record = await tx.calculatorSettings.upsert({
+        where: { tenantId: tenant.id },
+        update: { isEnabled: enabled },
+        create: { tenantId: tenant.id, isEnabled: enabled, status: "CONFIGURED" },
+      });
+      await tx.auditLog.create({
+        data: {
+          tenantId: tenant.id,
+          actorUserId: userId,
+          action: "CALCULATOR_AVAILABILITY_UPDATED",
+          targetType: "CalculatorSettings",
+          targetId: record.id,
+          changeMetadata: { before: before?.isEnabled ?? false, after: record.isEnabled },
+        },
+      });
+      return record;
+    });
+    revalidatePath("/admin/calculator");
+    revalidatePath("/");
+    return { enabled: updated?.isEnabled ?? false, saved: true };
+  } catch {
+    // Report the database value, never an optimistically toggled browser value.
+    const persisted = await db.calculatorSettings.findUnique({ where: { tenantId: tenant.id }, select: { isEnabled: true } });
+    return { enabled: persisted?.isEnabled ?? false, saved: false };
+  }
+}
+
 export async function saveCalculatorSettingsAction(form: FormData) {
   const { tenant, userId } = await staff(["ADMINISTRATOR"]);
   const optionalNumber = (key: string) => value(form, key) === "" ? null : Number(value(form, key));
   const optionalInteger = (key: string) => value(form, key) === "" ? null : Number(value(form, key));
   const input = z.object({
-    isEnabled: z.boolean(),
     monthlyInterestRate: z.number().positive().max(100),
     weeklyEnabled: z.boolean(),
     fortnightlyEnabled: z.boolean(),
@@ -783,7 +816,6 @@ export async function saveCalculatorSettingsAction(form: FormData) {
     minimumRepayments: z.number().int().positive().max(1200).nullable(),
     maximumRepayments: z.number().int().positive().max(1200).nullable(),
   }).parse({
-    isEnabled: checkbox(form, "isEnabled"),
     monthlyInterestRate: Number(value(form, "monthlyInterestRate")),
     weeklyEnabled: checkbox(form, "weeklyEnabled"),
     fortnightlyEnabled: checkbox(form, "fortnightlyEnabled"),

@@ -17,6 +17,8 @@ const publicPage = read("src/app/(public)/page.tsx");
 const homeData = read("src/lib/home-data.ts");
 const publicForm = read("src/components/loan-calculator-form.tsx");
 const homeExperience = read("src/components/home-experience.tsx");
+const adminSettings = read("src/components/admin-calculator-settings.tsx");
+const availability = read("src/components/calculator-availability.tsx");
 
 // 20: missing/new settings are safely OFF and the public endpoint refuses calculation while OFF.
 assert(/isEnabled Boolean @default\(false\)/.test(schema), "Calculator schema default is not OFF");
@@ -43,6 +45,18 @@ assert(/requireStaffMembership\(tenant, \["ADMINISTRATOR"\]\)/.test(adminRoute),
 assert(!/staff\(\["EDITOR"\]\)/.test(adminAction.slice(adminAction.indexOf("saveCalculatorSettingsAction"), adminAction.indexOf("saveLeadershipAction"))), "Editor access was added to calculator settings");
 
 assert(/changeMetadata:[\s\S]*before:[\s\S]*after:/.test(adminAction.slice(adminAction.indexOf("saveCalculatorSettingsAction"), adminAction.indexOf("saveLeadershipAction"))), "Calculator changes are not meaningfully audit logged");
+const availabilityAction = adminAction.slice(adminAction.indexOf("setCalculatorAvailabilityAction"), adminAction.indexOf("saveCalculatorSettingsAction"));
+const settingsAction = adminAction.slice(adminAction.indexOf("saveCalculatorSettingsAction"), adminAction.indexOf("saveLeadershipAction"));
+assert(/staff\(\["ADMINISTRATOR"\]\)/.test(availabilityAction), "Availability action is not Administrator-only");
+assert(/z\.boolean\(\)\.parse\(desired\)/.test(availabilityAction), "Availability mutation must receive an explicit boolean");
+assert(/where: \{ tenantId: tenant\.id \}/.test(availabilityAction), "Availability mutation is not tenant scoped");
+assert(/update: \{ isEnabled: enabled \}/.test(availabilityAction), "Availability must update only the ON/OFF field");
+assert(/changeMetadata: \{ before: before\?\.isEnabled \?\? false, after: record\.isEnabled \}/.test(availabilityAction), "Availability change must audit old and new states");
+assert(/revalidatePath\("\/admin\/calculator"\)/.test(availabilityAction) && /revalidatePath\("\/"\)/.test(availabilityAction), "Availability change must invalidate Admin and public pages");
+assert(!/\bisEnabled\b/.test(settingsAction.slice(0, settingsAction.indexOf("const record = await db.$transaction"))), "Main settings save must not overwrite availability");
+assert(!/name="isEnabled"/.test(adminSettings), "Availability switch must not be submitted with the settings form");
+assert(/action\(desired\)/.test(availability) && /setEnabled\(result\.enabled\)/.test(availability), "Switch must use the server-confirmed persisted value");
+assert(/setEnabled\(persisted\)/.test(availability) && /router\.refresh\(\)/.test(availability), "Switch must recover from errors using persisted state");
 assert(/PERCENTAGE[\s\S]*establishmentFeeValue > 100/.test(adminAction.slice(adminAction.indexOf("saveCalculatorSettingsAction"), adminAction.indexOf("saveLeadershipAction"))), "Percentage fee validation does not prevent unusable configuration");
 assert(!/minimumLoanAmount\.toFixed|maximumLoanAmount\.toFixed|Enter at least \$\{settings\.minimumRepayments/.test(publicRoute), "Public API exposes configured limit values");
 assert(/scenarioLimitError\(settings/.test(publicRoute) && /scenarioLimitError\(settings/.test(adminRoute), "Public and Admin preview do not share scenario limit validation");
