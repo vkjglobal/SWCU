@@ -1,5 +1,5 @@
 export const MEMBER_SERVICE_FORM_TITLES = {
-  membership: "Application for Membership",
+  membership: "Application for Membership Form",
   fullWithdrawal: "Full Withdrawal Form",
   partialWithdrawal: "Partial Withdrawal Form",
   loan: "Loan Application Form",

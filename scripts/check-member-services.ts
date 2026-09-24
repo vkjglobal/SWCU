@@ -70,6 +70,7 @@ async function main() {
     select: { title: true, mediaAssetId: true },
   });
   const approvedMembershipTitle = "Application for Membership Form";
+  check(MEMBER_SERVICE_FORM_TITLES.membership === approvedMembershipTitle, "Membership & Services uses the approved form title for lookup");
   const membershipRecords = await db.formDocument.findMany({
     where: { tenantId: tenant.id, isAnnualReport: false, title: { contains: "Membership", mode: "insensitive" } },
     select: { title: true },
@@ -78,6 +79,7 @@ async function main() {
   check(forms.filter((form) => form.title === approvedMembershipTitle).length === 1, "Exactly one approved membership form is enabled and available");
   const approvedMembership = findExactMemberServiceForm(forms, approvedMembershipTitle);
   check(Boolean(approvedMembership?.mediaAssetId), "Approved membership form has a downloadable media asset");
+  check(findExactMemberServiceForm(forms, MEMBER_SERVICE_FORM_TITLES.membership)?.mediaAssetId === approvedMembership?.mediaAssetId, "Public membership lookup resolves the approved PDF");
   for (const title of Object.values(MEMBER_SERVICE_FORM_TITLES).filter((title) => title !== MEMBER_SERVICE_FORM_TITLES.membership)) {
     const expected = forms.find((form) => form.title === title);
     const selected = findExactMemberServiceForm(forms, title);
@@ -98,6 +100,8 @@ async function main() {
   const pageSource = readFileSync("src/app/(public)/membership-services/page.tsx", "utf8");
   const resourcesSource = readFileSync("src/app/(public)/forms-resources/page.tsx", "utf8");
   const adminSource = readFileSync("src/app/admin/page-content/page.tsx", "utf8");
+  check(pageSource.includes("title={membershipForm.title}") && pageSource.includes("href={`/api/media/${membershipForm.mediaAssetId}`}"), "Membership & Services renders the current form title and download link");
+  check(pageSource.includes("membershipForm ? <ResourceCard") && pageSource.includes(": <p className=\"text-charcoal/70\">The application will appear here when available.</p>"), "Unavailable placeholder is used only when the approved form lookup fails");
   check(resourcesSource.includes("title={f.title}") && resourcesSource.includes("href={`/api/media/${f.mediaAssetId}`}"), "Forms & Resources exposes the approved form title and its download");
   check(pageSource.includes("retirementMinimum &&"), "Blank minimum contribution is omitted publicly");
   check(adminSource.includes("Leave blank until SWCU confirms the current minimum contribution."), "Admin explains the optional minimum");

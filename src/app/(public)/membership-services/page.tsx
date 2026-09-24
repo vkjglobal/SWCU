@@ -31,7 +31,7 @@ export default async function MembershipServicesPage() {
      {sections.map(([id, label, slot]) => <section id={id} key={id} className="scroll-mt-52">
         {by(slot) && <Content heading={by(slot)?.heading || label} body={by(slot)?.body} />}
          {id === "membership" && <div id="joining" className="mt-8 scroll-mt-52 rounded-2xl bg-soft-blue-grey p-7">
-          {membershipForm ? <ResourceCard title="Membership Application" description={membershipForm.description} href={`/api/media/${membershipForm.mediaAssetId}`} label="Download Membership Application" /> : <p className="text-charcoal/70">The application will appear here when available.</p>}
+          {membershipForm ? <ResourceCard title={membershipForm.title} description={membershipForm.description} href={`/api/media/${membershipForm.mediaAssetId}`} label="Download Membership Application" /> : <p className="text-charcoal/70">The application will appear here when available.</p>}
          <div className="mt-6 flex flex-wrap gap-3"><Link href="/forms-resources" className="button-secondary">Forms &amp; Resources</Link><Link href="/contact" className="button-primary">Contact SWCU</Link></div>
        </div>}
         {id === "savings" && (fullWithdrawalForm || partialWithdrawalForm) && <div className="mt-8 grid gap-3 sm:grid-cols-2">{fullWithdrawalForm && <ResourceCard title={MEMBER_SERVICE_FORM_TITLES.fullWithdrawal} description={fullWithdrawalForm.description} href={`/api/media/${fullWithdrawalForm.mediaAssetId}`} />}{partialWithdrawalForm && <ResourceCard title={MEMBER_SERVICE_FORM_TITLES.partialWithdrawal} description={partialWithdrawalForm.description} href={`/api/media/${partialWithdrawalForm.mediaAssetId}`} />}</div>}
