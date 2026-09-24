@@ -204,9 +204,6 @@ export async function retireMedia(tenant: ResolvedTenant, actorUserId: string, m
   if (existing.purpose === "contact-map") throw new Error("Contact Map assets must use the dedicated Contact Map workflow.");
   return db.$transaction(async (tx) => {
     await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${tenant.id}, 0))`;
-    const activeHeroRefs = await tx.homeHeroSlide.count({ where: { tenantId: tenant.id, mediaAssetId: existing.id, isEnabled: true } });
-    const activeHeroCount = await tx.homeHeroSlide.count({ where: { tenantId: tenant.id, isEnabled: true } });
-    if (activeHeroRefs > 0 && activeHeroCount - activeHeroRefs < 1) throw new Error("Keep at least one active hero slide.");
     // Retiring media removes the hero slot rather than leaving an unusable
     // null-media row that could be rendered or counted as a slide.
     const heroRefs = await tx.homeHeroSlide.deleteMany({ where: { tenantId: tenant.id, mediaAssetId: existing.id } });

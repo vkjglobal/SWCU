@@ -182,7 +182,6 @@ export async function toggleHeroSlide(form: FormData) {
   await db.$transaction(async (tx) => {
     await lockCmsTenant(tx, tenant.id);
     const activeCount = await tx.homeHeroSlide.count({ where: { tenantId: tenant.id, isEnabled: true } });
-    if (!enabled && current.isEnabled && activeCount <= 1) throw new Error("Keep at least one active hero slide.");
     if (enabled && !current.isEnabled && activeCount >= 4) throw new Error("A maximum of four active hero slides is allowed.");
     await tx.homeHeroSlide.update({ where: { id }, data: { isEnabled: enabled } });
     await tx.auditLog.create({ data: { tenantId: tenant.id, actorUserId: userId, action: enabled ? "HERO_PUBLISH" : "HERO_UNPUBLISH", targetType: "HomeHeroSlide", targetId: id, changeMetadata: { before: { isEnabled: current.isEnabled }, after: { isEnabled: enabled } } } });
@@ -267,8 +266,6 @@ export async function removeHeroSlide(form: FormData) {
   }
   await db.$transaction(async (tx) => {
     await lockCmsTenant(tx, tenant.id);
-    const activeCount = await tx.homeHeroSlide.count({ where: { tenantId: tenant.id, isEnabled: true } });
-    if (slide.isEnabled && activeCount <= 1) throw new Error("Keep at least one active hero slide.");
     // A removed slide must not remain as a visible/null-media row. Delete the
     // slot itself; the asset is retired below and remains recoverable/audited.
     await tx.homeHeroSlide.delete({ where: { id } });

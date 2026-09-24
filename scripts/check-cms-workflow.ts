@@ -167,6 +167,20 @@ async function main() {
   check(publishedAudit?.actorUserId === admin.id && publishedAudit.changeMetadata && JSON.stringify(publishedAudit.changeMetadata).includes("ADMINISTRATOR"), "Draft approver audit metadata missing.");
   check(mediaCacheControl(true) === "public, max-age=3600" && mediaCacheControl(false) === "private, no-store", "Media cache policy is incorrect.");
   check(canServeMedia({ isPublished: true }) && canServeMedia({ isPublished: false, membershipRole: "EDITOR", membershipActive: true }) && !canServeMedia({ isPublished: false, membershipRole: "EDITOR", membershipActive: false }) && !canServeMedia({ isPublished: false }), "Media authorization policy is incorrect.");
+  const extraHeroRemove = await createCmsDraft({ tenant: resolved, actorUserId: editor.id, kind: CmsDraftKind.HERO, operation: CmsDraftOperation.REMOVE, targetId: sharedHeroReplace.id, payload: {} });
+  await publishCmsDraft({ tenant: resolved, actorUserId: admin.id, draftId: extraHeroRemove.id });
+  const lastHeroHide = await createCmsDraft({ tenant: resolved, actorUserId: editor.id, kind: CmsDraftKind.HERO, operation: CmsDraftOperation.TOGGLE, targetId: hero.id, payload: { isEnabled: false } });
+  await publishCmsDraft({ tenant: resolved, actorUserId: admin.id, draftId: lastHeroHide.id });
+  check(await db.homeHeroSlide.count({ where: { tenantId: tenant.id, isEnabled: true } }) === 0, "Hiding the last Hero slide did not expose the zero-image fallback.");
+  const hiddenHeroReorder = await createCmsDraft({ tenant: resolved, actorUserId: editor.id, kind: CmsDraftKind.HERO, operation: CmsDraftOperation.REORDER, targetId: hero.id, payload: { sortOrder: 3 } });
+  await publishCmsDraft({ tenant: resolved, actorUserId: admin.id, draftId: hiddenHeroReorder.id });
+  const hiddenHero = await db.homeHeroSlide.findUniqueOrThrow({ where: { id: hero.id } });
+  check(hiddenHero.sortOrder === 3 && !hiddenHero.isEnabled, "Reordering a hidden Hero slide changed its visibility or failed to publish.");
+  const lastHeroShow = await createCmsDraft({ tenant: resolved, actorUserId: editor.id, kind: CmsDraftKind.HERO, operation: CmsDraftOperation.TOGGLE, targetId: hero.id, payload: { isEnabled: true } });
+  await publishCmsDraft({ tenant: resolved, actorUserId: admin.id, draftId: lastHeroShow.id });
+  const lastHeroRemove = await createCmsDraft({ tenant: resolved, actorUserId: editor.id, kind: CmsDraftKind.HERO, operation: CmsDraftOperation.REMOVE, targetId: hero.id, payload: {} });
+  await publishCmsDraft({ tenant: resolved, actorUserId: admin.id, draftId: lastHeroRemove.id });
+  check(await db.homeHeroSlide.count({ where: { tenantId: tenant.id } }) === 0, "Removing the final Hero slide left a slot behind.");
   console.info(JSON.stringify({ editorDraftIsolation: "passed", editorPublishRejected: "passed", administratorPublish: "passed", mediaRecovery: "passed", tenantIsolation: "passed", auditDistinction: "passed" }));
 }
 

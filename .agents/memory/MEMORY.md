@@ -2,3 +2,4 @@
 - [Reset-link setup reliability](reset-link-fragment-hydration.md) — retain fragment tokens across Strict Mode replay and surface pre-submit validation errors inline.
 - [Two-stage CMS media uploads](cms-media-upload-staging.md) — binary routes must use actor-bound claim/finalize states and lock cleanup against reference creation.
 - [Headless Chromium responsive checks](headless-chromium-responsive.md) — create a fresh CDP page and wait for navigation before reading layout; the first target can be a background page.
+- [Tenant-host DEV UAT](tenant-host-dev-uat.md) — the Replit proxy owns forwarded-host headers; arbitrary cross-tenant Host probes through its public URL can mislead.

@@ -94,7 +94,8 @@ async function targetRecord(
   if (kind === CmsDraftKind.NEWS) return tx.newsNotice.findFirst({ where: { id: targetId, tenantId, isPublished: true }, select: { id: true, updatedAt: true, isPublished: true } });
   if (kind === CmsDraftKind.FAQ) return tx.fAQ.findFirst({ where: { id: targetId, tenantId, isEnabled: true }, select: { id: true, updatedAt: true, isEnabled: true } });
   if (kind === CmsDraftKind.FORM_DOCUMENT) return tx.formDocument.findFirst({ where: { id: targetId, tenantId, isEnabled: true }, select: { id: true, updatedAt: true, isEnabled: true } });
-  if (kind === CmsDraftKind.HERO) return tx.homeHeroSlide.findFirst({ where: { id: targetId, tenantId, isEnabled: true }, select: { id: true, updatedAt: true, isEnabled: true } });
+  // Hidden Hero slots remain editable; only a deleted slot is retired.
+  if (kind === CmsDraftKind.HERO) return tx.homeHeroSlide.findFirst({ where: { id: targetId, tenantId }, select: { id: true, updatedAt: true, isEnabled: true } });
   if (kind === CmsDraftKind.MEDIA) return tx.mediaAsset.findFirst({ where: { id: targetId, tenantId, retiredAt: null }, select: { id: true, updatedAt: true, retiredAt: true } });
   if (kind === CmsDraftKind.PAGE_CONTENT) return tx.pageContent.findFirst({ where: { id: targetId, tenantId, isPublished: true }, select: { id: true, updatedAt: true, isPublished: true } });
   return tx.siteNotice.findFirst({
@@ -419,13 +420,6 @@ async function assertHeroLimit(
   if ((adding || enabling) && active >= 4) {
     throw new Error("A maximum of four active hero slides is allowed.");
   }
-  const disabling =
-    (operation === CmsDraftOperation.TOGGLE ||
-      operation === CmsDraftOperation.REMOVE) &&
-    current?.isEnabled;
-  if (disabling && active <= 1) {
-    throw new Error("Keep at least one active hero slide.");
-  }
 }
 
 export async function publishCmsDraft(input: {
@@ -683,9 +677,6 @@ export async function publishCmsDraft(input: {
         await retireIfUnreferenced(tx, input.tenant.id, existing.id, replacement.id);
       } else if (draft.operation === CmsDraftOperation.RETIRE) {
         await lockCmsTenant(tx, input.tenant.id);
-        const activeHeroRefs = await tx.homeHeroSlide.count({ where: { tenantId: input.tenant.id, mediaAssetId: existing.id, isEnabled: true } });
-        const activeHeroCount = await tx.homeHeroSlide.count({ where: { tenantId: input.tenant.id, isEnabled: true } });
-        if (activeHeroCount - activeHeroRefs < 1) throw new Error("Keep at least one active hero slide.");
         // Retiring a media asset must remove its Hero slot, not leave a
         // null-media row that could be rendered or counted as a slide.
         await tx.homeHeroSlide.deleteMany({

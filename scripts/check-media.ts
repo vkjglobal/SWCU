@@ -26,11 +26,10 @@ let userId: string | undefined;
 const routeHost = process.env.REPLIT_DEV_DOMAIN;
 const routeBase = process.env.MEDIA_QA_BASE_URL ?? (routeHost ? `https://${routeHost}` : undefined);
 
-async function requestMediaRoute(mediaId: string, host?: string) {
-  const forwardedHost = host ?? routeHost;
-  if (!routeBase || !routeHost || !forwardedHost) throw new Error("REPLIT_DEV_DOMAIN is required for live media route QA.");
+async function requestMediaRoute(mediaId: string) {
+  if (!routeBase || !routeHost) throw new Error("REPLIT_DEV_DOMAIN is required for live media route QA.");
   const url = new URL(`/api/media/${mediaId}`, routeBase);
-  return fetch(url, { headers: { host: routeHost, "x-forwarded-host": forwardedHost } });
+  return fetch(url, { headers: { host: routeHost, "x-forwarded-host": routeHost } });
 }
 
 async function assertApplicationNotFound(response: Response | null, label: string) {
@@ -322,7 +321,13 @@ async function main() {
       replacementResponse.headers.get("content-disposition") !== 'attachment; filename="prompt2-media-document-replacement.pdf"'
     ) throw new Error("Replacement PDF route did not return exact bytes and safe headers.");
 
-    const wrongTenantResponse = await requestMediaRoute(pdfReplacement.id, crossTenantHost);
+    // The development proxy replaces forwarded host headers. Only this
+    // cross-tenant check uses the local DEV server so its Host header reaches
+    // the application unchanged; normal route checks still use the proxy.
+    const localDevBase = process.env.MEDIA_QA_LOCAL_BASE_URL ?? `http://127.0.0.1:${process.env.PORT || "3000"}`;
+    const wrongTenantResponse = await fetch(new URL(`/api/media/${pdfReplacement.id}`, localDevBase), {
+      headers: { host: crossTenantHost, "x-forwarded-host": crossTenantHost },
+    });
     await assertApplicationNotFound(wrongTenantResponse, "Wrong-tenant media");
 
     await getR2Client().send(new DeleteObjectCommand({
@@ -337,6 +342,25 @@ async function main() {
     if (missingObjectBody.includes(pdfReplacement.objectKey)) throw new Error("Missing-object response leaked the private object key.");
 
     routeMatrix = "passed (published, disabled, retired, wrong-tenant, missing-media, missing-object, replacement)";
+  }
+
+  const isolatedHero = await uploadMedia({
+    tenant: crossTenant,
+    actorUserId: user.id,
+    purpose: "hero",
+    altText: "Temporary Hero retirement QA image",
+    file: new NodeFile([webpBuffer], "temporary-hero-retirement-qa.webp", { type: "image/webp" }) as unknown as File,
+  });
+  mediaIds.push(isolatedHero.id);
+  objectKeys.push(isolatedHero.objectKey);
+  const isolatedSlide = await db.homeHeroSlide.create({
+    data: { tenantId: crossTenant.id, mediaAssetId: isolatedHero.id, altText: "Temporary Hero retirement QA image", isEnabled: true },
+  });
+  heroSlideIds.push(isolatedSlide.id);
+  await retireMedia(crossTenant, user.id, isolatedHero.id);
+  if (await db.homeHeroSlide.count({ where: { tenantId: crossTenant.id } }) !== 0 ||
+      !(await db.mediaAsset.findUniqueOrThrow({ where: { id: isolatedHero.id } })).retiredAt) {
+    throw new Error("Retiring the final active Hero media did not delete its slot and retire the asset.");
   }
 
   await retireMedia(tenant, user.id, replacement.id);
@@ -355,6 +379,7 @@ async function main() {
       referencedContentUpdated: true,
       pdfUpload: "passed",
       routeMatrix,
+      lastHeroMediaRetirement: "passed",
     }),
   );
 }
