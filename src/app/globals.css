@@ -51,13 +51,108 @@ body {
 
 .display-heading { font-family: var(--font-poppins), sans-serif; letter-spacing: -.045em; }
 .section-kicker { color: #176db3; font-size: .75rem; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
-.home-link { transition: transform .18s ease, box-shadow .18s ease, background-color .18s ease; }
-.home-link:hover { transform: translateY(-2px); box-shadow: 0 14px 30px rgba(22, 59, 92, .18); }
-.home-link:active { transform: translateY(0); }
+.home-link { transition: transform .28s cubic-bezier(.22,1,.36,1), box-shadow .28s ease, background-color .28s ease, border-color .28s ease; }
+.home-link:hover { box-shadow: 0 18px 36px rgba(22, 59, 92, .2); }
+.home-link:active { transform: scale(.985); }
 .story-line { background: linear-gradient(90deg, #c83f45 0 42px, transparent 42px); height: 3px; width: 82px; }
 .service-scroller { scrollbar-width: none; }
 .service-scroller::-webkit-scrollbar { display: none; }
 .app-grid { background-image: linear-gradient(rgba(255,255,255,.06) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.06) 1px, transparent 1px); background-size: 34px 34px; }
+
+/* Public cards share a restrained lift and a stronger static border/shadow. */
+#services { background: #eaf2f7; }
+#services .service-scroller .home-link {
+  background: #fff;
+  border-color: rgba(22, 59, 92, .2);
+  box-shadow: 0 12px 28px rgba(22, 59, 92, .09);
+}
+#why-swcu .grid > div {
+  background: #fff;
+  box-shadow: 0 12px 28px rgba(22, 59, 92, .09);
+  transition: box-shadow .28s ease, border-color .28s ease;
+}
+#help-resources { background: #f3f7fa; }
+#help-resources .border-b:has(> a) {
+  border-radius: .5rem;
+  transition: background-color .28s ease, box-shadow .28s ease;
+}
+#help-resources .border-b:has(> a):hover,
+#help-resources .border-b:has(> a):focus-within {
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(22, 59, 92, .1);
+}
+#help-resources button[aria-expanded="true"] {
+  background: #f3f7fa;
+  box-shadow: inset 3px 0 #168887;
+}
+#help-resources .bg-soft-blue-grey.rounded-2xl {
+  background: #fff;
+  border: 1px solid rgba(22, 59, 92, .15);
+  box-shadow: 0 15px 35px rgba(22, 59, 92, .1);
+}
+.resource-card {
+  height: 100%;
+  border-color: rgba(22, 59, 92, .2);
+  box-shadow: 0 12px 30px rgba(22, 59, 92, .1);
+  transition: transform .28s cubic-bezier(.22,1,.36,1), box-shadow .28s ease, border-color .28s ease;
+}
+.resource-card:focus-within {
+  border-color: #176db3;
+  box-shadow: 0 18px 36px rgba(22, 59, 92, .18);
+}
+.resource-card a svg { transition: transform .28s cubic-bezier(.22,1,.36,1); }
+.resource-card:focus-within a svg { transform: translateX(4px); }
+.public-site form.grid.rounded-2xl.bg-soft-blue-grey {
+  border: 1px solid rgba(22, 59, 92, .16);
+  box-shadow: 0 18px 38px rgba(22, 59, 92, .12);
+}
+.about-content > .swcu-reveal {
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border: 1px solid rgba(22, 59, 92, .16);
+  border-left: 4px solid #176db3;
+  border-radius: .9rem;
+  background: #fff;
+  box-shadow: 0 14px 32px rgba(22, 59, 92, .09);
+  transition: box-shadow .28s ease, border-color .28s ease;
+}
+.about-content > .swcu-reveal:first-child { border-left-color: #c83f45; }
+.public-site #savings,
+.public-site #retirement-savings {
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border-left: 3px solid rgba(23, 109, 179, .55);
+  border-radius: .9rem;
+  background: #eef5f8;
+}
+.public-site #membership,
+.public-site #loans,
+.public-site #death-benefit {
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(22, 59, 92, .16);
+}
+.public-site .button-primary,
+.public-site .button-secondary,
+.public-header .button-primary,
+.public-header .button-secondary {
+  transition: transform .28s cubic-bezier(.22,1,.36,1), box-shadow .28s ease, background-color .28s ease, border-color .28s ease;
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .home-link:hover { transform: translateY(-5px); }
+  #services .home-link:hover { transform: translateY(-7px) scale(1.012); border-color: #176db3; box-shadow: 0 22px 42px rgba(22, 59, 92, .2); }
+  #services .home-link:hover .size-12 { transform: translateY(-2px) scale(1.06); }
+  .resource-card:hover { transform: translateY(-6px) scale(1.008); border-color: #176db3; box-shadow: 0 22px 42px rgba(22, 59, 92, .19); }
+  .resource-card:hover a svg { transform: translateX(4px); }
+  #why-swcu .grid > div:hover { box-shadow: 0 20px 38px rgba(22, 59, 92, .16); }
+  .about-content > .swcu-reveal:hover { border-color: rgba(23, 109, 179, .4); box-shadow: 0 20px 40px rgba(22, 59, 92, .16); }
+  .public-site .button-primary:hover,
+  .public-site .button-secondary:hover,
+  .public-header .button-primary:hover,
+  .public-header .button-secondary:hover { transform: translateY(-3px); }
+}
+#services .home-link .size-12 { transition: transform .28s cubic-bezier(.22,1,.36,1); }
+@media (hover: none) {
+  .resource-card:active { border-color: #176db3; background: #f3f7fa; transform: scale(.99); }
+  #services .home-link:active { border-color: #176db3; background: #f3f7fa; transform: scale(.985); }
+}
 
 a {
   color: inherit;
@@ -334,8 +429,10 @@ a {
 .leadership-group-title h3 { color: #163b5c; font-family: var(--font-poppins), sans-serif; font-size: 1.25rem; }
 .leadership-group-title span { height: 1px; flex: 1; background: rgba(22,59,92,.17); }
 .leadership-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; margin-top: 1.15rem; }
-.leader-card { display: flex; min-width: 0; overflow: hidden; border: 1px solid rgba(22,59,92,.12); border-radius: .85rem; background: #fff; box-shadow: 0 8px 25px rgba(22,59,92,.06); transition: transform 160ms ease, box-shadow 160ms ease; }
-.leader-card:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(22,59,92,.11); }
+.leader-card { display: flex; min-width: 0; overflow: hidden; border: 1px solid rgba(22,59,92,.2); border-radius: .85rem; background: #fff; box-shadow: 0 12px 28px rgba(22,59,92,.1); transition: transform .28s cubic-bezier(.22,1,.36,1), box-shadow .28s ease, border-color .28s ease; }
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .leader-card:hover { transform: translateY(-4px); border-color: rgba(23,109,179,.5); box-shadow: 0 19px 38px rgba(22,59,92,.17); }
+}
 .leader-portrait { position: relative; flex: 0 0 7.5rem; height: 9.375rem; align-self: flex-start; overflow: hidden; background: #d9e9ef; color: #176db3; display: grid; place-items: center; font-family: var(--font-poppins), sans-serif; font-size: 1.25rem; font-weight: 700; letter-spacing: .08em; }
 .leader-info { min-width: 0; padding: 1rem 1rem .9rem; }
 .leader-info h4 { color: #163b5c; font-family: var(--font-poppins), sans-serif; font-size: 1rem; line-height: 1.25; }
@@ -377,6 +474,21 @@ a {
   html {
     scroll-behavior: auto;
   }
+  .swcu-reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .home-link:hover,
+  .home-link:active,
+  .resource-card:hover,
+  .resource-card:active,
+  .leader-card:hover,
+  .public-site .button-primary:hover,
+  .public-site .button-secondary:hover,
+  .public-header .button-primary:hover,
+  .public-header .button-secondary:hover,
+  .public-site .button-primary:active,
+  .public-site .button-secondary:active { transform: none; }
 
   *,
   *::before,

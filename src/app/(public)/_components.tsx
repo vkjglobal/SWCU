@@ -15,7 +15,7 @@ export function PublicHeader({ memberAppHref = "/member-login" }: { memberAppHre
     ["/", "Home"], ["/about-swcu", "About SWCU"], ["/membership-services", "Membership & Services"],
     ["/forms-resources", "Forms & Resources"], ["/contact", "Contact"],
   ];
-  return <header className="sticky top-0 z-50 border-b border-deep-navy/10 bg-white/95 backdrop-blur">
+  return <header className="public-header sticky top-0 z-50 border-b border-deep-navy/10 bg-white/95 backdrop-blur">
     <div className="site-container flex min-h-20 min-w-0 items-center gap-2 py-2 sm:gap-4">
       <Link href="/" aria-label="SWCU home" className="shrink-0"><Image src="/brand/swcu/swcu-logo-transparent.png" alt="Service Worker Credit Union" width={165} height={116} priority className="h-auto w-[114px] sm:w-[145px]"/></Link>
       <nav className="ml-auto hidden items-center gap-1 xl:flex" aria-label="Main navigation">{links.map(([href, label]) => <Link key={href} href={href} className="rounded-md px-3 py-2 text-sm font-semibold text-charcoal hover:text-swcu-blue">{label}</Link>)}</nav>
@@ -46,15 +46,15 @@ export function AvailabilityState({ heading, children }: { heading: string; chil
 }
 
 export function AnchorNav({ items }: { items: [string, string][] }) {
-  return <nav aria-label="On this page" className="sticky top-20 z-10 border-y border-deep-navy/10 bg-white/95 py-3 backdrop-blur"><div className="site-container flex gap-2 overflow-x-auto whitespace-nowrap">{items.map(([id, label]) => <a key={id} href={`#${id}`} className="rounded-full border border-deep-navy/15 px-4 py-2 text-sm font-semibold text-swcu-blue">{label}</a>)}</div></nav>;
+  return <nav aria-label="On this page" className="sticky top-20 z-10 border-y border-deep-navy/10 bg-white/95 py-3 backdrop-blur"><div className="site-container flex gap-2 overflow-x-auto whitespace-nowrap">{items.map(([id, label]) => <a key={id} href={`#${id}`} className="rounded-full border border-deep-navy/15 px-4 py-2 text-sm font-semibold text-swcu-blue transition-colors hover:border-swcu-blue hover:bg-soft-blue-grey focus-visible:border-swcu-blue focus-visible:bg-soft-blue-grey active:bg-soft-blue-grey">{label}</a>)}</div></nav>;
 }
 
 export function ResourceCard({ title, description, href, label = "Download" }: { title: string; description?: string | null; href?: string; label?: string }) {
-  return <article className="flex min-h-44 flex-col rounded-2xl border border-deep-navy/10 bg-white p-5 shadow-[0_12px_30px_rgba(22,59,92,.06)]"><h3 className="display-heading text-xl font-semibold text-deep-navy">{title}</h3>{description && <p className="mt-2 text-sm text-charcoal/70">{description}</p>}{href && <a href={href} className="mt-auto inline-flex items-center gap-2 pt-5 text-sm font-bold text-swcu-blue">{label}<ArrowRight size={16}/></a>}</article>;
+  return <article className="resource-card flex min-h-44 flex-col rounded-2xl border border-deep-navy/10 bg-white p-5 shadow-[0_12px_30px_rgba(22,59,92,.06)]"><h3 className="display-heading text-xl font-semibold text-deep-navy">{title}</h3>{description && <p className="mt-2 text-sm text-charcoal/70">{description}</p>}{href && <a href={href} className="mt-auto inline-flex items-center gap-2 pt-5 text-sm font-bold text-swcu-blue">{label}<ArrowRight size={16}/></a>}</article>;
 }
 
 export function FAQList({ faqs }: { faqs: { id: string; question: string; answer: string }[] }) {
-  return <div className="divide-y divide-deep-navy/10 rounded-2xl border border-deep-navy/10 bg-white">{faqs.map((faq) => <details key={faq.id} name="common-questions" className="group p-5"><summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 font-semibold text-deep-navy [&::-webkit-details-marker]:hidden">{faq.question}<ChevronDown className="shrink-0 transition-transform group-open:rotate-180"/></summary><p className="max-w-3xl whitespace-pre-line pt-4 leading-6 text-charcoal/75">{faq.answer}</p></details>)}</div>;
+  return <div className="divide-y divide-deep-navy/10 rounded-2xl border border-deep-navy/15 bg-white shadow-[0_12px_30px_rgba(22,59,92,.08)]">{faqs.map((faq) => <details key={faq.id} name="common-questions" className="group p-5 transition-colors hover:bg-soft-blue-grey/70 open:bg-soft-blue-grey"><summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 font-semibold text-deep-navy hover:text-swcu-blue [&::-webkit-details-marker]:hidden">{faq.question}<ChevronDown className="shrink-0 transition-transform group-open:rotate-180"/></summary><p className="max-w-3xl whitespace-pre-line pt-4 leading-6 text-charcoal/75">{faq.answer}</p></details>)}</div>;
 }
 
 export function PublicFooter({ contact, published }: { contact: { organisationName: string; streetAddress: string; postalAddress: string; telephone: string; secondaryTelephone?: string | null; publicEmail: string } | null; published: { privacy: boolean; terms: boolean; accessibility: boolean; importantInformation: boolean } }) {

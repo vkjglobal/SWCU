@@ -17,5 +17,5 @@ export default async function PublicLayout({
   const published = { privacy: pages.some((p) => p.slot === "PRIVACY"), terms: pages.some((p) => p.slot === "TERMS_OF_USE"), accessibility: pages.some((p) => p.slot === "ACCESSIBILITY"), importantInformation: pages.some((p) => p.slot === "IMPORTANT_INFORMATION") };
 
   const memberAppHref = getMemberAppHref(tenantSettings);
-  return <><PublicHeader memberAppHref={memberAppHref} />{notice && <SiteNoticeMotion notice={notice}/>}<main className="pb-24 md:pb-0">{children}</main><MobileQuickActions phone={contact?.telephone} memberAppHref={memberAppHref}/><PublicFooter contact={contact} published={published} /></>;
+  return <><PublicHeader memberAppHref={memberAppHref} />{notice && <SiteNoticeMotion notice={notice}/>}<main className="public-site pb-24 md:pb-0">{children}</main><MobileQuickActions phone={contact?.telephone} memberAppHref={memberAppHref}/><PublicFooter contact={contact} published={published} /></>;
 }
