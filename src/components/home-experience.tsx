@@ -53,6 +53,11 @@ export function HomeExperience({ heroSlides = [], highlights = [], services = []
   const reduce = usePublicReducedMotion();
   const slides = heroSlides.slice(0, 4);
   const [slide, setSlide] = useState(0);
+  const [firstImageReady, setFirstImageReady] = useState(false);
+  const firstImageRef = useCallback((image: HTMLImageElement | null) => {
+    // A cached image can finish before hydration attaches onLoad.
+    if (image?.complete) setFirstImageReady(true);
+  }, []);
   const [carouselPaused, setCarouselPaused] = useState(false);
   const [faq, setFaq] = useState<number | null>(null);
   const [serviceIndex, setServiceIndex] = useState(0);
@@ -113,7 +118,7 @@ export function HomeExperience({ heroSlides = [], highlights = [], services = []
           <div role="region" aria-roledescription="carousel" aria-label="SWCU highlights" className="relative min-h-[390px] overflow-hidden rounded-[2rem] bg-deep-navy shadow-[0_24px_60px_rgba(22,59,92,.2)] lg:min-h-[500px]" onMouseEnter={() => setCarouselPaused(true)} onMouseLeave={() => setCarouselPaused(false)} onFocusCapture={() => setCarouselPaused(true)} onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setCarouselPaused(false); }} onTouchStart={(event) => { touchStartX.current = event.touches[0]?.clientX ?? null; }} onTouchEnd={(event) => { if (touchStartX.current === null) return; const delta = event.changedTouches[0]?.clientX - touchStartX.current; if (Math.abs(delta) > 42 && slides.length > 1) markManualSlide((slide + (delta < 0 ? 1 : -1) + slides.length) % slides.length); touchStartX.current = null; }}>
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(22,136,135,.55),transparent_32%),linear-gradient(135deg,#163b5c,#176db3)]" />
             <div className="absolute -right-16 -top-16 size-64 rounded-full border-[2rem] border-white/10" /><div className="absolute -bottom-24 -left-16 size-72 rounded-full border-[2.2rem] border-swcu-red/30" />
-            {slides.length > 0 ? slides.map((item, i) => <motion.img key={item.id} src={item.src} alt={i === slide ? item.alt : ""} aria-hidden={i !== slide} loading={i === 0 ? "eager" : "lazy"} fetchPriority={i === 0 ? "high" : "low"} decoding="async" className="absolute inset-0 size-full object-cover" initial={reduce ? false : { opacity: 0 }} animate={{ opacity: i === slide ? 1 : 0 }} transition={{ duration: reduce ? 0 : .8 }} />) : null}
+            {slides.length > 0 ? slides.map((item, i) => <motion.img key={item.id} ref={i === 0 ? firstImageRef : undefined} src={i === 0 || firstImageReady || i === slide ? item.src : undefined} onLoad={i === 0 ? () => setFirstImageReady(true) : undefined} onError={i === 0 ? () => setFirstImageReady(true) : undefined} alt={i === slide ? item.alt : ""} aria-hidden={i !== slide} loading={i === 0 ? "eager" : "lazy"} fetchPriority={i === 0 ? "high" : "low"} decoding="async" className="absolute inset-0 size-full object-cover" initial={reduce ? false : { opacity: 0 }} animate={{ opacity: i === slide ? 1 : 0 }} transition={{ duration: reduce ? 0 : .8 }} />) : null}
             <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-deep-navy/80 to-transparent p-6 pt-28 text-white">
               <div className="flex items-end justify-between gap-4">{slides.length > 0 && <p className="max-w-sm text-sm font-medium text-white/80">{slides[slide]?.alt}</p>}
                 {slides.length > 1 && <div className="flex gap-1">{slides.map((s, i) => <button key={s.id} aria-label={`Show hero slide ${i + 1}`} aria-pressed={i === slide} onClick={() => markManualSlide(i)} className="grid size-11 place-items-center rounded-full"><span aria-hidden="true" className={`size-2.5 rounded-full ${i === slide ? "bg-white" : "bg-white/40"}`} /></button>)}</div>}</div>
