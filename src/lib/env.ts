@@ -35,6 +35,11 @@ const serverSchema = z.object({
   ),
   SENDGRID_FROM_EMAIL: optionalEmail,
   SENDGRID_FROM_NAME: optionalSendGridName,
+  SWCU_MEMBER_APP_API_BASE_URL: optionalUrl,
+  SWCU_MEMBER_APP_ADMIN_SERVICE_KEY: z.preprocess(
+    (value) => (value === "" ? undefined : value),
+    z.string().min(1).optional(),
+  ),
 });
 
 export type ServerEnvironment = z.infer<typeof serverSchema>;
@@ -57,6 +62,8 @@ export function getServerEnvironment(): ServerEnvironment {
     SENDGRID_API_KEY: process.env.SENDGRID_API_KEY,
     SENDGRID_FROM_EMAIL: process.env.SENDGRID_FROM_EMAIL,
     SENDGRID_FROM_NAME: process.env.SENDGRID_FROM_NAME,
+    SWCU_MEMBER_APP_API_BASE_URL: process.env.SWCU_MEMBER_APP_API_BASE_URL,
+    SWCU_MEMBER_APP_ADMIN_SERVICE_KEY: process.env.SWCU_MEMBER_APP_ADMIN_SERVICE_KEY,
   });
 
   return cachedEnvironment;

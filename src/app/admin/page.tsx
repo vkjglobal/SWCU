@@ -19,6 +19,9 @@ const modules = [
   ["Leadership & committees", "/admin/leadership", "Approved committee records"],
   ["Loan Calculator", "/admin/calculator", "Website estimate settings and testing"],
   ["Contact enquiries", "/admin/contact-enquiries", "Review messages received from members"],
+  ["Member Requests", "/admin/member-requests", "Manage private member requests"],
+  ["Member Notices", "/admin/member-notices", "Messages for signed-in members"],
+  ["Member Documents", "/admin/member-documents", "Secure files for signed-in members"],
 ];
 
 export default async function AdminDashboardPage() {
