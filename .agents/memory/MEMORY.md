@@ -7,3 +7,4 @@
 - [Fiji-local member scheduling](fiji-local-member-scheduling.md) — Admin wall-time inputs must convert explicitly between Pacific/Fiji and UTC for Member App visibility windows.
 - [Member-service UAT read-back](member-service-uat-readback.md) — distinguish current member-facing state from historical activity, and require an explicit selected member after search.
 - [Next DEV cache after production build](next-dev-build-cache.md) — a successful build can leave the running DEV preview serving tenant 404s until its generated cache is rebuilt.
+- [Prisma client regeneration in DEV](prisma-dev-client-regeneration.md) — restart the running Next DEV process after generating a new Prisma model field; the old client can keep rejecting it.
