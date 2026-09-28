@@ -22,6 +22,7 @@ const modules = [
   ["Member Requests", "/admin/member-requests", "Manage private member requests"],
   ["Member Notices", "/admin/member-notices", "Messages for signed-in members"],
   ["Member Documents", "/admin/member-documents", "Secure files for signed-in members"],
+  ["Ask SWCU", "/admin/ask-swcu", "Website assistant visibility and connection status"],
 ];
 
 export default async function AdminDashboardPage() {

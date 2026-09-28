@@ -1,0 +1,1 @@
+ALTER TABLE "tenant_settings" ADD COLUMN "showAskSwcu" BOOLEAN NOT NULL DEFAULT false;

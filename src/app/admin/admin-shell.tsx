@@ -37,6 +37,7 @@ export function AdminShell({
           {role === "ADMINISTRATOR" && <Link href="/admin/member-requests" className="whitespace-nowrap hover:text-swcu-blue">Member Requests</Link>}
           {role === "ADMINISTRATOR" && <Link href="/admin/member-notices" className="whitespace-nowrap hover:text-swcu-blue">Member Notices</Link>}
           {role === "ADMINISTRATOR" && <Link href="/admin/member-documents" className="whitespace-nowrap hover:text-swcu-blue">Member Documents</Link>}
+           {role === "ADMINISTRATOR" && <Link href="/admin/ask-swcu" className="whitespace-nowrap hover:text-swcu-blue">Ask SWCU</Link>}
         </div>
       </nav>
       <section className="site-container py-10">
