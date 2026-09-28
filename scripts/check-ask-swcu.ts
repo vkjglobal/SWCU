@@ -81,7 +81,11 @@ check(action.includes('value !== "on" && value !== "off"'), "action rejects unkn
 check(nav.includes('role === "ADMINISTRATOR" && <Link href="/admin/ask-swcu"'), "navigation is Administrator-only");
 check(dashboard.includes('["Ask SWCU", "/admin/ask-swcu"'), "dashboard area is present");
 check(page.includes("Not connected") && page.includes("Prepared — connection pending"), "connection and Member App status are read-only");
-check(page.includes("passwords, PINs, verification codes or private account information"), "public privacy reminder is shown");
+check((page.match(/<section\b/g) ?? []).length === 3, "Admin page has only three areas");
+check(page.includes("Website visibility") && page.includes("Current value:") && page.includes("Show Ask SWCU on website") && page.includes("Save setting"), "Website visibility control remains");
+check(page.includes("Chatbot connection") && page.includes("Ask SWCU is not connected to the chatbot service yet.") && page.includes("The chatbot will be connected after the final SWCU website is live and approved content has been used for training."), "Chatbot connection copy is plain-language");
+check(page.indexOf("Chatbot connection") < page.indexOf(">Member App</h2>"), "Member App sits next to Chatbot connection");
+check(!/Chatling|Public display|Public name|Management and privacy|Omcore/.test(page), "unneeded cards and provider references are absent from Admin page");
 check(storage.includes("planAskSwcuChange(false, input.requested, ASK_SWCU_CONNECTION_READY)") && storage.includes("if (!change) return"), "ON is rejected before writing and no-op is not audited");
 check(storage.includes("tx.tenantSettings.upsert(") && storage.includes("tx.auditLog.create(") && storage.includes('action: "ASK_SWCU_VISIBILITY_CHANGED"') && storage.includes("actorUserId: input.actorUserId") && storage.includes("changeMetadata: change"), "valid setting change writes a tenant-scoped audit record with actor and old/new values");
 check(layout.includes("showAskSwcu: true") && layout.includes("<AskSwcuWidget enabled={tenantSettings?.showAskSwcu ?? false} />"), "one central public insertion point uses tenant-scoped OFF-by-default setting");

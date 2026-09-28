@@ -35,24 +35,15 @@ export default async function AskSwcuAdminPage() {
         </section>
 
         <section className="rounded-card border border-deep-navy/10 bg-white p-6 shadow-card">
-          <h2 className="font-heading text-xl font-bold text-deep-navy">Chatling connection</h2>
+          <h2 className="font-heading text-xl font-bold text-deep-navy">Chatbot connection</h2>
           <p className="mt-3 font-semibold text-swcu-red">Not connected</p>
-          <p className="mt-2 text-sm text-charcoal/70">Ask SWCU is not connected to Chatling yet.</p>
-          <p className="mt-2 text-sm text-charcoal/70">The assistant will be connected after the final SWCU website is live and approved content has been used for training.</p>
-        </section>
-        <section className="rounded-card border border-deep-navy/10 bg-white p-6 shadow-card">
-          <h2 className="font-heading text-xl font-bold text-deep-navy">Public display</h2>
-          <dl className="mt-3 space-y-2 text-sm"><div><dt className="font-semibold">Public name</dt><dd>Ask SWCU</dd></div><div><dt className="font-semibold">Desktop</dt><dd>Bottom right</dd></div><div><dt className="font-semibold">Phone</dt><dd>Bottom right, above the Join / Login / Call bar</dd></div></dl>
+          <p className="mt-2 text-sm text-charcoal/70">Ask SWCU is not connected to the chatbot service yet.</p>
+          <p className="mt-2 text-sm text-charcoal/70">The chatbot will be connected after the final SWCU website is live and approved content has been used for training.</p>
         </section>
         <section className="rounded-card border border-deep-navy/10 bg-white p-6 shadow-card">
           <h2 className="font-heading text-xl font-bold text-deep-navy">Member App</h2>
           <p className="mt-3 text-sm text-charcoal/70">The same Ask SWCU assistant will also be available from Help in the Member App.</p>
           <p className="mt-2 text-sm font-semibold text-swcu-blue">Prepared — connection pending</p>
-        </section>
-        <section className="rounded-card border border-deep-navy/10 bg-white p-6 shadow-card">
-          <h2 className="font-heading text-xl font-bold text-deep-navy">Management and privacy</h2>
-          <p className="mt-3 text-sm text-charcoal/70">Omcore manages the Ask SWCU training and chatbot settings in Chatling. SWCU staff can use this page to show or hide the assistant once it is connected.</p>
-          <p className="mt-3 text-sm text-charcoal/70">Ask SWCU is for general information only. Members should not enter passwords, PINs, verification codes or private account information.</p>
         </section>
       </div>
     </AdminShell>
