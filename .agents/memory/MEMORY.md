@@ -4,3 +4,6 @@
 - [Headless Chromium responsive checks](headless-chromium-responsive.md) — create a fresh CDP page and wait for navigation before reading layout; the first target can be a background page.
 - [Tenant-host DEV UAT](tenant-host-dev-uat.md) — the Replit proxy owns forwarded-host headers; arbitrary cross-tenant Host probes through its public URL can mislead.
 - [Member services boundary](member-services-boundary.md) — the website Admin is the sole staff portal, but private member data belongs to a separate Member App service.
+- [Fiji-local member scheduling](fiji-local-member-scheduling.md) — Admin wall-time inputs must convert explicitly between Pacific/Fiji and UTC for Member App visibility windows.
+- [Member-service UAT read-back](member-service-uat-readback.md) — distinguish current member-facing state from historical activity, and require an explicit selected member after search.
+- [Next DEV cache after production build](next-dev-build-cache.md) — a successful build can leave the running DEV preview serving tenant 404s until its generated cache is rebuilt.

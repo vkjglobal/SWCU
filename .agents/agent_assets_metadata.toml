@@ -1,0 +1,16 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "83VImdIagjLFleZfU26Sb"
+uri = "file://.local/qa/demo-upload.pdf"
+type = "pdf"
+title = "SWCU DEV test-only PDF"
+description = "Synthetic one-page file for fictional Member Services attachment and document UAT. Not a member record; kept out of Git."
+logical_id = "a531c2d8-09aa-4af4-8da0-3656b869504d"
+content_hash = "sha256:a7923d89739f3deac80df8c14b7ce80a8ec1847216f1ae81b5e81d3a2d8c119a"
+size = 662
+mtime_ms = 1790570381147
+storage_uri = "gcs://replit-rams-assets-janeway/rams/assets/repl:5a489f37-2dea-485a-8af3-b9cbd5ab1653/a531c2d8-09aa-4af4-8da0-3656b869504d/6c40009a-a2c2-427f-bc71-278ce24588a1"
+storage_version_token = "1790570401268855"
+content_type = "application/pdf"
