@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import { fijiLocalDateTimeToUtcIso, formatFijiDateTime } from "../src/lib/fiji-time";
+import { changedMemberMessage } from "../src/lib/member-services-request-message";
 
 const root = process.cwd();
 let assertions = 0;
@@ -38,6 +40,23 @@ for (const path of adminPages) {
 
 const actionsPath = "src/app/admin/member-services/actions.ts";
 const actions = source(actionsPath);
+const fijiInstant = fijiLocalDateTimeToUtcIso("2026-01-15T09:00");
+check(
+  fijiInstant === "2026-01-14T21:00:00.000Z"
+    && formatFijiDateTime(new Date(fijiInstant)) === "2026-01-15T09:00",
+  "Fiji-local editor time converts to UTC and round-trips through the explicit Fiji zone",
+);
+assert.throws(() => fijiLocalDateTimeToUtcIso("2026-02-30T09:00"), RangeError);
+assert.throws(() => fijiLocalDateTimeToUtcIso("2026-01-15T24:00"), RangeError);
+check(true, "invalid calendar dates and wall-clock values are rejected");
+const dateEditors = source("src/components/member-services-editors.tsx");
+check(
+  dateEditors.includes("formatFijiDateTime(instant)")
+    && ["showFrom", "showUntil", "availableFrom", "availableUntil"].every((field) => actions.includes(`readOptionalDate(formData, \"${field}\")`))
+    && actions.includes("fijiLocalDateTimeToUtcIso(value)")
+    && actions.includes('if (value === "") return null;'),
+  "notice/document create and edit date fields use Fiji conversion and retain null clears",
+);
 check(
   /requireStaffMembership\(tenant,\s*\["ADMINISTRATOR"\]\)/.test(actions),
   "server action authorization is restricted to Administrators",
@@ -55,7 +74,6 @@ check(
 const actionExpectations = new Map<string, string[]>([
   ["updateMemberRequestAction", ["updateRequest"]],
   ["addMemberInternalNoteAction", ["addInternalNote"]],
-  ["openMemberAttachmentAction", ["getAttachmentAccess"]],
   ["searchMemberTargetsAction", ["searchMembers"]],
   ["saveMemberNoticeAction", ["createNotice", "updateNotice"]],
   ["saveMemberDocumentAction", ["createDocument", "updateDocument"]],
@@ -79,11 +97,23 @@ for (const [name, adapterCalls] of actionExpectations) {
 const requestActionStart = actions.indexOf("export async function updateMemberRequestAction(");
 const requestActionEnd = actions.indexOf("\nexport async function ", requestActionStart + 1);
 const requestAction = actions.slice(requestActionStart, requestActionEnd);
+check(changedMemberMessage("", "") === undefined, "an untouched empty member message is not sent");
+check(changedMemberMessage("Existing message", "Existing message") === undefined, "an unchanged message is not sent");
+check(changedMemberMessage("", "  Fictional update  ") === "Fictional update", "an edited message is sent");
+check(changedMemberMessage("Existing message", "   ") === null, "clearing a message sends explicit null");
+const requestEditor = source("src/components/member-services-request-update.tsx");
 check(
-  requestAction.includes('formData.get("changeMemberMessage") === "on"')
-    && requestAction.includes("...(changeMemberMessage ? { memberMessage: readText(formData, \"memberMessage\") } : {})")
-    && requestAction.includes("...(changeMemberMessage ? { memberMessage: values.memberMessage } : {})"),
-  "request action only sends memberMessage when the explicit checkbox is checked, including an empty value",
+  requestEditor.includes('name="initialMemberMessage"')
+    && requestEditor.includes('name="memberMessage"')
+    && !requestEditor.includes('name="changeMemberMessage"')
+    && requestAction.includes('readText(formData, "initialMemberMessage")')
+    && requestAction.includes('readText(formData, "memberMessage")')
+    && requestAction.includes("changedMemberMessage(")
+    && requestAction.includes("...(memberMessage !== undefined ? { memberMessage } : {})")
+    && requestAction.includes("...(values.memberMessage !== undefined ? { memberMessage: values.memberMessage } : {})")
+    && requestAction.includes("saved.memberMessage !== values.memberMessage")
+    && requestAction.includes("?updated=1"),
+  "request form sends edited messages without a separate checkbox and verifies the service response",
 );
 
 const memberSearchStart = actions.indexOf("export async function searchMemberTargetsAction(");
@@ -106,6 +136,30 @@ check(
 );
 
 const memberEditors = source("src/components/member-services-editors.tsx");
+const requestsPage = source("src/app/admin/member-requests/page.tsx");
+const requestDetail = source("src/app/admin/member-requests/[id]/page.tsx");
+const noticesPage = source("src/app/admin/member-notices/page.tsx");
+const documentsPage = source("src/app/admin/member-documents/page.tsx");
+check(
+  requestsPage.includes("client.listRequests({") && requestsPage.includes("formCode: filters.type")
+    && requestsPage.includes("pageSize"),
+  "request filters and pagination are delegated server-side to the adapter",
+);
+check(
+  noticesPage.includes("client.listNotices({") && noticesPage.includes("pageSize")
+    && documentsPage.includes("client.listDocuments({") && documentsPage.includes("pageSize"),
+  "notice and document filters and pagination are delegated server-side",
+);
+check(
+  requestDetail.includes("/api/admin/member-requests/") && requestDetail.includes("Member responses")
+    && requestDetail.includes("field.label") && actions.includes("?noted=1"),
+  "request detail renders ordered labelled fields, responses, same-origin secure links, and refreshed note confirmation",
+);
+check(
+  !actions.includes("getAttachmentAccess") && !actions.includes("checkedSignedAccessUrl")
+    && requestDetail.includes("/attachments/${encodeURIComponent(attachment.id)}"),
+  "attachments use same-origin protected stream links instead of signed URL actions",
+);
 for (const path of [
   "src/app/admin/member-requests/page.tsx",
   "src/app/admin/member-requests/[id]/page.tsx",
@@ -138,6 +192,19 @@ check(
 check(
   /type="file"[\s\S]*?disabled=\{!connected\}/.test(editors),
   "private file inputs are disabled when disconnected",
+);
+check(
+  editors.includes("{!notice && <Field label=\"Optional attachment\">")
+    && editors.includes("{!document && <Field label=\"File\">")
+    && editors.includes("cannot be replaced or removed while editing"),
+  "notice attachments are create-only and document files cannot be replaced while editing",
+);
+check(
+  (actions.match(/submittedFile !== null/g) ?? []).length === 2
+    && actions.includes("client.updateNotice(values.id, payload)")
+    && actions.includes("client.updateDocument(values.id, payload)")
+    && actions.includes("client.createDocument(payload, file!)"),
+  "edit actions reject all file parts and perform metadata-only updates",
 );
 check(
   privateForm.includes("useActionState") && privateForm.includes("encType=\"multipart/form-data\""),

@@ -3,9 +3,14 @@ import { documentStatuses, noticeStatuses } from "@/lib/member-app-admin-contrac
 import { MemberServicesPrivateForm } from "@/components/member-services-private-form";
 import { Field, inputClass, MemberServiceNotice } from "@/components/member-services-ui";
 import { MemberServicesMemberTargetPicker } from "@/components/member-services-member-target-picker";
+import { formatFijiDateTime } from "@/lib/fiji-time";
+import Link from "next/link";
 
 function dateInputValue(value: string | null | undefined) {
-  return value ? new Date(value).toISOString().slice(0, 16) : "";
+  if (!value) return "";
+  const instant = new Date(value);
+  if (!Number.isFinite(instant.getTime())) throw new RangeError("Invalid saved date.");
+  return formatFijiDateTime(instant);
 }
 
 export function MemberNoticeEditor({ notice, connected, action }: {
@@ -20,12 +25,13 @@ export function MemberNoticeEditor({ notice, connected, action }: {
       <Field label="Title"><input name="title" required defaultValue={notice?.title} className={inputClass} /></Field>
       <Field label="Message"><textarea name="message" required rows={6} defaultValue={notice?.message} className={inputClass} /></Field>
       <MemberServicesMemberTargetPicker initialMember={notice?.member} initialAudience={notice?.audience ?? "All Members"} connected={connected} />
-      <Field label="Optional attachment"><input type="file" name="file" disabled={!connected} className={inputClass} />{notice?.attachment && <span className="text-xs font-normal text-charcoal/65">Current file: {notice.attachment.name}</span>}</Field>
+      {!notice && <Field label="Optional attachment"><input type="file" name="file" disabled={!connected} accept="application/pdf,image/jpeg,image/png,image/webp" className={inputClass} /></Field>}
+      {notice?.attachment && <p className="text-sm">Existing attachment: <Link href={`/api/admin/member-notices/${encodeURIComponent(notice.id)}/attachment`} className="font-semibold text-swcu-blue underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-swcu-blue">{notice.attachment.name} (open securely)</Link><span className="block text-xs text-charcoal/65">Attachments cannot be replaced or removed while editing.</span></p>}
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Show from"><input type="datetime-local" name="showFrom" defaultValue={dateInputValue(notice?.showFrom)} className={inputClass} /></Field>
         <Field label="Show until"><input type="datetime-local" name="showUntil" defaultValue={dateInputValue(notice?.showUntil)} className={inputClass} /></Field>
       </div>
-      <Field label="Status"><select name="status" defaultValue={notice?.status ?? "Draft"} className={inputClass}>{noticeStatuses.map((status) => <option key={status}>{status}</option>)}</select></Field>
+      <Field label="Status"><select name="status" defaultValue={notice?.storedStatus ?? notice?.status ?? "Draft"} className={inputClass}>{noticeStatuses.map((status) => <option key={status}>{status}</option>)}</select></Field>
     </MemberServicesPrivateForm>
   </>;
 }
@@ -43,12 +49,13 @@ export function MemberDocumentEditor({ document, connected, action }: {
       <Field label="Short description"><textarea name="shortDescription" rows={3} defaultValue={document?.shortDescription} className={inputClass} /></Field>
       <MemberServicesMemberTargetPicker initialMember={document?.member} initialAudience={document?.audience ?? "All Members"} connected={connected} />
       <Field label="Document type"><input name="documentType" required defaultValue={document?.documentType} className={inputClass} /></Field>
-      <Field label="File"><input type="file" name="file" required={!document?.file} disabled={!connected} className={inputClass} />{document?.file && <span className="text-xs font-normal text-charcoal/65">Current file: {document.file.name}. Choose a new file only if replacing it.</span>}</Field>
+      {!document && <Field label="File"><input type="file" name="file" required disabled={!connected} accept="application/pdf,image/jpeg,image/png,image/webp" className={inputClass} /></Field>}
+      {document?.file && <p className="text-sm">Current file: <Link href={`/api/admin/member-documents/${encodeURIComponent(document.id)}/file`} className="font-semibold text-swcu-blue underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-swcu-blue">{document.file.name} (open securely)</Link><span className="block text-xs text-charcoal/65">Files cannot be replaced or removed while editing.</span></p>}
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Available from"><input type="datetime-local" name="availableFrom" defaultValue={dateInputValue(document?.availableFrom)} className={inputClass} /></Field>
         <Field label="Available until"><input type="datetime-local" name="availableUntil" defaultValue={dateInputValue(document?.availableUntil)} className={inputClass} /></Field>
       </div>
-      <Field label="Status"><select name="status" defaultValue={document?.status ?? "Draft"} className={inputClass}>{documentStatuses.map((status) => <option key={status}>{status}</option>)}</select></Field>
+      <Field label="Status"><select name="status" defaultValue={document?.storedStatus ?? document?.status ?? "Draft"} className={inputClass}>{documentStatuses.map((status) => <option key={status}>{status}</option>)}</select></Field>
     </MemberServicesPrivateForm>
   </>;
 }

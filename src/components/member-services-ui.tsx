@@ -8,8 +8,8 @@ export function MemberServiceNotice({ children = disconnectedMessage }: { childr
   return <p className="rounded-lg border border-swcu-blue/15 bg-swcu-blue/5 p-4 text-sm font-medium text-deep-navy">{children}</p>;
 }
 
-export function MemberServiceLoadError() {
-  return <p role="alert" className="mt-6 rounded-lg border border-swcu-red/15 bg-white p-4 text-sm font-medium text-charcoal">We could not load this item. Please try again.</p>;
+export function MemberServiceLoadError({ message = "We could not load this item. Please try again." }: { message?: string }) {
+  return <p role="alert" className="mt-6 rounded-lg border border-swcu-red/15 bg-white p-4 text-sm font-medium text-charcoal">{message}</p>;
 }
 
 export function MemberServiceBadge({ status }: { status: string }) {
@@ -22,8 +22,8 @@ export function MemberServiceBadge({ status }: { status: string }) {
 }
 
 export function MemberSummaryText({ member }: { member: MemberSummary | null }) {
-  if (!member) return <>All members</>;
-  return <>{member.name} <span className="text-charcoal/60">({member.identifier})</span></>;
+  if (!member) return <>All Members</>;
+  return <>{member.name} <span className="text-charcoal/60">({member.identifier})</span>{member.membershipStatus && <span className="block text-xs text-charcoal/60">Member status: {member.membershipStatus}</span>}</>;
 }
 
 export function MemberServicePageHeader({ title, intro, action }: { title: string; intro: string; action?: { href: string; label: string } }) {
@@ -39,4 +39,4 @@ export function Field({ label, children }: { label: string; children: ReactNode 
   return <label className="grid gap-1.5 text-sm font-semibold text-deep-navy"><span>{label}</span>{children}</label>;
 }
 
-export const inputClass = "w-full rounded-lg border border-deep-navy/15 bg-white px-3 py-2.5 text-sm font-normal text-charcoal";
+export const inputClass = "w-full rounded-lg border border-deep-navy/15 bg-white px-3 py-2.5 text-sm font-normal text-charcoal focus-visible:outline focus-visible:outline-2 focus-visible:outline-swcu-blue";

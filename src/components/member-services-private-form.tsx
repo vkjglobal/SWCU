@@ -51,7 +51,7 @@ export function MemberServicesPrivateForm({
   return (
     <form action={formAction} encType="multipart/form-data" className={className}>
       {children}
-      {state.error && <p role="alert" className="text-sm font-semibold text-swcu-red">We could not save this change. Please try again.</p>}
+      {state.error && <p role="alert" className="text-sm font-semibold text-swcu-red">{state.error === "save" ? "We could not save this change. Please try again." : state.error}</p>}
       <SubmitButton disabled={disabled}>{submitLabel}</SubmitButton>
     </form>
   );

@@ -52,15 +52,15 @@ export function MemberServicesMemberTargetPicker({
     </Field>
     <input type="hidden" name="memberId" value={audience === "Individual Member" ? selectedMember?.id ?? "" : ""} />
     {connected && audience === "Individual Member" && <div className="rounded-lg bg-soft-blue-grey p-4">
-      {selectedMember && <p className="mb-3 text-sm font-semibold text-deep-navy">Selected: {selectedMember.name} — {selectedMember.identifier}</p>}
-      {!selectedMember && <p className="mb-3 text-sm text-charcoal/65">Search for and select a member.</p>}
+       {selectedMember && <p className="mb-3 text-sm font-semibold text-deep-navy">Selected: {selectedMember.name} — {selectedMember.identifier}{selectedMember.membershipStatus && <span className="block text-xs font-normal">Member status: {selectedMember.membershipStatus}</span>}</p>}
+       {!selectedMember && <p className="mb-3 text-sm text-charcoal/65">Search, then click a member in the results to select them before saving. A search alone does not select a member.</p>}
       <div role="search" className="flex flex-wrap gap-2">
         <input value={query} onChange={(event) => setQuery(event.target.value)} onKeyDown={handleSearchKeyDown} placeholder="Search by name or member number" aria-label="Search members" className={`${inputClass} min-w-48 flex-1`} />
-        <button type="button" onClick={search} disabled={pending || query.trim().length < 2} className="rounded-lg border border-swcu-blue px-4 py-2 text-sm font-semibold text-swcu-blue disabled:opacity-50">{pending ? "Searching…" : "Search members"}</button>
+         <button type="button" onClick={search} disabled={pending || query.trim().length < 2} className="rounded-lg border border-swcu-blue px-4 py-2 text-sm font-semibold text-swcu-blue focus-visible:outline focus-visible:outline-2 focus-visible:outline-swcu-blue disabled:opacity-50">{pending ? "Searching…" : "Search members"}</button>
       </div>
       {error && <p role="alert" className="mt-3 text-sm font-semibold text-swcu-red">We could not search members. Please try again.</p>}
       {searched && results.length === 0 && <p className="mt-3 text-sm text-charcoal/65">No members found. Try another search.</p>}
-      {results.length > 0 && <ul className="mt-3 divide-y divide-deep-navy/10 rounded-lg border border-deep-navy/10 bg-white">{results.map((member) => <li key={member.id}><button type="button" onClick={() => setSelectedMember(member)} className="w-full px-3 py-2 text-left text-sm hover:bg-swcu-blue/5">{member.name} — {member.identifier}{selectedMember?.id === member.id && <span className="ml-2 font-semibold text-ocean-teal">Selected</span>}</button></li>)}</ul>}
+       {results.length > 0 && <ul className="mt-3 divide-y divide-deep-navy/10 rounded-lg border border-deep-navy/10 bg-white">{results.map((member) => <li key={member.id}><button type="button" onClick={() => setSelectedMember(member)} className="w-full px-3 py-2 text-left text-sm hover:bg-swcu-blue/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-swcu-blue">{member.name} — {member.identifier}{member.membershipStatus && <span className="block text-xs text-charcoal/60">Member status: {member.membershipStatus}</span>}{selectedMember?.id === member.id && <span className="ml-2 font-semibold text-ocean-teal">Selected</span>}</button></li>)}</ul>}
     </div>}
     {!connected && audience === "Individual Member" && <MemberServiceNotice />}
   </div>;

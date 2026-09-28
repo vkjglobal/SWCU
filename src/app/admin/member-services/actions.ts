@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireStaffMembership } from "@/lib/authorise";
 import { getMemberAppAdminClient, MemberAppServiceError } from "@/lib/member-app-admin";
+import { fijiLocalDateTimeToUtcIso } from "@/lib/fiji-time";
 import {
   documentStatuses,
   memberAudiences,
@@ -13,6 +14,7 @@ import {
   requestStatuses,
   type MemberSummary,
 } from "@/lib/member-app-admin-contract";
+import { changedMemberMessage } from "@/lib/member-services-request-message";
 import { requireTenant } from "@/lib/tenant";
 
 const MAX_FILE_BYTES = 10 * 1024 * 1024;
@@ -21,9 +23,6 @@ const ALLOWED_FILE_TYPES = new Set([
   "image/jpeg",
   "image/png",
   "image/webp",
-  "text/plain",
-  "application/msword",
-  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 ]);
 const idSchema = z.string().trim().min(1).max(200)
   .regex(/^(?!\.{1,2}$)[^/\\\u0000-\u001f\u007f]+$/);
@@ -33,16 +32,16 @@ const documentStatusSchema = z.enum(documentStatuses);
 const audienceSchema = z.enum(memberAudiences);
 const requestUpdateSchema = z.object({
   id: idSchema,
-  status: requestStatusSchema,
-  memberMessage: z.string().max(10_000).optional(),
+  status: requestStatusSchema.optional(),
+  memberMessage: z.string().max(2_000).nullable().optional(),
 });
-const internalNoteSchema = z.object({ id: idSchema, note: z.string().trim().min(1).max(10_000) });
+const internalNoteSchema = z.object({ id: idSchema, note: z.string().trim().min(1).max(4_000) });
 const noticeSchema = z.object({
   id: idSchema.optional(),
   title: z.string().trim().min(1).max(250),
   message: z.string().min(1).max(50_000),
   audience: audienceSchema,
-  memberId: idSchema.optional(),
+  memberId: idSchema.nullable().optional(),
   showFrom: z.string().nullable().optional(),
   showUntil: z.string().nullable().optional(),
   status: noticeStatusSchema,
@@ -52,7 +51,7 @@ const documentSchema = z.object({
   title: z.string().trim().min(1).max(250),
   shortDescription: z.string().max(2_000),
   audience: audienceSchema,
-  memberId: idSchema.optional(),
+  memberId: idSchema.nullable().optional(),
   documentType: z.string().trim().min(1).max(150),
   availableFrom: z.string().nullable().optional(),
   availableUntil: z.string().nullable().optional(),
@@ -87,24 +86,12 @@ function readOptionalDate(formData: FormData, key: string): string | null | unde
   const value = formData.get(key);
   if (value === null) return undefined;
   if (value === "") return null;
-  if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(value)) {
-    throw new Error("Invalid date.");
+  if (typeof value !== "string") throw new Error("Invalid date.");
+  try {
+    return fijiLocalDateTimeToUtcIso(value);
+  } catch {
+    throw new Error("Enter a valid date and time in Fiji time.");
   }
-  const parsed = new Date(value);
-  const [datePart, timePart] = value.split("T");
-  const [year, month, day] = datePart.split("-").map(Number);
-  const [hour, minute] = timePart.split(":").map(Number);
-  if (
-    !Number.isFinite(parsed.getTime()) ||
-    parsed.getFullYear() !== year ||
-    parsed.getMonth() !== month - 1 ||
-    parsed.getDate() !== day ||
-    parsed.getHours() !== hour ||
-    parsed.getMinutes() !== minute
-  ) {
-    throw new Error("Invalid date.");
-  }
-  return parsed.toISOString();
 }
 
 function validateDateRange(start?: string | null, end?: string | null): void {
@@ -139,7 +126,11 @@ function formFailure(error: unknown): { error: string } {
   if (error instanceof MemberAppServiceError && error.code === "disconnected") {
     return { error: "Member App service is not connected. Please contact support." };
   }
-  return { error: "We could not save this change. Check the submitted details and try again." };
+  if (error instanceof z.ZodError) return { error: "Check the submitted details and try again." };
+  if (error instanceof Error && error.message === "Choose a member for an individual audience.") return { error: error.message };
+  if (error instanceof Error && error.message === "A file is not supported for metadata-only edits.") return { error: error.message };
+  if (error instanceof Error && error.message === "Enter a valid date and time in Fiji time.") return { error: error.message };
+  return { error: "We could not save this change. Please try again." };
 }
 
 function isNextControlFlow(error: unknown): boolean {
@@ -157,56 +148,39 @@ function checkedAudienceTarget(audience: string, memberId?: string) {
     if (!memberId) throw new Error("Choose a member for an individual audience.");
     return { audience: validatedAudience, memberId: idSchema.parse(memberId) };
   }
-  return { audience: validatedAudience };
+  return { audience: validatedAudience, memberId: null };
 }
 
-function checkedSignedAccessUrl(value: string): string {
-  let url: URL;
+export async function updateMemberRequestAction(_previous: { error?: string }, formData: FormData): Promise<{ error?: string }> {
   try {
-    url = new URL(value);
-  } catch {
-    throw new Error("Invalid attachment link.");
-  }
-  if (url.protocol !== "https:") throw new Error("Invalid attachment link.");
-
-  const params = new Map<string, string>();
-  url.searchParams.forEach((item, key) => params.set(key.toLowerCase(), item));
-  const now = Date.now();
-  let expiresAt: number | undefined;
-  const signedAt = params.get("x-amz-date");
-  const signedDuration = params.get("x-amz-expires");
-  if (signedAt && signedDuration && /^\d+$/.test(signedDuration)) {
-    const parsedSignedAt = Date.parse(`${signedAt.slice(0, 4)}-${signedAt.slice(4, 6)}-${signedAt.slice(6, 8)}T${signedAt.slice(9, 11)}:${signedAt.slice(11, 13)}:${signedAt.slice(13, 15)}Z`);
-    expiresAt = parsedSignedAt + Number(signedDuration) * 1000;
-  } else {
-    const expiry = params.get("expiresat") ?? params.get("expires_at") ?? params.get("expires") ?? params.get("exp") ?? params.get("se");
-    if (expiry) {
-      const numeric = Number(expiry);
-      expiresAt = Number.isFinite(numeric)
-        ? (numeric < 10_000_000_000 ? numeric * 1000 : numeric)
-        : Date.parse(expiry);
+    const client = await getAuthorizedClient();
+    const selectedStatus = readOptionalText(formData, "status");
+    const initialStatus = readOptionalText(formData, "initialStatus");
+    const status = selectedStatus && selectedStatus !== initialStatus ? selectedStatus : "";
+    const memberMessage = changedMemberMessage(
+      readText(formData, "initialMemberMessage"),
+      readText(formData, "memberMessage"),
+    );
+    const values = requestUpdateSchema.parse({
+      id: readText(formData, "id"),
+      ...(status ? { status } : {}),
+      ...(memberMessage !== undefined ? { memberMessage } : {}),
+    });
+    if (!values.status && values.memberMessage === undefined) return { error: "Make a status or member-message change before saving." };
+    const saved = await client.updateRequest(values.id, {
+      ...(values.status ? { status: values.status } : {}),
+      ...(values.memberMessage !== undefined ? { memberMessage: values.memberMessage } : {}),
+    });
+    if (values.memberMessage !== undefined && saved.memberMessage !== values.memberMessage) {
+      revalidateMemberServicePages(`/admin/member-requests/${encodeURIComponent(values.id)}`);
+      return { error: "The member message was not confirmed. Refresh and try again." };
     }
+    revalidateMemberServicePages(`/admin/member-requests/${encodeURIComponent(values.id)}`);
+    redirect(`/admin/member-requests/${encodeURIComponent(values.id)}?updated=1`);
+  } catch (error) {
+    if (isNextControlFlow(error)) throw error;
+    return formFailure(error);
   }
-  if (!expiresAt || !Number.isFinite(expiresAt) || expiresAt <= now || expiresAt > now + 15 * 60 * 1000) {
-    throw new Error("Attachment link is not short-lived.");
-  }
-  return url.toString();
-}
-
-export async function updateMemberRequestAction(formData: FormData): Promise<void> {
-  const client = await getAuthorizedClient();
-  const changeMemberMessage = formData.get("changeMemberMessage") === "on";
-  const values = requestUpdateSchema.parse({
-    id: readText(formData, "id"),
-    status: readText(formData, "status"),
-    ...(changeMemberMessage ? { memberMessage: readText(formData, "memberMessage") } : {}),
-  });
-  await client.updateRequest(values.id, {
-    status: values.status,
-    ...(changeMemberMessage ? { memberMessage: values.memberMessage } : {}),
-  });
-  revalidateMemberServicePages(`/admin/member-requests/${encodeURIComponent(values.id)}`);
-  redirect(`/admin/member-requests/${encodeURIComponent(values.id)}`);
 }
 
 export async function searchMemberTargetsAction(query: string): Promise<MemberSummary[]> {
@@ -222,23 +196,20 @@ export async function searchMemberTargetsAction(query: string): Promise<MemberSu
   }
 }
 
-export async function addMemberInternalNoteAction(formData: FormData): Promise<void> {
-  const client = await getAuthorizedClient();
-  const values = internalNoteSchema.parse({
-    id: readText(formData, "id"),
-    note: readText(formData, "note"),
-  });
-  await client.addInternalNote(values.id, values.note);
-  revalidateMemberServicePages(`/admin/member-requests/${encodeURIComponent(values.id)}`);
-  redirect(`/admin/member-requests/${encodeURIComponent(values.id)}`);
-}
-
-export async function openMemberAttachmentAction(formData: FormData): Promise<void> {
-  const client = await getAuthorizedClient();
-  const requestId = idSchema.parse(readText(formData, "requestId"));
-  const attachmentId = idSchema.parse(readText(formData, "attachmentId"));
-  const accessUrl = checkedSignedAccessUrl(await client.getAttachmentAccess(requestId, attachmentId));
-  redirect(accessUrl);
+export async function addMemberInternalNoteAction(_previous: { error?: string }, formData: FormData): Promise<{ error?: string }> {
+  try {
+    const client = await getAuthorizedClient();
+    const values = internalNoteSchema.parse({
+      id: readText(formData, "id"),
+      note: readText(formData, "note"),
+    });
+    await client.addInternalNote(values.id, values.note);
+    revalidateMemberServicePages(`/admin/member-requests/${encodeURIComponent(values.id)}`);
+    redirect(`/admin/member-requests/${encodeURIComponent(values.id)}?noted=1`);
+  } catch (error) {
+    if (isNextControlFlow(error)) throw error;
+    return formFailure(error);
+  }
 }
 
 export async function saveMemberNoticeAction(
@@ -261,22 +232,26 @@ export async function saveMemberNoticeAction(
       status: readText(formData, "status"),
     });
     validateDateRange(values.showFrom, values.showUntil);
-    const file = readUpload(formData, false);
+    const submittedFile = formData.get("file");
+    if (id && submittedFile !== null) throw new Error("A file is not supported for metadata-only edits.");
+    const file = id ? undefined : readUpload(formData, false);
     const payload = {
       title: values.title,
       message: values.message,
       audience: values.audience,
-      ...(values.memberId ? { memberId: values.memberId } : {}),
+       ...(values.memberId !== undefined ? { memberId: values.memberId } : {}),
       ...(values.showFrom !== undefined ? { showFrom: values.showFrom } : {}),
       ...(values.showUntil !== undefined ? { showUntil: values.showUntil } : {}),
       status: values.status,
-      ...(file ? { attachment: file } : {}),
+       ...(!values.id && file ? { attachment: file } : {}),
     };
     const saved = values.id
       ? await client.updateNotice(values.id, payload)
       : await client.createNotice(payload);
     revalidateMemberServicePages(`/admin/member-notices/${encodeURIComponent(saved.id)}`);
-    redirect("/admin/member-notices");
+    redirect(values.id
+      ? `/admin/member-notices/${encodeURIComponent(saved.id)}?saved=1`
+      : "/admin/member-notices");
   } catch (error) {
     if (isNextControlFlow(error)) throw error;
     return formFailure(error);
@@ -304,22 +279,26 @@ export async function saveMemberDocumentAction(
       status: readText(formData, "status"),
     });
     validateDateRange(values.availableFrom, values.availableUntil);
-    const file = readUpload(formData, !values.id);
+    const submittedFile = formData.get("file");
+    if (values.id && submittedFile !== null) throw new Error("A file is not supported for metadata-only edits.");
+    const file = values.id ? undefined : readUpload(formData, true);
     const payload = {
       title: values.title,
       shortDescription: values.shortDescription,
       audience: values.audience,
-      ...(values.memberId ? { memberId: values.memberId } : {}),
+      ...(values.memberId !== undefined ? { memberId: values.memberId } : {}),
       documentType: values.documentType,
       ...(values.availableFrom !== undefined ? { availableFrom: values.availableFrom } : {}),
       ...(values.availableUntil !== undefined ? { availableUntil: values.availableUntil } : {}),
       status: values.status,
     };
     const saved = values.id
-      ? await client.updateDocument(values.id, payload, file)
+      ? await client.updateDocument(values.id, payload)
       : await client.createDocument(payload, file!);
     revalidateMemberServicePages(`/admin/member-documents/${encodeURIComponent(saved.id)}`);
-    redirect("/admin/member-documents");
+    redirect(values.id
+      ? `/admin/member-documents/${encodeURIComponent(saved.id)}?saved=1`
+      : "/admin/member-documents");
   } catch (error) {
     if (isNextControlFlow(error)) throw error;
     return formFailure(error);
