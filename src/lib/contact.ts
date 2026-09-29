@@ -1,10 +1,12 @@
 import "server-only";
 
+import { createHash } from "node:crypto";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import type { ResolvedTenant } from "@/lib/tenant";
 import { hasPublishedPrivacy } from "@/lib/public-data";
 import { getServerEnvironment } from "@/lib/env";
+import { CONTACT_UNAVAILABLE_MESSAGE, CONTACT_VERIFICATION_MESSAGE, getTurnstileConfiguration, verifyContactTurnstile } from "@/lib/turnstile";
 
 export const CONTACT_SUBJECTS = [
   "Membership", "Loans", "Savings", "Forms & Documents",
@@ -12,18 +14,22 @@ export const CONTACT_SUBJECTS = [
 ] as const;
 
 const contactSchema = z.object({
-  name: z.string().trim().min(2).max(160),
-  email: z.string().trim().email().max(320),
-  phone: z.string().trim().max(80).optional().default(""),
+  name: z.string().trim().min(2).max(100),
+  email: z.string().trim().email().max(254),
+  phone: z.string().trim().max(50).optional().default(""),
   subject: z.enum(CONTACT_SUBJECTS),
   message: z.string().trim().min(0).max(4000),
   privacyAcknowledged: z.literal(true),
   website: z.string().max(0).optional().default(""),
+  turnstileToken: z.string().min(1).max(2048),
 }).superRefine((value, context) => {
   if (value.subject !== "Request a Call Back" && value.message.length < 5) context.addIssue({ code: "custom", path: ["message"], message: "Please provide at least 5 characters." });
 });
 
 export type ContactInput = z.input<typeof contactSchema>;
+export class ContactError extends Error {
+  constructor(message: string, readonly status: number) { super(message); }
+}
 
 export type ContactNotificationStatus = "SKIPPED_NO_RECIPIENT" | "SKIPPED_NO_PROVIDER" | "SENT" | "FAILED";
 type ContactNotificationResult = { status: ContactNotificationStatus; message: string };
@@ -49,9 +55,9 @@ export function parseContactRecipientsForm(form: FormData) {
   return contactRecipientsSchema.parse(form.get("notificationRecipients")?.toString() ?? "");
 }
 
-export async function handleContactPost(tenant: ResolvedTenant, body: unknown, ipAddress: string) {
+export async function handleContactPost(tenant: ResolvedTenant, body: unknown, ipAddress: string, hostname = "") {
   if (!body || typeof body !== "object") throw new Error("Invalid request.");
-  return submitContactEnquiry({ tenant, value: body as ContactInput, ipAddress });
+  return submitContactEnquiry({ tenant, value: body as ContactInput, ipAddress, hostname });
 }
 
 export async function updateContactStatus(input: { tenant: ResolvedTenant; actorUserId: string; id: string; status: "NEW" | "BEING_HANDLED" | "CLOSED"; note: string }) {
@@ -76,13 +82,17 @@ export async function openContactEnquiry(input: { tenant: ResolvedTenant; actorU
 }
 
 function keyFor(tenantId: string, ip: string) {
-  return `${tenantId}:${ip || "unknown"}`;
+  // A keyed lookup without permanently retaining an IP address in the database.
+  return `${tenantId}:${createHash("sha256").update(`contact-v2\0${tenantId}\0${ip}`).digest("hex")}`;
 }
 
 async function takeContactRateLimit(tenantId: string, ip: string) {
+  // When the reverse proxy is not trusted/configured, Turnstile stays mandatory;
+  // do not make one global "unknown" bucket deny service to legitimate visitors.
+  if (!ip) return true;
   const now = new Date();
-  const windowMs = 15 * 60 * 1000;
-  const blockedMs = 15 * 60 * 1000;
+  const windowMs = 10 * 60 * 1000;
+  const blockedMs = 10 * 60 * 1000;
   return db.$transaction(async (tx) => {
     const key = keyFor(tenantId, ip);
     await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${key}, 0))`;
@@ -97,7 +107,7 @@ async function takeContactRateLimit(tenantId: string, ip: string) {
         windowStart: inWindow ? previous.windowStart : now,
         blockedUntil: attempts >= 5 ? new Date(now.getTime() + blockedMs) : null,
       },
-      create: { key, tenantId, ipAddress: ip || null, attempts, windowStart: now, blockedUntil: attempts >= 5 ? new Date(now.getTime() + blockedMs) : null },
+      create: { key, tenantId, ipAddress: null, attempts, windowStart: now, blockedUntil: attempts >= 5 ? new Date(now.getTime() + blockedMs) : null },
     });
     return attempts <= 5;
   });
@@ -107,7 +117,10 @@ export async function submitContactEnquiry(input: {
   tenant: ResolvedTenant;
   value: ContactInput;
   ipAddress?: string;
-}, dependencies: { notify?: ContactNotifier } = {}) {
+  hostname?: string;
+}, dependencies: { notify?: ContactNotifier; verifyTurnstile?: typeof verifyContactTurnstile } = {}) {
+  const configuration = getTurnstileConfiguration();
+  if (!configuration) throw new ContactError(CONTACT_UNAVAILABLE_MESSAGE, 503);
   const parsed = contactSchema.safeParse(input.value);
   if (!parsed.success) throw new Error("Please check the highlighted contact form fields.");
   if (parsed.data.subject === "Request a Call Back" && !parsed.data.phone.trim()) {
@@ -117,7 +130,10 @@ export async function submitContactEnquiry(input: {
     throw new Error("Contact enquiries are temporarily unavailable until the published Privacy information is ready.");
   }
   if (!(await takeContactRateLimit(input.tenant.id, input.ipAddress ?? ""))) {
-    throw new Error("Please wait before sending another enquiry.");
+    throw new ContactError("Too many enquiries have been sent. Please wait a little and try again.", 429);
+  }
+  if (!(await (dependencies.verifyTurnstile ?? verifyContactTurnstile)(parsed.data.turnstileToken, input.hostname ?? "", configuration))) {
+    throw new ContactError(CONTACT_VERIFICATION_MESSAGE, 400);
   }
 
   const submission = await db.$transaction(async (tx) => {

@@ -3,11 +3,53 @@
 import { ChevronDown, Menu, X, Phone, Mail, MapPin, ArrowRight, UserRound, LogIn, MessageCircle } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import type { FormEvent } from "react";
 import { sanitizeRichText } from "@/lib/rich-text";
 import { formatLocalTelephone, formatTelephone, telephoneHref } from "@/lib/public-links";
+
+type TurnstileApi = {
+  render: (container: HTMLElement, options: {
+    sitekey: string;
+    action: string;
+    callback: (token: string) => void;
+    "expired-callback": () => void;
+    "error-callback": () => void;
+  }) => string;
+  reset: (widgetId?: string) => void;
+};
+
+declare global {
+  interface Window {
+    turnstile?: TurnstileApi;
+  }
+}
+
+let turnstileScriptPromise: Promise<TurnstileApi> | undefined;
+
+function loadTurnstile(): Promise<TurnstileApi> {
+  if (window.turnstile) return Promise.resolve(window.turnstile);
+  if (turnstileScriptPromise) return turnstileScriptPromise;
+
+  turnstileScriptPromise = new Promise<TurnstileApi>((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+    script.async = true;
+    script.defer = true;
+    script.onload = () => {
+      if (window.turnstile) resolve(window.turnstile);
+      else reject(new Error("The security check could not be initialized."));
+    };
+    script.onerror = () => reject(new Error("The security check could not be loaded."));
+    document.head.appendChild(script);
+  }).catch((error: unknown) => {
+    turnstileScriptPromise = undefined;
+    throw error;
+  });
+
+  return turnstileScriptPromise;
+}
 
 export function PublicHeader({ memberAppHref = "/member-login" }: { memberAppHref?: string }) {
   const [open, setOpen] = useState(false);
@@ -61,9 +103,67 @@ export function PublicFooter({ contact, published }: { contact: { organisationNa
    return <footer className="border-t-4 border-swcu-red bg-deep-navy pb-24 text-white md:pb-0"><div className="site-container grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-4"><div><div className="inline-flex overflow-hidden rounded-lg bg-white p-2"><Image src="/brand/swcu/swcu-logo-white-footer.png" alt="Service Worker Credit Union" width={1804} height={1206} className="h-auto w-32" /></div><p className="mt-3 max-w-xs text-sm text-white/75"><span className="block">Save with confidence. Borrow with purpose.</span><span className="block">A member-owned credit union in Fiji.</span></p></div><div><p className="font-heading font-semibold">Member Services</p><div className="mt-3 grid gap-2 text-sm text-white/75"><Link href="/membership-services#membership">Membership</Link><Link href="/membership-services#savings">Savings</Link><Link href="/membership-services#loans">Loans</Link></div></div><div><p className="font-heading font-semibold">Resources</p><div className="mt-3 grid gap-2 text-sm text-white/75"><Link href="/forms-resources">Forms & Resources</Link><Link href="/about-swcu">About SWCU</Link><Link href="/contact">Contact</Link></div></div><div><p className="font-heading font-semibold">Contact</p>{contact && <div className="mt-3 grid gap-2 text-sm text-white/75"><span className="flex gap-2"><MapPin size={16}/><span>{contact.streetAddress}<br/>{contact.postalAddress}</span></span><a className="flex gap-2" href={telephoneHref(contact.telephone)}><Phone size={16}/>Digicel: {formatLocalTelephone(contact.telephone)}</a>{contact.secondaryTelephone && <a className="flex gap-2" href={telephoneHref(contact.secondaryTelephone)}><Phone size={16}/>Vodafone: {formatLocalTelephone(contact.secondaryTelephone)}</a>}<a className="flex gap-2" href={`mailto:${contact.publicEmail}`}><Mail size={16}/>{contact.publicEmail}</a></div>}</div></div><div className="border-t border-white/10"><div className="site-container py-5 text-sm text-white/75"><p className="font-heading font-semibold text-white">Important Information</p><div className="mt-4 flex flex-wrap gap-4">{published.privacy && <Link href="/privacy">Privacy</Link>}{published.terms && <Link href="/terms-of-use">Terms of Use</Link>}{published.accessibility && <Link href="/accessibility">Accessibility</Link>}{published.importantInformation && <Link href="/important-information">Important Information</Link>}</div></div></div></footer>;
 }
 
-export function ContactForm({ subjects }: { subjects: readonly string[] }) {
+export function ContactForm({ subjects, siteKey }: { subjects: readonly string[]; siteKey: string }) {
   const [state, setState] = useState<"idle"|"sending"|"success"|"error">("idle"); const [message, setMessage] = useState(""); const [subject, setSubject] = useState(subjects[0] ?? "");
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [turnstileError, setTurnstileError] = useState("");
+  const widgetContainer = useRef<HTMLDivElement>(null);
+  const widgetId = useRef<string | undefined>(undefined);
   const callbackRequested = subject === "Request a Call Back";
-  async function submit(event: FormEvent<HTMLFormElement>) { event.preventDefault(); setState("sending"); setMessage(""); const formElement = event.currentTarget; const form = new FormData(formElement); const value = Object.fromEntries(form.entries()); try { const res = await fetch("/api/contact", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({...value, privacyAcknowledged: form.get("privacyAcknowledged") === "on"}) }); const data = await res.json(); if (!res.ok) throw new Error(data.error); setState("success"); setMessage(`Your enquiry has been received. Reference: ${data.reference}`); formElement.reset(); } catch (e) { setState("error"); setMessage(e instanceof Error ? e.message : "Unable to send your enquiry."); } }
-  return <form onSubmit={submit} className="grid gap-5 rounded-2xl bg-soft-blue-grey p-6 md:p-8"><div className="grid gap-5 sm:grid-cols-2"><label className="grid gap-2 font-semibold">Name<input required name="name" aria-required="true" className="min-h-12 rounded-xl border border-deep-navy/15 bg-white px-4" /></label><label className="grid gap-2 font-semibold">Email<input required type="email" name="email" aria-required="true" className="min-h-12 rounded-xl border border-deep-navy/15 bg-white px-4" /></label></div><label className="grid gap-2 font-semibold">Phone <span className="text-sm font-normal text-charcoal/60">{callbackRequested ? "required for a call back" : "optional"}</span><input required={callbackRequested} aria-required={callbackRequested} name="phone" className="min-h-12 rounded-xl border border-deep-navy/15 bg-white px-4" /></label><label className="grid gap-2 font-semibold">Subject<select required name="subject" value={subject} onChange={(event) => setSubject(event.target.value)} aria-required="true" className="min-h-12 rounded-xl border border-deep-navy/15 bg-white px-4">{subjects.map(s=><option key={s}>{s}</option>)}</select></label><label className="grid gap-2 font-semibold">Message <span className="text-sm font-normal text-charcoal/60">{callbackRequested ? "optional for a call back request" : "required"}</span><textarea required={!callbackRequested} minLength={callbackRequested ? undefined : 5} aria-required={!callbackRequested} name="message" rows={5} className="rounded-xl border border-deep-navy/15 bg-white p-4"/></label><label className="flex gap-3 text-sm"><input required type="checkbox" name="privacyAcknowledged" className="mt-1 size-4"/><span>I acknowledge the published Privacy information.</span></label><input name="website" tabIndex={-1} autoComplete="off" className="hidden"/><button disabled={state==="sending"} className="button-primary w-fit">{state==="sending" ? "Sending…" : "Send enquiry"}</button>{message && <p role={state==="error"?"alert":"status"} className={state==="error"?"text-swcu-red":"text-ocean-teal"}>{message}</p>}</form>;
+  useEffect(() => {
+    let active = true;
+    loadTurnstile().then((turnstile) => {
+      if (!active || !widgetContainer.current) return;
+      widgetId.current = turnstile.render(widgetContainer.current, {
+        sitekey: siteKey,
+        action: "contact",
+        callback: (token) => {
+          setTurnstileToken(token);
+          setTurnstileError("");
+        },
+        "expired-callback": () => {
+          setTurnstileToken("");
+          setTurnstileError("The security check expired. Please complete it again.");
+        },
+        "error-callback": () => {
+          setTurnstileToken("");
+          setTurnstileError("The security check could not be completed. Please refresh the page and try again.");
+        },
+      });
+    }).catch((error: unknown) => {
+      if (active) setTurnstileError(error instanceof Error ? error.message : "The security check could not be loaded.");
+    });
+    return () => {
+      active = false;
+    };
+  }, [siteKey]);
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!turnstileToken || state === "sending") return;
+    setState("sending");
+    setMessage("");
+    const formElement = event.currentTarget;
+    const form = new FormData(formElement);
+    const value = Object.fromEntries(form.entries());
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({...value, privacyAcknowledged: form.get("privacyAcknowledged") === "on", turnstileToken}),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      setState("success");
+      setMessage(`Your enquiry has been received. Reference: ${data.reference}`);
+      formElement.reset();
+    } catch (e) {
+      setState("error");
+      setMessage(e instanceof Error ? e.message : "Unable to send your enquiry.");
+    } finally {
+      setTurnstileToken("");
+      setTurnstileError("");
+      if (widgetId.current && window.turnstile) window.turnstile.reset(widgetId.current);
+    }
+  }
+  return <form onSubmit={submit} className="grid gap-5 rounded-2xl bg-soft-blue-grey p-6 md:p-8"><div className="grid gap-5 sm:grid-cols-2"><label className="grid gap-2 font-semibold">Name<input required name="name" aria-required="true" className="min-h-12 rounded-xl border border-deep-navy/15 bg-white px-4" /></label><label className="grid gap-2 font-semibold">Email<input required type="email" name="email" aria-required="true" className="min-h-12 rounded-xl border border-deep-navy/15 bg-white px-4" /></label></div><label className="grid gap-2 font-semibold">Phone <span className="text-sm font-normal text-charcoal/60">{callbackRequested ? "required for a call back" : "optional"}</span><input required={callbackRequested} aria-required={callbackRequested} name="phone" className="min-h-12 rounded-xl border border-deep-navy/15 bg-white px-4" /></label><label className="grid gap-2 font-semibold">Subject<select required name="subject" value={subject} onChange={(event) => setSubject(event.target.value)} aria-required="true" className="min-h-12 rounded-xl border border-deep-navy/15 bg-white px-4">{subjects.map(s=><option key={s}>{s}</option>)}</select></label><label className="grid gap-2 font-semibold">Message <span className="text-sm font-normal text-charcoal/60">{callbackRequested ? "optional for a call back request" : "required"}</span><textarea required={!callbackRequested} minLength={callbackRequested ? undefined : 5} aria-required={!callbackRequested} name="message" rows={5} className="rounded-xl border border-deep-navy/15 bg-white p-4"/></label><label className="flex gap-3 text-sm"><input required type="checkbox" name="privacyAcknowledged" className="mt-1 size-4"/><span>I acknowledge the published Privacy information.</span></label><input name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" className="hidden"/><div className="min-w-0"><div ref={widgetContainer} className="max-w-full"/>{turnstileError && <p role="alert" className="mt-2 text-sm text-swcu-red">{turnstileError}</p>}</div><button disabled={state==="sending" || !turnstileToken} className="button-primary w-fit">{state==="sending" ? "Sending…" : "Send enquiry"}</button>{message && <p role={state==="error"?"alert":"status"} className={state==="error"?"text-swcu-red":"text-ocean-teal"}>{message}</p>}</form>;
 }

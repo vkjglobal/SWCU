@@ -10,11 +10,11 @@ let assertions = 0;
 const suffix = Date.now().toString(36);
 let fixtureHost = "";
 function assert(ok: boolean, message: string) { if (!ok) throw new Error(`HTTP 3B assertion failed: ${message}`); assertions++; }
-function http(port: number, path: string, method: string, host: string, body?: unknown) {
+function http(port: number, path: string, method: string, host: string, body?: unknown, origin?: string) {
   return new Promise<{ status: number; headers: Record<string, string | string[] | undefined>; body: string }>((resolve, reject) => {
     const payload = body === undefined ? undefined : JSON.stringify(body);
     const effectiveHost = host === "www.swcu.finance" && fixtureHost ? fixtureHost : host;
-    const req = request({ hostname: "127.0.0.1", port, path, method, headers: { Host: effectiveHost, "x-forwarded-host": effectiveHost, "x-forwarded-for": `qa-http-${Date.now()}-${Math.random()}`, ...(payload ? { "content-type": "application/json", "content-length": Buffer.byteLength(payload) } : {}) } }, (res) => {
+    const req = request({ hostname: "127.0.0.1", port, path, method, headers: { Host: effectiveHost, "x-forwarded-host": effectiveHost, "x-forwarded-for": `qa-http-${Date.now()}-${Math.random()}`, ...(origin ? { origin } : {}), ...(payload ? { "content-type": "application/json", "content-length": Buffer.byteLength(payload) } : {}) } }, (res) => {
       const chunks: Buffer[] = []; res.on("data", (chunk) => chunks.push(chunk)); res.on("end", () => resolve({ status: res.statusCode ?? 0, headers: res.headers, body: Buffer.concat(chunks).toString() }));
     });
     req.on("error", reject); if (payload) req.write(payload); req.end();
@@ -65,12 +65,18 @@ async function main() {
     await db.contactSettings.update({ where: { id: contactSettings.id }, data: { contactMapMediaAssetId: mapImage.id } });
     const annual = await db.formDocument.create({ data: { tenantId: tenant.id, title: "HTTP QA Annual", category: "ANNUAL_REPORT", isAnnualReport: true, isEnabled: true, mediaAssetId: pdf.id } }); createdDocs.push(annual.id);
     const leader = await db.leadershipRecord.create({ data: { tenantId: tenant.id, name: "HTTP QA", title: "QA", group: "QA", isEnabled: true, isPublished: true, mediaAssetId: image.id } }); createdLeadership.push(leader.id);
-    let response = await http(port, "/api/contact", "POST", "www.swcu.finance", { name: "HTTP Callback", email: "http@example.com", phone: "6797000000", subject: "Request a Call Back", message: "", privacyAcknowledged: true, website: "" }); const createdReference = JSON.parse(response.body).reference; if (createdReference) createdRefs.push(createdReference); assert(response.status === 201 && createdReference, `contact callback 201/reference status=${response.status} error=${JSON.parse(response.body).error ?? "none"}`);
+    const contactBody = { name: "HTTP Callback", email: "http@example.com", phone: "6797000000", subject: "Request a Call Back", message: "", privacyAcknowledged: true, website: "", turnstileToken: "qa-dummy-token" };
+    let response = await http(port, "/api/contact", "POST", "www.swcu.finance", contactBody, `http://${fixtureHost}`);
+    const createdReference = JSON.parse(response.body).reference; if (createdReference) createdRefs.push(createdReference); assert(response.status === 201 && createdReference, `contact callback 201/reference status=${response.status} error=${JSON.parse(response.body).error ?? "none"}`);
+    response = await http(port, "/api/contact", "POST", "www.swcu.finance", { ...contactBody, email: "cross-origin@example.com" }, "https://attacker.invalid"); assert(response.status === 403, "cross-origin contact is rejected");
+    const missingTokenBody: Record<string, unknown> = { ...contactBody };
+    delete missingTokenBody.turnstileToken;
+    response = await http(port, "/api/contact", "POST", "www.swcu.finance", missingTokenBody, `http://${fixtureHost}`); assert(response.status === 400, "contact requires a Turnstile token");
     await db.pageContent.update({ where: { tenantId_slot: { tenantId: tenant.id, slot: "PRIVACY" } }, data: { isPublished: false } });
-    response = await http(port, "/api/contact", "POST", "www.swcu.finance", { name: "HTTP Callback", email: "http@example.com", phone: "6797000000", subject: "Request a Call Back", message: "", privacyAcknowledged: true, website: "" }); assert(response.status === 400, "privacy-off contact rejection");
+    response = await http(port, "/api/contact", "POST", "www.swcu.finance", { ...contactBody, email: "privacy-off@example.com" }, `http://${fixtureHost}`); assert(response.status === 400, "privacy-off contact rejection");
     await db.pageContent.update({ where: { tenantId_slot: { tenantId: tenant.id, slot: "PRIVACY" } }, data: { body: "HTTP QA privacy", isPublished: true, publishedAt: new Date() } });
-    response = await http(port, "/api/contact", "POST", "www.swcu.finance", { name: "HTTP Invalid", email: "invalid", subject: "Membership", message: "hello", privacyAcknowledged: true, website: "" }); assert(response.status === 400, "invalid contact rejection");
-    response = await http(port, "/api/contact", "POST", "www.swcu.finance", { name: "HTTP Bot", email: "http@example.com", subject: "Membership", message: "hello", privacyAcknowledged: true, website: "bot" }); assert(response.status === 400, "honeypot contact rejection");
+    response = await http(port, "/api/contact", "POST", "www.swcu.finance", { name: "HTTP Invalid", email: "invalid", subject: "Membership", message: "hello", privacyAcknowledged: true, website: "", turnstileToken: "qa-dummy-token" }, `http://${fixtureHost}`); assert(response.status === 400, "invalid contact rejection");
+    response = await http(port, "/api/contact", "POST", "www.swcu.finance", { ...contactBody, email: "bot@example.com", website: "bot" }, `http://${fixtureHost}`); assert(response.status === 400, "honeypot contact rejection");
     response = await http(port, `/api/media/${pdf.id}`, "GET", "www.swcu.finance"); assert(response.status === 404, "annual unapproved 404");
     await db.formDocument.update({ where: { id: annual.id }, data: { publicApprovedAt: new Date() } });
     response = await http(port, `/api/media/${pdf.id}`, "GET", "www.swcu.finance"); assert(response.status === 404, "annual approved remains private");

@@ -1,6 +1,6 @@
 import { db } from "../src/lib/db";
 import { getPublishedPageContent, getPublishedLeadership, getPublishedRates, getCalculatorSettings, hasPublishedPrivacy, getPublicContactSettings, getPublishedResources } from "../src/lib/public-data";
-import { submitContactEnquiry, handleContactPost, notifyContact, updateContactStatus, openContactEnquiry, parseContactRecipientsForm } from "../src/lib/contact";
+import { submitContactEnquiry, notifyContact, updateContactStatus, openContactEnquiry, parseContactRecipientsForm } from "../src/lib/contact";
 import { CmsDraftKind, CmsDraftOperation } from "../src/generated/prisma/client";
 import { createCmsDraft, submitCmsDraft, publishCmsDraft } from "../src/lib/cms-workflow";
 import { uploadDocument } from "../src/lib/media-service";
@@ -13,10 +13,13 @@ const qaContactReferences = new Set<string>();
 const qaDraftIds = new Set<string>();
 const qaObjectKeys = new Set<string>();
 const qaMediaIds = new Set<string>();
-const qaRateKeys = new Set<string>();
 const suffix = Date.now().toString(36);
 let fixtureTenantId: string | undefined;
 const fixtureActorIds = new Set<string>();
+const previousTurnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+const previousTurnstileSecretKey = process.env.TURNSTILE_SECRET_KEY;
+const previousNodeEnv = process.env.NODE_ENV;
+const mutableEnvironment = process.env as Record<string, string | undefined>;
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(`Prompt 3B assertion failed: ${message}`);
   assertions += 1;
@@ -96,7 +99,11 @@ async function runAssertions() {
   const clearRecipientsForm = new FormData();
   clearRecipientsForm.set("notificationRecipients", "");
   assert(parseContactRecipientsForm(clearRecipientsForm).length === 0, "recipient FormData clear parser");
-  const callbackIp = `prompt3b-callback-${Date.now()}`; qaRateKeys.add(`${tenant.id}:${callbackIp}`); const callback = await handleContactPost(tenant, { name: "QA Callback", email: "callback@example.com", phone: "6797000000", subject: "Request a Call Back", message: "", privacyAcknowledged: true, website: "" }, callbackIp); qaContactReferences.add(callback.reference);
+  const callbackIp = `prompt3b-callback-${Date.now()}`;
+  const callback = await submitContactEnquiry(
+    { tenant, ipAddress: callbackIp, hostname: fixtureHostname, value: { name: "QA Callback", email: "callback@example.com", phone: "6797000000", subject: "Request a Call Back", message: "", privacyAcknowledged: true, website: "", turnstileToken: "qa-dummy-token" } },
+    { verifyTurnstile: async () => true },
+  ); qaContactReferences.add(callback.reference);
   assert(Boolean(callback.reference), "API boundary accepts empty callback message");
   await db.contactSubmission.deleteMany({ where: { tenantId: tenant.id, reference: callback.reference } });
   const configuration = { apiKey: "qa-provider-key", fromEmail: "website@swcu.finance", fromName: "SWCU Website" };
@@ -132,9 +139,9 @@ async function runAssertions() {
   assert((await notifyContact({ recipients: ["admin@example.com"], reference: "SWCU-C-NOCONFIG", subject: "Other" }, { configuration: {}, fetch: skippedFetch })).status === "SKIPPED_NO_PROVIDER" && !skippedFetchCalled, "missing SendGrid configuration skips provider");
   assert((await notifyContact({ recipients: ["admin@example.com"], reference: "SWCU-C-FAIL", subject: "Loans" }, { configuration, fetch: (async () => new Response("failure", { status: 500 })) as typeof fetch })).status === "FAILED", "SendGrid non-2xx response reports failed");
   assert((await notifyContact({ recipients: ["admin@example.com"], reference: "SWCU-C-ERROR", subject: "Savings" }, { configuration, fetch: (async () => { throw new Error("provider unavailable"); }) as typeof fetch })).status === "FAILED", "SendGrid network error reports failed");
-  const successIp = `prompt3b-success-${Date.now()}`; qaRateKeys.add(`${tenant.id}:${successIp}`); const contactResult = await submitContactEnquiry(
-    { tenant, ipAddress: successIp, value: { name: "QA Member", email: "qa@example.com", phone: "6797000000", subject: "Membership", message: "A safe enquiry for the QA inbox.", privacyAcknowledged: true, website: "" } },
-    { notify: async ({ recipients, reference, subject }) => {
+  const successIp = `prompt3b-success-${Date.now()}`; const contactResult = await submitContactEnquiry(
+    { tenant, ipAddress: successIp, hostname: fixtureHostname, value: { name: "QA Member", email: "qa@example.com", phone: "6797000000", subject: "Membership", message: "A safe enquiry for the QA inbox.", privacyAcknowledged: true, website: "", turnstileToken: "qa-dummy-token" } },
+    { verifyTurnstile: async () => true, notify: async ({ recipients, reference, subject }) => {
       const [persisted, audit] = await Promise.all([
         db.contactSubmission.findFirst({ where: { tenantId: tenant.id, reference } }),
         db.auditLog.findFirst({ where: { tenantId: tenant.id, targetId: reference, action: "CONTACT_ENQUIRY_RECEIVED" } }),
@@ -176,6 +183,9 @@ async function assertRejects(fn: () => Promise<unknown>, message: string) {
 
 async function main() {
   assertQaExecutionSafe();
+  process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY = "qa-test-site-key";
+  process.env.TURNSTILE_SECRET_KEY = "qa-test-secret-key";
+  mutableEnvironment.NODE_ENV = "test";
   let failure: unknown;
   const cleanupErrors: string[] = [];
   try {
@@ -185,7 +195,6 @@ async function main() {
   } finally {
     const attempt = async (label: string, fn: () => Promise<unknown>) => { try { await fn(); } catch (error) { cleanupErrors.push(`${label}: ${error instanceof Error ? error.message : String(error)}`); } };
     await attempt("contacts", () => db.contactSubmission.deleteMany({ where: { id: { in: [...qaContactIds] } } }));
-    await attempt("rate limits", () => db.contactRateLimit.deleteMany({ where: { key: { in: [...qaRateKeys] } } }));
     if (fixtureTenantId) {
       const [auditRows, draftRows, formRows, mediaRows, membershipRows, pageRows, domainRows, contactRows, rateRows] = await Promise.all([
         db.auditLog.findMany({ where: { tenantId: fixtureTenantId }, select: { id: true } }),
@@ -215,6 +224,9 @@ async function main() {
       await attempt("tenant", () => db.tenant.delete({ where: { id: fixtureTenantId } }));
     }
     await attempt("users", () => fixtureActorIds.size ? db.user.deleteMany({ where: { id: { in: [...fixtureActorIds] } } }) : Promise.resolve());
+    if (previousTurnstileSiteKey === undefined) delete process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY; else process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY = previousTurnstileSiteKey;
+    if (previousTurnstileSecretKey === undefined) delete process.env.TURNSTILE_SECRET_KEY; else process.env.TURNSTILE_SECRET_KEY = previousTurnstileSecretKey;
+    if (previousNodeEnv === undefined) delete mutableEnvironment.NODE_ENV; else mutableEnvironment.NODE_ENV = previousNodeEnv;
   }
   if (failure) { if (cleanupErrors.length) console.error(JSON.stringify({ cleanupErrors })); throw failure; }
   if (cleanupErrors.length) throw new Error(`Cleanup failures: ${cleanupErrors.join("; ")}`);

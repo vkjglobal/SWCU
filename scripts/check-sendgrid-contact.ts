@@ -89,6 +89,10 @@ await notifyContact(
 check((JSON.parse(defaultNameBody) as { from: { name: string } }).from.name === "SWCU Website", "sender name defaults safely");
 
 assertQaExecutionSafe();
+const priorTurnstileSite = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+const priorTurnstileSecret = process.env.TURNSTILE_SECRET_KEY;
+process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY = "qa-test-site-key";
+process.env.TURNSTILE_SECRET_KEY = "qa-test-secret-key";
 const fixtureSuffix = Date.now().toString(36);
 const fixtureSlug = `sendgrid-contact-${fixtureSuffix}`;
 const fixtureIp = `sendgrid-contact-${fixtureSuffix}`;
@@ -129,9 +133,11 @@ try {
         message: "Private QA enquiry.",
         privacyAcknowledged: true,
         website: "",
+        turnstileToken: "qa-test-token",
       },
     },
     {
+      verifyTurnstile: async () => true,
       notify: async ({ recipients, reference, subject }) => {
         notificationAttempted = true;
         const [persisted, audit] = await Promise.all([
@@ -160,9 +166,10 @@ try {
         message: "Another private QA enquiry.",
         privacyAcknowledged: true,
         website: "",
+        turnstileToken: "qa-test-token",
       },
     },
-    { notify: async () => { throw new Error("unexpected notifier failure"); } },
+    { verifyTurnstile: async () => true, notify: async () => { throw new Error("unexpected notifier failure"); } },
   );
   check(throwingResult.notification.status === "FAILED", "unexpected notifier exception is isolated as failed");
   const [throwingSubmission, throwingAudit] = await Promise.all([
@@ -178,6 +185,10 @@ try {
   await db.contactSettings.deleteMany({ where: { tenantId: tenant.id } });
   await db.tenant.delete({ where: { id: tenant.id } });
   await db.$disconnect();
+  if (priorTurnstileSite === undefined) delete process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+  else process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY = priorTurnstileSite;
+  if (priorTurnstileSecret === undefined) delete process.env.TURNSTILE_SECRET_KEY;
+  else process.env.TURNSTILE_SECRET_KEY = priorTurnstileSecret;
 }
 
 console.info(JSON.stringify({ script: "check-sendgrid-contact", assertions }));
