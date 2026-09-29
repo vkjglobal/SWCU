@@ -20,8 +20,8 @@ export default async function HomePage() {
       }))}
       memberApp={{
         enabled: data.homeSettings?.memberAppEnabled ?? true,
-        label: data.homeSettings?.memberAppLabel ?? "Member App — Coming Soon",
-        href: getMemberAppHref(data.tenantSettings),
+        label: data.homeSettings?.memberAppLabel && !/coming soon/i.test(data.homeSettings.memberAppLabel) ? data.homeSettings.memberAppLabel : "Open Member App",
+        href: getMemberAppHref(),
       }}
       calculator={{
         enabled: data.calculatorSettings?.isEnabled ?? false,

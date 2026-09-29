@@ -8,6 +8,7 @@ import type { ReactNode } from "react";
 import type { FormEvent } from "react";
 import { sanitizeRichText } from "@/lib/rich-text";
 import { formatLocalTelephone, formatTelephone, telephoneHref } from "@/lib/public-links";
+import { MemberLoginAction } from "@/components/member-login-action";
 
 type TurnstileApi = {
   render: (container: HTMLElement, options: {
@@ -51,7 +52,7 @@ function loadTurnstile(): Promise<TurnstileApi> {
   return turnstileScriptPromise;
 }
 
-export function PublicHeader({ memberAppHref = "/member-login" }: { memberAppHref?: string }) {
+export function PublicHeader({ memberAppHref }: { memberAppHref: string | null }) {
   const [open, setOpen] = useState(false);
   const links = [
     ["/", "Home"], ["/about-swcu", "About SWCU"], ["/membership-services", "Membership & Services"],
@@ -61,17 +62,17 @@ export function PublicHeader({ memberAppHref = "/member-login" }: { memberAppHre
     <div className="site-container flex min-h-20 min-w-0 items-center gap-2 py-2 sm:gap-4">
       <Link href="/" aria-label="SWCU home" className="shrink-0"><Image src="/brand/swcu/swcu-logo-transparent.png" alt="Service Worker Credit Union" width={165} height={116} priority className="h-auto w-[114px] sm:w-[145px]"/></Link>
       <nav className="ml-auto hidden items-center gap-1 xl:flex" aria-label="Main navigation">{links.map(([href, label]) => <Link key={href} href={href} className="rounded-md px-3 py-2 text-sm font-semibold text-charcoal hover:text-swcu-blue">{label}</Link>)}</nav>
-       <div className="ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2 xl:ml-3"><Link href="/membership-services#membership" className="header-join button-secondary">Join SWCU</Link><Link href={memberAppHref} className="button-primary header-member-login whitespace-nowrap">Member Login</Link><button type="button" className="grid size-11 shrink-0 place-items-center rounded-lg border border-deep-navy/15 text-deep-navy sm:size-12 xl:hidden" aria-expanded={open} aria-controls="mobile-navigation" aria-label={open ? "Close menu" : "Open menu"} onClick={() => setOpen(!open)}>{open ? <X/> : <Menu/>}</button></div>
+       <div className="ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2 xl:ml-3"><Link href="/membership-services#membership" className="header-join button-secondary">Join SWCU</Link><MemberLoginAction href={memberAppHref} className="button-primary header-member-login whitespace-nowrap">Member Login</MemberLoginAction><button type="button" className="grid size-11 shrink-0 place-items-center rounded-lg border border-deep-navy/15 text-deep-navy sm:size-12 xl:hidden" aria-expanded={open} aria-controls="mobile-navigation" aria-label={open ? "Close menu" : "Open menu"} onClick={() => setOpen(!open)}>{open ? <X/> : <Menu/>}</button></div>
     </div>
     {open && <nav id="mobile-navigation" className="site-container border-t border-deep-navy/10 py-4 xl:hidden" aria-label="Mobile navigation"><div className="grid gap-1">{links.map(([href, label]) => <Link key={href} href={href} onClick={() => setOpen(false)} className="rounded-lg px-3 py-3 font-semibold text-charcoal">{label}</Link>)}<Link href="/membership-services#membership" onClick={() => setOpen(false)} className="mt-2 rounded-lg border border-swcu-blue px-3 py-3 font-semibold text-swcu-blue">Join SWCU</Link></div></nav>}
   </header>;
 }
 
-export function MobileQuickActions({ phone, memberAppHref = "/member-login" }: { phone?: string | null; memberAppHref?: string }) {
+export function MobileQuickActions({ phone, memberAppHref }: { phone?: string | null; memberAppHref: string | null }) {
   const [visible, setVisible] = useState(false);
   useEffect(() => { const onScroll = () => setVisible(window.scrollY > 420); window.addEventListener("scroll", onScroll, { passive: true }); onScroll(); return () => window.removeEventListener("scroll", onScroll); }, []);
   if (!visible) return null;
-   return <div className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-3 border-t border-deep-navy/15 bg-white/95 px-2 pt-2 pb-[calc(.5rem+env(safe-area-inset-bottom))] shadow-[0_-8px_25px_rgba(22,59,92,.12)] backdrop-blur md:hidden" role="navigation" aria-label="Quick actions"><Link href="/membership-services#membership" aria-label="Join Service Worker Credit Union" className="grid min-h-11 place-items-center gap-0.5 rounded-md text-center text-[0.68rem] font-bold text-swcu-blue"><UserRound size={18} aria-hidden="true"/><span>Join</span></Link><Link href={memberAppHref} aria-label="Sign in to Member Login" className="grid min-h-11 place-items-center gap-0.5 border-x border-deep-navy/10 text-center text-[0.68rem] font-bold text-swcu-blue"><LogIn size={18} aria-hidden="true"/><span>Login</span></Link>{phone ? <a href={telephoneHref(phone)} aria-label={`Call SWCU at ${formatTelephone(phone)}`} className="grid min-h-11 place-items-center gap-0.5 rounded-md text-center text-[0.68rem] font-bold text-swcu-blue"><Phone size={18} aria-hidden="true"/><span>Call</span></a> : <Link href="/contact" aria-label="Contact Service Worker Credit Union" className="grid min-h-11 place-items-center gap-0.5 rounded-md text-center text-[0.68rem] font-bold text-swcu-blue"><MessageCircle size={18} aria-hidden="true"/><span>Contact</span></Link>}</div>;
+   return <div className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-3 border-t border-deep-navy/15 bg-white/95 px-2 pt-2 pb-[calc(.5rem+env(safe-area-inset-bottom))] shadow-[0_-8px_25px_rgba(22,59,92,.12)] backdrop-blur md:hidden" role="navigation" aria-label="Quick actions"><Link href="/membership-services#membership" aria-label="Join Service Worker Credit Union" className="grid min-h-11 place-items-center gap-0.5 rounded-md text-center text-[0.68rem] font-bold text-swcu-blue"><UserRound size={18} aria-hidden="true"/><span>Join</span></Link><MemberLoginAction href={memberAppHref} ariaLabel="Sign in to Member Login" className="grid min-h-11 place-items-center gap-0.5 border-x border-deep-navy/10 text-center text-[0.68rem] font-bold text-swcu-blue"><LogIn size={18} aria-hidden="true"/><span>Login</span></MemberLoginAction>{phone ? <a href={telephoneHref(phone)} aria-label={`Call SWCU at ${formatTelephone(phone)}`} className="grid min-h-11 place-items-center gap-0.5 rounded-md text-center text-[0.68rem] font-bold text-swcu-blue"><Phone size={18} aria-hidden="true"/><span>Call</span></a> : <Link href="/contact" aria-label="Contact Service Worker Credit Union" className="grid min-h-11 place-items-center gap-0.5 rounded-md text-center text-[0.68rem] font-bold text-swcu-blue"><MessageCircle size={18} aria-hidden="true"/><span>Contact</span></Link>}</div>;
 }
 
 export function InnerHero({ eyebrow, title, summary }: { eyebrow?: string; title: string; summary?: string }) {

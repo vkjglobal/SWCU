@@ -5,6 +5,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { getMemberAppHref } from "@/lib/public-links";
+import { MemberLoginAction } from "@/components/member-login-action";
 
 const links = [
   { href: "/", label: "Home" },
@@ -75,9 +77,9 @@ export function SiteHeader() {
               Join SWCU
             </Link>
           </div>
-          <Link href="/member-login" className="button-primary header-member-login">
+          <MemberLoginAction href={getMemberAppHref()} className="button-primary header-member-login">
             Member Login
-          </Link>
+          </MemberLoginAction>
           <button
             type="button"
             className="grid size-12 place-items-center rounded-lg border border-deep-navy/15 text-deep-navy xl:hidden"

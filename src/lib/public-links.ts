@@ -1,10 +1,14 @@
-export const MEMBER_APP_HOLDING_PATH = "/member-login";
-
-export function getMemberAppHref(settings?: { memberAppStatus?: string | null; memberAppUrl?: string | null } | null) {
-  if (settings?.memberAppStatus?.toUpperCase() === "LIVE") {
-    return "https://app.swcu.finance";
+export function getMemberAppHref(baseUrl: string | undefined = process.env.NEXT_PUBLIC_MEMBER_APP_URL): string | null {
+  if (!baseUrl?.trim()) return null;
+  try {
+    const url = new URL(baseUrl.trim());
+    // Only a secure base URL is accepted; never redirect to an arbitrary path or scheme.
+    if (url.protocol !== "https:" || !url.hostname || url.username || url.password ||
+        url.search || url.hash || !/^\/+$/.test(url.pathname)) return null;
+    return `${url.origin}/login`;
+  } catch {
+    return null;
   }
-  return MEMBER_APP_HOLDING_PATH;
 }
 
 export function formatTelephone(value: string) {

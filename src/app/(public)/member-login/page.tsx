@@ -1,24 +1,20 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { redirect } from "next/navigation";
+import { getMemberAppHref } from "@/lib/public-links";
 
 export const metadata: Metadata = {
-  title: { absolute: "Member App Coming Soon" },
+  title: { absolute: "Member Login" },
   robots: { index: false, follow: false },
 };
 
 export default function MemberLoginPage() {
+  const href = getMemberAppHref();
+  if (href) redirect(href);
   return (
     <section className="route-placeholder">
       <div className="site-container">
-        <p className="eyebrow">Member App</p>
-        <h1>Your SWCU. Wherever you are.</h1>
-        <p className="max-w-2xl text-lg">
-          The SWCU Member App is coming soon. Until then, you can use this website
-          for SWCU information, forms and contact details.
-        </p>
-        <Link href="/" className="button-primary mt-7">
-          Return to the SWCU website
-        </Link>
+        <h1>Member login temporarily unavailable</h1>
+        <p className="max-w-2xl text-lg">Please try again later or contact SWCU for assistance.</p>
       </div>
     </section>
   );

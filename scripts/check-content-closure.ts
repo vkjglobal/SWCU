@@ -48,7 +48,7 @@ async function main() {
     "Actual repayments, terms and loan approval",
     "Become an SWCU Member",
     "Your SWCU. Wherever You Are.",
-    "Member App — Coming Soon",
+    "Member App",
     "Help & Resources",
     "How Can We Help?",
   ]) check(home.includes(required), `Home includes: ${required}`);
@@ -85,7 +85,8 @@ async function main() {
 
   check(contact.includes('title="Contact SWCU"'), "Contact uses approved page title");
   check(contact.includes("The contact form is temporarily unavailable. Please use the contact details on this page to reach SWCU."), "Contact uses approved privacy fallback");
-  check(memberLogin.includes("The SWCU Member App is coming soon. Until then, you can use this website"), "Member Login uses owner-approved wording");
+  check(memberLogin.includes("redirect(href)") && !memberLogin.toLowerCase().includes("coming soon"), "Old Member Login holding page redirects or shows a safe unavailable state");
+  check(!home.toLowerCase().includes("coming soon"), "Home no longer advertises the Member App as coming soon");
   check(memberLogin.includes("index: false, follow: false"), "Member Login remains no-indexed");
   check(shell.includes('<span className="block">Save with confidence. Borrow with purpose.</span><span className="block">A member-owned credit union in Fiji.</span>'), "Footer uses the exact approved wording on two separate lines");
   check(utility.includes("Information from Service Worker Credit Union."), "Utility metadata uses approved generic description");
